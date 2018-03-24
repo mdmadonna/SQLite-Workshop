@@ -1,0 +1,459 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace SQLiteWorkshop
+{
+    enum SQLType
+    {
+        SQLGenCreate,
+        SQLGenDropAndCreate,
+        SQLGenDrop,
+        SQLGenSelect,
+        SQLGenInsert,
+        SQLGenUpdate,
+        SQLGenDelete,
+        SQLSelect1000,
+        SQLTruncate,
+        SQLDrop,
+        SQLRename,
+        SQLCompress,
+        SQLEncrypt,
+        SQLIntegrityCheck,
+        SQLBackup,
+        SQLClone,
+        SQLGenIndex,
+        SQLGenAllIndexes,
+        SQLDeleteIndex,
+        SQLDeleteAllIndexes,
+        SQLRebuildIndex,
+        SQLRebuildAllIndexes,
+        SQLCreateView,
+        SQLEditView,
+        SQLDeleteView,
+        SQLSelect1000View,
+        SQLGenViewCreate,
+        SQLCreateTrigger,
+        SQLEditTrigger,
+        SQLGenTriggerCreate,
+        SQLDeleteTrigger,
+        SQLAddColumn,
+        SQLDeleteColumn,
+        SQLRenameColumn,
+        SQLModifyColumn,
+        SQLNewQuery
+    }
+
+    class Common
+    {
+        #region Constants
+        internal const string APPNAME                   = "SQLite Workshop";
+
+        internal const string NOTIMPLEMENTED            = "This feature is not yet implemented.";
+        internal const string MSG_FILEEXISTS            = "This file already exists.  Do you want to overwrite it?";
+        internal const string ERR_FILEENTRY             = "Please enter a file name.";
+
+        internal const string OK_BACKUP                 = "Backup Ok: Database {0} copied to {1}.";
+        internal const string OK_CLONE                  = "Clone Ok: Database {0} cloned to {1}.";
+        internal const string OK_DBCREATED              = "Create Ok: Database {0} created.";
+        internal const string OK_DELINDEX               = "Delete Ok: Index {0} deleted.";
+        internal const string OK_DELALLINDEXES          = "Delete Ok: All Indexes on Table {0} deleted.";
+        internal const string OK_DELTRIGGER             = "Delete Ok: Trigger {0} deleted.";
+        internal const string OK_DELVIEW                = "Delete Ok: Index {0} deleted.";
+        internal const string OK_ENCRYPT                = "Encrypt Ok: Database {0} encrypted.";
+        internal const string OK_EXPLAIN                = "Explain executed successfully.";
+        internal const string OK_IDXCREATED             = "Create Ok: Index {0} created.";
+        internal const string OK_QUERY                  = "Query Executed Successfully.";
+        internal const string OK_RECORDSAFFECTED        = "{0} records affected.";
+        internal const string OK_REINDEX                = "Reindex Ok: Index {0} rebuilt.";
+        internal const string OK_REINDEXALL             = "Reindex Ok: All indexes on Table {0} rebuilt.";
+        internal const string OK_RENAME                 = "Rename Ok: Table {0} renamed.";
+        internal const string OK_SQL                    = "SQL Executed Successfully.";
+        internal const string OK_TBLDELETE              = "Delete Ok: Table {0} deleted.";
+        internal const string OK_VACUUM                 = "Compress Ok: Database {0} compressed.";
+        
+        #region Error Messages
+        internal const string ERR_BACKUPFAILED          = "Backup Failed: {0}\r\nSQL Error Code: {1}.";
+        internal const string ERR_BACKUPSAMEFILE        = "Source database and target database are the same file. Select a different target file.";
+        internal const string ERR_CLONEFAILED           = "Clone Failed: {0}\r\nSQL Error Code: {1}.";
+        internal const string ERR_CREATEDBFAILED        = "Create Failed: {0}\r\nSQL Error Code: {1}.";
+        internal const string ERR_CREATEIDXFAILED       = "Create Failed: {0}\r\nSQL Error Code: {1}.";
+        internal const string ERR_ENCRYPTFAILED         = "Encryption Failed: {0}\r\nSQL Error Code: {1}.";
+        internal const string ERR_EXPLAIN               = "Explain Failed: {0}\r\nSQL Error Code: {1}.";
+        internal const string ERR_EXPLAINERR            = "Explain executed with errors.";
+        internal const string ERR_FORMATERROR           = "Formatting errors were detected.  Not all rows are viewable.";
+        internal const string ERR_MULTIUPDATE           = "This update cannot be made because it would cause multiple rows to be modified.";
+        internal const string ERR_OPEN                  = "Open Error: {0}\r\nSQL Error Code: {1}.";
+        internal const string ERR_QUERY                 = "Query Executed with errors.";
+        internal const string ERR_RENAMEFAIL            = "Rename failed: {0}\r\nSQL Error Code: {1}.";
+        internal const string ERR_SQL                   = "SQL Execution Failed: {0}\r\nSQL Error Code: {1}.";
+        internal const string ERR_SQLERR                = "SQL Executed with errors.";
+        internal const string ERR_VACUUMFAIL            = "Compress failed: {0}\r\nSQL Error Code: {1}.";
+        #endregion
+
+        #endregion
+
+        #region Helper Routines
+
+        #region keywords
+        /// <summary>
+        /// List of SQLite reserved words in upper case.
+        /// </summary>
+        internal static string[] keywords = new string[] {
+            "ABORT",
+            "ACTION",
+            "ADD",
+            "AFTER",
+            "ALL",
+            "ALTER",
+            "ANALYZE",
+            "AND",
+            "AS",
+            "ASC",
+            "ATTACH",
+            "AUTOINCREMENT",
+            "BEFORE",
+            "BEGIN",
+            "BETWEEN",
+            "BY",
+            "CASCADE",
+            "CASE",
+            "CAST",
+            "CHECK",
+            "COLLATE",
+            "COLUMN",
+            "COMMIT",
+            "CONFLICT",
+            "CONSTRAINT",
+            "CREATE",
+            "CROSS",
+            "CURRENT_DATE",
+            "CURRENT_TIME",
+            "CURRENT_TIMESTAMP",
+            "DATABASE",
+            "DEFAULT",
+            "DEFERRABLE",
+            "DEFERRED",
+            "DELETE",
+            "DESC",
+            "DETACH",
+            "DISTINCT",
+            "DROP",
+            "EACH",
+            "ELSE",
+            "END",
+            "ESCAPE",
+            "EXCEPT",
+            "EXCLUSIVE",
+            "EXISTS",
+            "EXPLAIN",
+            "FAIL",
+            "FOR",
+            "FOREIGN",
+            "FROM",
+            "FULL",
+            "GLOB",
+            "GROUP",
+            "HAVING",
+            "IF",
+            "IGNORE",
+            "IMMEDIATE",
+            "IN",
+            "INDEX",
+            "INDEXED",
+            "INITIALLY",
+            "INNER",
+            "INSERT",
+            "INSTEAD",
+            "INTERSECT",
+            "INTO",
+            "IS",
+            "ISNULL",
+            "JOIN",
+            "KEY",
+            "LEFT",
+            "LIKE",
+            "LIMIT",
+            "MATCH",
+            "NATURAL",
+            "NO",
+            "NOT",
+            "NOTNULL",
+            "NULL",
+            "OF",
+            "OFFSET",
+            "ON",
+            "OR",
+            "ORDER",
+            "OUTER",
+            "PLAN",
+            "PRAGMA",
+            "PRIMARY",
+            "QUERY",
+            "RAISE",
+            "RECURSIVE",
+            "REFERENCES",
+            "REGEXP",
+            "REINDEX",
+            "RELEASE",
+            "RENAME",
+            "REPLACE",
+            "RESTRICT",
+            "RIGHT",
+            "ROLLBACK",
+            "ROW",
+            "SAVEPOINT",
+            "SELECT",
+            "SET",
+            "TABLE",
+            "TEMP",
+            "TEMPORARY",
+            "THEN",
+            "TO",
+            "TRANSACTION",
+            "TRIGGER",
+            "UNION",
+            "UNIQUE",
+            "UPDATE",
+            "USING",
+            "VACUUM",
+            "VALUES",
+            "VIEW",
+            "VIRTUAL",
+            "WHEN",
+            "WHERE",
+            "WITH",
+            "WITHOUT" };
+        #endregion
+
+        /// <summary>
+        /// Determine if a word is an SQLite reserved word.
+        /// </summary>
+        /// <param name="token">Word to check.</param>
+        /// <returns>True if the word is a reserved word, oyherwise false.</returns>
+        internal static bool IsKeyword(string token)
+        {
+            return keywords.Contains(token.ToUpper());
+        }
+
+        /// <summary>
+        /// List of characters that we won't allow in column names.
+        /// </summary>
+        static string invalidChars = "'\"@?\\%";
+
+        /// <summary>
+        /// Determine is text contains invalid characters.
+        /// </summary>
+        /// <param name="token">Text to check.</param>
+        /// <param name="chars">Invalid character found in text.</param>
+        /// <returns>True if the string contains invalid characters, otherwise false.</returns>
+        internal static bool HasInvalidChars(string token, out string chars)
+        {
+            chars = invalidChars;
+            return token.IndexOfAny(invalidChars.ToCharArray()) != -1;
+        }
+
+        /// <summary>
+        /// General purpose routine to display informative messages in a Dialog Box.
+        /// </summary>
+        /// <param name="message">Message to display.</param>
+        /// <param name="buttons">Buttons that will be displayed in the Dialog Box.</param>
+        /// <param name="icon">Icon to be diaplayed in the Dialog Box.</param>
+        /// <returns>DiaglogResult representing the button presses by the user.</returns>
+        internal static DialogResult ShowMsg(string message, MessageBoxButtons buttons = MessageBoxButtons.OK, MessageBoxIcon icon = MessageBoxIcon.Error)
+        {
+            return MessageBox.Show(message, APPNAME, buttons, icon);
+        }
+
+        /// <summary>
+        /// List of SQLite system tables.
+        /// </summary>
+        static string[] SysTables = new string[] { "sqlite_master", "sqlite_stat1", "sqlite_sequence", "sqlite_stat2", "sqlite_stat3", "sqlite_stat4" };
+
+        /// <summary>
+        /// Determine if a string (table name) is a valid SQLite system table.
+        /// </summary>
+        /// <param name="tableName">Name of the SQLite table to check.</param>
+        /// <returns>True if the name is an SQLite system table, otherwise false.</returns>
+        internal static bool IsSystemTable(string tableName)
+        {
+            return SysTables.Contains(tableName);
+        }
+
+        /// <summary>
+        /// Helper routines to determine the Universal Naming Convention(UNC) version of a file name.
+        /// This routine is used to insure a file will not be copied on top of itself.
+        /// </summary>
+        /// <param name="lpLocalPath"></param>
+        /// <param name="dwInfoLevel"></param>
+        /// <param name="lpBuffer"></param>
+        /// <param name="lpBufferSize"></param>
+        /// <returns></returns>
+        #region Get UNC
+
+        [DllImport("mpr.dll", CharSet = CharSet.Unicode)]
+        [return: MarshalAs(UnmanagedType.U4)]
+        static extern int WNetGetUniversalName(
+        string lpLocalPath,
+        [MarshalAs(UnmanagedType.U4)] int dwInfoLevel,
+        IntPtr lpBuffer,
+        [MarshalAs(UnmanagedType.U4)] ref int lpBufferSize);
+
+        const int UNIVERSAL_NAME_INFO_LEVEL = 0x00000001;
+        const int REMOTE_NAME_INFO_LEVEL = 0x00000002;
+
+        const int ERROR_MORE_DATA = 234;
+        const int NOERROR = 0;
+
+        /// <summary>
+        /// Retrieve a Universal Name for a file.  This routine will fail if a 
+        /// UNC file name or a local file name is passed.
+        /// </summary>
+        /// <param name="localPath">Local name of the file.</param>
+        /// <returns></returns>
+        internal static string GetUniversalName(string localPath)
+        {
+
+            string fileName = null;
+            IntPtr buffer = IntPtr.Zero;
+
+            try
+            {
+                int size = 0;
+                int returnCode = WNetGetUniversalName(localPath, UNIVERSAL_NAME_INFO_LEVEL, (IntPtr)IntPtr.Size, ref size);
+                if (returnCode != ERROR_MORE_DATA) return null;
+
+                buffer = Marshal.AllocCoTaskMem(size);
+                returnCode = WNetGetUniversalName(localPath, UNIVERSAL_NAME_INFO_LEVEL, buffer, ref size);
+                if (returnCode != NOERROR) return null;
+                // and pass to PtrToStringAnsi.
+                fileName = Marshal.PtrToStringAuto(new IntPtr(buffer.ToInt64() + IntPtr.Size), size);
+                fileName = fileName.Substring(0, fileName.IndexOf('\0'));
+            }
+            catch { }
+            finally
+            {  Marshal.FreeCoTaskMem(buffer); }
+            return fileName;
+        }
+        #endregion
+        #endregion
+
+        #region Type Checking
+        private static string[] TextTypes       = new string[] { "char", "nchar", "varchar", "nvarchar", "text" };
+        private static string[] IntegerTypes    = new string[] { "autoincrement", "bigint", "boolean", "int", "mediumint", "smallint", "tinyint", "unsigned" };
+        private static string[] RealTypes       = new string[] { "double", "float", "real" };
+        private static string[] BooleanTypes    = new string[] { "boolean" };
+        private static string[] NumericTypes    = new string[] { "boolean", "decimal", "numeric"};
+        private static string[] DateTypes       = new string[] { "date", "datetime" };
+        private static string[] NumberTypes     = new string[] { "bigint", "boolean", "decimal", "double", "float", "int", "mediumint", "numeric", "real", "smallint", "tinyint", "unsigned" };
+
+        /// <summary>
+        /// Determine if a column type has Text affinity.  Used to determine if column should be wrapped in quotes.
+        /// </summary>
+        /// <param name="ColType">Valid SQLite Column Type.</param>
+        /// <returns>True if the column has text affinity, False if not</returns>
+        internal static bool IsText(string ColType)
+        {
+            // Note that this routines assume all Column types are in lower case
+            foreach (string szType in TextTypes)
+            {
+                if (ColType.ToLower().StartsWith(szType.ToLower())) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Determine if a column type has Integer affinity.  
+        /// </summary>
+        /// <param name="ColType">Valid SQLite Column Type.</param>
+        /// <returns>True if the column has Integer affinity, False if not</returns>
+        internal static bool IsInteger(string ColType)
+        {
+            // Note that this routines assume all Column types are in lower case
+            foreach (string szType in IntegerTypes)
+            {
+                if (ColType.StartsWith(szType)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Determine if a column type has Real affinity.  
+        /// </summary>
+        /// <param name="ColType">Valid SQLite Column Type.</param>
+        /// <returns>True if the column has Real affinity, False if not</returns>
+        internal static bool IsReal(string ColType)
+        {
+            // Note that this routines assume all Column types are in lower case
+            foreach (string szType in RealTypes)
+            {
+                if (ColType.StartsWith(szType)) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Determine if a column type is boolean.  
+        /// </summary>
+        /// <param name="ColType">Valid SQLite Column Type.</param>
+        /// <returns>True if the column is boolean, False if not</returns>
+        internal static bool IsBoolean(string ColType)
+        {
+            // Note that this routines assume all Column types are in lower case
+            foreach (string szType in BooleanTypes)
+            {
+                if (ColType.StartsWith(szType)) return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Determine if a column type has Numeric affinity. Note that this routine excludes Boolean and Dates
+        /// </summary>
+        /// <param name="ColType">Valid SQLite Column Type.</param>
+        /// <returns>True if the column has Numeric affinity, False if not</returns>
+        internal static bool IsNumeric(string ColType)
+        {
+            // Note that this routines assume all Column types are in lower case
+            foreach (string szType in NumericTypes)
+            {
+                if (ColType.StartsWith(szType)) return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Determine if a column type is a Date type with Numeric affinity.  
+        /// </summary>
+        /// <param name="ColType">Valid SQLite Column Type.</param>
+        /// <returns>True if the column is a Date type, False if not</returns>
+        internal static bool IsDate(string ColType)
+        {
+            // Note that this routines assume all Column types are in lower case
+            foreach (string szType in DateTypes)
+            {
+                if (ColType.StartsWith(szType)) return true;
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        /// Determine if a column type has Integer, Real, or Numeric affinity.  
+        /// </summary>
+        /// <param name="ColType">Valid SQLite Column Type.</param>
+        /// <returns>True if the column has affinity to a numeric value, False if not</returns>
+        internal static bool IsNumber(string ColType)
+        {
+            // Note that this routines assume all Column types are in lower case
+            foreach (string szType in NumberTypes)
+            {
+                if (ColType.StartsWith(szType)) return true;
+            }
+            return false;
+        }
+        #endregion
+    }
+}

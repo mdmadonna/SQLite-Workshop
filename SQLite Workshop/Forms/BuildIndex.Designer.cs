@@ -1,0 +1,401 @@
+﻿namespace SQLiteWorkshop
+{
+    partial class BuildIndex
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BuildIndex));
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.panelTop = new System.Windows.Forms.Panel();
+            this.lblFormHeading = new System.Windows.Forms.Label();
+            this.pbIcon = new System.Windows.Forms.PictureBox();
+            this.panelControls = new System.Windows.Forms.Panel();
+            this.pbClose = new System.Windows.Forms.PictureBox();
+            this.panelBottom = new System.Windows.Forms.Panel();
+            this.btnClose = new System.Windows.Forms.Button();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.txtIndexName = new System.Windows.Forms.TextBox();
+            this.lblTableName = new System.Windows.Forms.Label();
+            this.dgvColumns = new System.Windows.Forms.DataGridView();
+            this.ColumnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColumnType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.label1 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.dgvIndexColumns = new System.Windows.Forms.DataGridView();
+            this.ChkUnique = new System.Windows.Forms.CheckBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtWhereClause = new System.Windows.Forms.TextBox();
+            this.btnCreate = new System.Windows.Forms.Button();
+            this.toolStripStatusLabelResult = new System.Windows.Forms.ToolStripStatusLabel();
+            this.IdxColName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColOrder = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.btnShowSQL = new System.Windows.Forms.Button();
+            this.statusStrip1.SuspendLayout();
+            this.panelTop.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
+            this.panelControls.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbClose)).BeginInit();
+            this.panelBottom.SuspendLayout();
+            this.panel1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).BeginInit();
+            this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvIndexColumns)).BeginInit();
+            this.SuspendLayout();
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripStatusLabelResult});
+            this.statusStrip1.Location = new System.Drawing.Point(1, 522);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(792, 22);
+            this.statusStrip1.TabIndex = 0;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // panelTop
+            // 
+            this.panelTop.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.panelTop.Controls.Add(this.lblFormHeading);
+            this.panelTop.Controls.Add(this.pbIcon);
+            this.panelTop.Controls.Add(this.panelControls);
+            this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTop.Location = new System.Drawing.Point(1, 1);
+            this.panelTop.Name = "panelTop";
+            this.panelTop.Size = new System.Drawing.Size(792, 28);
+            this.panelTop.TabIndex = 1;
+            this.panelTop.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MainForm_MouseDown);
+            // 
+            // lblFormHeading
+            // 
+            this.lblFormHeading.AutoSize = true;
+            this.lblFormHeading.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblFormHeading.ForeColor = System.Drawing.Color.DimGray;
+            this.lblFormHeading.Location = new System.Drawing.Point(29, 7);
+            this.lblFormHeading.Name = "lblFormHeading";
+            this.lblFormHeading.Size = new System.Drawing.Size(121, 17);
+            this.lblFormHeading.TabIndex = 5;
+            this.lblFormHeading.Text = "lblFormHeading";
+            // 
+            // pbIcon
+            // 
+            this.pbIcon.Image = ((System.Drawing.Image)(resources.GetObject("pbIcon.Image")));
+            this.pbIcon.Location = new System.Drawing.Point(3, 3);
+            this.pbIcon.Name = "pbIcon";
+            this.pbIcon.Size = new System.Drawing.Size(24, 24);
+            this.pbIcon.TabIndex = 4;
+            this.pbIcon.TabStop = false;
+            // 
+            // panelControls
+            // 
+            this.panelControls.Controls.Add(this.pbClose);
+            this.panelControls.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panelControls.Location = new System.Drawing.Point(669, 0);
+            this.panelControls.Name = "panelControls";
+            this.panelControls.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
+            this.panelControls.Size = new System.Drawing.Size(123, 28);
+            this.panelControls.TabIndex = 3;
+            // 
+            // pbClose
+            // 
+            this.pbClose.Dock = System.Windows.Forms.DockStyle.Right;
+            this.pbClose.Image = ((System.Drawing.Image)(resources.GetObject("pbClose.Image")));
+            this.pbClose.Location = new System.Drawing.Point(89, 0);
+            this.pbClose.Margin = new System.Windows.Forms.Padding(0);
+            this.pbClose.Name = "pbClose";
+            this.pbClose.Size = new System.Drawing.Size(24, 28);
+            this.pbClose.TabIndex = 11;
+            this.pbClose.TabStop = false;
+            this.pbClose.Click += new System.EventHandler(this.pbClose_Click);
+            this.pbClose.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ControlBox_MouseDown);
+            this.pbClose.MouseEnter += new System.EventHandler(this.ControlBox_MouseEnter);
+            this.pbClose.MouseLeave += new System.EventHandler(this.ControlBox_MouseLeave);
+            this.pbClose.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ControlBox_MouseUp);
+            // 
+            // panelBottom
+            // 
+            this.panelBottom.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.panelBottom.Controls.Add(this.btnShowSQL);
+            this.panelBottom.Controls.Add(this.btnCreate);
+            this.panelBottom.Controls.Add(this.btnClose);
+            this.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panelBottom.Location = new System.Drawing.Point(1, 483);
+            this.panelBottom.Name = "panelBottom";
+            this.panelBottom.Size = new System.Drawing.Size(792, 39);
+            this.panelBottom.TabIndex = 2;
+            // 
+            // btnClose
+            // 
+            this.btnClose.Location = new System.Drawing.Point(692, 6);
+            this.btnClose.Name = "btnClose";
+            this.btnClose.Size = new System.Drawing.Size(75, 23);
+            this.btnClose.TabIndex = 0;
+            this.btnClose.Text = "Close";
+            this.btnClose.UseVisualStyleBackColor = true;
+            this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.Window;
+            this.panel1.Controls.Add(this.txtWhereClause);
+            this.panel1.Controls.Add(this.label3);
+            this.panel1.Controls.Add(this.ChkUnique);
+            this.panel1.Controls.Add(this.dgvIndexColumns);
+            this.panel1.Controls.Add(this.panel2);
+            this.panel1.Controls.Add(this.lblTableName);
+            this.panel1.Controls.Add(this.txtIndexName);
+            this.panel1.Controls.Add(this.label2);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panel1.Location = new System.Drawing.Point(1, 29);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(792, 454);
+            this.panel1.TabIndex = 3;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(35, 46);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(67, 13);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Index Name:";
+            // 
+            // txtIndexName
+            // 
+            this.txtIndexName.Location = new System.Drawing.Point(109, 46);
+            this.txtIndexName.Name = "txtIndexName";
+            this.txtIndexName.Size = new System.Drawing.Size(198, 20);
+            this.txtIndexName.TabIndex = 2;
+            // 
+            // lblTableName
+            // 
+            this.lblTableName.AutoSize = true;
+            this.lblTableName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTableName.ForeColor = System.Drawing.Color.DimGray;
+            this.lblTableName.Location = new System.Drawing.Point(29, 17);
+            this.lblTableName.Name = "lblTableName";
+            this.lblTableName.Size = new System.Drawing.Size(95, 16);
+            this.lblTableName.TabIndex = 5;
+            this.lblTableName.Text = "lblTableName";
+            // 
+            // dgvColumns
+            // 
+            this.dgvColumns.BackgroundColor = System.Drawing.SystemColors.Window;
+            this.dgvColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvColumns.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ColumnName,
+            this.ColumnType});
+            this.dgvColumns.Location = new System.Drawing.Point(19, 44);
+            this.dgvColumns.MultiSelect = false;
+            this.dgvColumns.Name = "dgvColumns";
+            this.dgvColumns.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvColumns.Size = new System.Drawing.Size(394, 305);
+            this.dgvColumns.TabIndex = 6;
+            this.dgvColumns.DoubleClick += new System.EventHandler(this.dgvColumns_DoubleClick);
+            // 
+            // ColumnName
+            // 
+            this.ColumnName.HeaderText = "Column";
+            this.ColumnName.Name = "ColumnName";
+            this.ColumnName.ReadOnly = true;
+            this.ColumnName.Width = 180;
+            // 
+            // ColumnType
+            // 
+            this.ColumnType.HeaderText = "Data Type";
+            this.ColumnType.Name = "ColumnType";
+            this.ColumnType.ReadOnly = true;
+            this.ColumnType.Width = 150;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(16, 10);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(217, 13);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Double Click Columns to include in the Index";
+            // 
+            // panel2
+            // 
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.label1);
+            this.panel2.Controls.Add(this.dgvColumns);
+            this.panel2.Location = new System.Drawing.Point(335, 6);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(432, 381);
+            this.panel2.TabIndex = 8;
+            // 
+            // dgvIndexColumns
+            // 
+            this.dgvIndexColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvIndexColumns.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.IdxColName,
+            this.ColOrder});
+            this.dgvIndexColumns.Location = new System.Drawing.Point(41, 121);
+            this.dgvIndexColumns.MultiSelect = false;
+            this.dgvIndexColumns.Name = "dgvIndexColumns";
+            this.dgvIndexColumns.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvIndexColumns.Size = new System.Drawing.Size(266, 266);
+            this.dgvIndexColumns.TabIndex = 9;
+            this.dgvIndexColumns.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dgvIndexColumns_MouseDown);
+            // 
+            // ChkUnique
+            // 
+            this.ChkUnique.AutoSize = true;
+            this.ChkUnique.Location = new System.Drawing.Point(41, 86);
+            this.ChkUnique.Name = "ChkUnique";
+            this.ChkUnique.Size = new System.Drawing.Size(60, 17);
+            this.ChkUnique.TabIndex = 10;
+            this.ChkUnique.Text = "Unique";
+            this.ChkUnique.UseVisualStyleBackColor = true;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(41, 412);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(42, 13);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Where:";
+            // 
+            // txtWhereClause
+            // 
+            this.txtWhereClause.Location = new System.Drawing.Point(82, 409);
+            this.txtWhereClause.Name = "txtWhereClause";
+            this.txtWhereClause.Size = new System.Drawing.Size(685, 20);
+            this.txtWhereClause.TabIndex = 12;
+            // 
+            // btnCreate
+            // 
+            this.btnCreate.Location = new System.Drawing.Point(485, 6);
+            this.btnCreate.Name = "btnCreate";
+            this.btnCreate.Size = new System.Drawing.Size(75, 23);
+            this.btnCreate.TabIndex = 1;
+            this.btnCreate.Text = "Create";
+            this.btnCreate.UseVisualStyleBackColor = true;
+            this.btnCreate.Click += new System.EventHandler(this.btnCreate_Click);
+            // 
+            // toolStripStatusLabelResult
+            // 
+            this.toolStripStatusLabelResult.Name = "toolStripStatusLabelResult";
+            this.toolStripStatusLabelResult.Size = new System.Drawing.Size(118, 17);
+            this.toolStripStatusLabelResult.Text = "toolStripStatusLabel1";
+            // 
+            // IdxColName
+            // 
+            this.IdxColName.HeaderText = "Column Name";
+            this.IdxColName.Name = "IdxColName";
+            this.IdxColName.ReadOnly = true;
+            this.IdxColName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // ColOrder
+            // 
+            this.ColOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ColOrder.HeaderText = "Sort Order";
+            this.ColOrder.Items.AddRange(new object[] {
+            "Ascending",
+            "Descending"});
+            this.ColOrder.Name = "ColOrder";
+            this.ColOrder.ReadOnly = true;
+            // 
+            // btnShowSQL
+            // 
+            this.btnShowSQL.Location = new System.Drawing.Point(578, 6);
+            this.btnShowSQL.Name = "btnShowSQL";
+            this.btnShowSQL.Size = new System.Drawing.Size(96, 23);
+            this.btnShowSQL.TabIndex = 4;
+            this.btnShowSQL.Text = "Show SQL";
+            this.btnShowSQL.UseVisualStyleBackColor = true;
+            this.btnShowSQL.Click += new System.EventHandler(this.btnShowSQL_Click);
+            // 
+            // BuildIndex
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(50)))));
+            this.ClientSize = new System.Drawing.Size(794, 545);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.panelBottom);
+            this.Controls.Add(this.panelTop);
+            this.Controls.Add(this.statusStrip1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "BuildIndex";
+            this.Padding = new System.Windows.Forms.Padding(1);
+            this.Text = "BuildIndex";
+            this.Load += new System.EventHandler(this.BuildIndex_Load);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
+            this.panelTop.ResumeLayout(false);
+            this.panelTop.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();
+            this.panelControls.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pbClose)).EndInit();
+            this.panelBottom.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).EndInit();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvIndexColumns)).EndInit();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.Panel panelTop;
+        private System.Windows.Forms.Panel panelControls;
+        private System.Windows.Forms.PictureBox pbClose;
+        private System.Windows.Forms.PictureBox pbIcon;
+        private System.Windows.Forms.Label lblFormHeading;
+        private System.Windows.Forms.Panel panelBottom;
+        private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.TextBox txtIndexName;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label lblTableName;
+        private System.Windows.Forms.DataGridView dgvColumns;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnType;
+        private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelResult;
+        private System.Windows.Forms.Button btnCreate;
+        private System.Windows.Forms.TextBox txtWhereClause;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.CheckBox ChkUnique;
+        private System.Windows.Forms.DataGridView dgvIndexColumns;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn IdxColName;
+        private System.Windows.Forms.DataGridViewComboBoxColumn ColOrder;
+        private System.Windows.Forms.Button btnShowSQL;
+    }
+}

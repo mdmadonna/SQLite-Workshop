@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EAEA7527-CB91-45B7-81EB-570D7BD59676}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>SQLiteWorkshop</RootNamespace>
+    <AssemblyName>SQLite Workshop</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>x64</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Main.ico</ApplicationIcon>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data.SQLite, Version=1.0.99.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\DLL\SQLite 1.0.108.0\Mixed\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AboutBox.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutBox.Designer.cs">
+      <DependentUpon>AboutBox.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\ColumnPropertySettings.cs" />
+    <Compile Include="Classes\Common.cs" />
+    <Compile Include="Classes\DBManager.cs" />
+    <Compile Include="Classes\DBMySqlManager.cs" />
+    <Compile Include="Classes\DBSQLiteManager.cs" />
+    <Compile Include="Classes\DBSqlServerManager.cs" />
+    <Compile Include="Classes\DBTextManager.cs" />
+    <Compile Include="Classes\DBOdbcManager.cs" />
+    <Compile Include="Classes\ImportWizTextPropertySettings.cs" />
+    <Compile Include="Classes\DBMSAccessManager.cs" />
+    <Compile Include="Classes\SqlFactory.cs" />
+    <Compile Include="Classes\TableEditorTab.cs" />
+    <Compile Include="Classes\Timers.cs" />
+    <Compile Include="Controls\DBEditorTabControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\DBEditorTabControl.Designer.cs">
+      <DependentUpon>DBEditorTabControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\TableEditorPropertySettings.cs" />
+    <Compile Include="Controls\TableEditorTabControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TableEditorTabControl.Designer.cs">
+      <DependentUpon>TableEditorTabControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\DBEditorTab.cs" />
+    <Compile Include="Controls\SqlTabControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SqlTabControl.designer.cs">
+      <DependentUpon>SqlTabControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Classes\DataAccess.cs" />
+    <Compile Include="Forms\ExecuteForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ExecuteForm.Designer.cs">
+      <DependentUpon>ExecuteForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\GetPassword.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\GetPassword.Designer.cs">
+      <DependentUpon>GetPassword.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\DBProperties.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\DBProperties.Designer.cs">
+      <DependentUpon>DBProperties.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ImportWiz.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ImportWiz.Designer.cs">
+      <DependentUpon>ImportWiz.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\ShowSQL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ShowSQL.Designer.cs">
+      <DependentUpon>ShowSQL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\BuildIndex.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\BuildIndex.Designer.cs">
+      <DependentUpon>BuildIndex.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\BuildColumn.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\BuildColumn.Designer.cs">
+      <DependentUpon>BuildColumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\Template.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Template.Designer.cs">
+      <DependentUpon>Template.cs</DependentUpon>
+    </Compile>
+    <Compile Include="MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Classes\SqlTab.cs" />
+    <EmbeddedResource Include="AboutBox.resx">
+      <DependentUpon>AboutBox.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\DBEditorTabControl.resx">
+      <DependentUpon>DBEditorTabControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SqlTabControl.resx">
+      <DependentUpon>SqlTabControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TableEditorTabControl.resx">
+      <DependentUpon>TableEditorTabControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\DBProperties.resx">
+      <DependentUpon>DBProperties.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ExecuteForm.resx">
+      <DependentUpon>ExecuteForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\GetPassword.resx">
+      <DependentUpon>GetPassword.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ImportWiz.resx">
+      <DependentUpon>ImportWiz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ShowSQL.resx">
+      <DependentUpon>ShowSQL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\BuildIndex.resx">
+      <DependentUpon>BuildIndex.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\BuildColumn.resx">
+      <DependentUpon>BuildColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Template.resx">
+      <DependentUpon>Template.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\Close.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\Maximize.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\Minimize.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\Restore.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\SmallClose.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\database.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\folder.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\column.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\index.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\server.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\table.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\view.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\SmallWhiteClose.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\MainSmall.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="assets\DB New.png" />
+    <None Include="assets\DB Open.png" />
+    <None Include="assets\Encrypt.png" />
+    <None Include="assets\DB Compress.png" />
+    <None Include="assets\Execute.png" />
+    <None Include="assets\CancelExecution.png" />
+    <None Include="assets\Explain Plan.png" />
+    <None Include="assets\Explain.png" />
+    <None Include="assets\Integrity.png" />
+    <None Include="assets\Data-Export.png" />
+    <None Include="assets\Data-Import.png" />
+    <None Include="assets\Export.png" />
+    <None Include="assets\Import.png" />
+    <None Include="assets\Parse.png" />
+    <None Include="assets\NewTable.png" />
+    <None Include="assets\Properties.png" />
+    <None Include="assets\New Query.png" />
+    <None Include="assets\Trigger.png" />
+    <Content Include="Main.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
