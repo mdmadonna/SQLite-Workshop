@@ -54,7 +54,7 @@ namespace SQLiteWorkshop
             this.DoubleBuffered = true;
             this.SetStyle(ControlStyles.ResizeRedraw, true);
             tabMain.Visible = false;
-            toolStripStatusDBName.Text = string.Empty;
+            toolStripStatusMain.Text = string.Empty;
 
             lblFormHeading.Text = Common.APPNAME;
             dbContextMenu = new ContextMenu();
@@ -153,6 +153,8 @@ namespace SQLiteWorkshop
             vwContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Select Top 1000 Rows", vwContextMenu_Clicked, vwContextMenu_Popup, vwContextMenu_Selected, null));
             vwContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Script View", vwContextMenu_Clicked, vwContextMenu_Popup, vwContextMenu_Selected, null));
             vwContextMenu.MenuItems.Add(new MenuItem("-"));
+            vwContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Export View", vwContextMenu_Clicked, vwContextMenu_Popup, vwContextMenu_Selected, null));
+            vwContextMenu.MenuItems.Add(new MenuItem("-"));
             vwContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Delete View", vwContextMenu_Clicked, vwContextMenu_Popup, vwContextMenu_Selected, null));
 
             // Context Menu for Trigger Parent Entry
@@ -180,6 +182,49 @@ namespace SQLiteWorkshop
 
         #endregion
 
+        #region Form Management
+
+        /// <summary>
+        /// Read key GUI cues to make the program appear the same as it did at last closing.
+        /// </summary>
+        private void InitializeFormGUI()
+        {
+            int parm;
+            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FTOP), out parm)) this.Top = parm;
+            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FLEFT), out parm)) this.Left = parm;
+            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FHEIGHT), out parm)) this.Height = parm;
+            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FWIDTH), out parm)) this.Width = parm;
+            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_VSPLITP), out parm)) vSplitter.SplitPosition = parm;
+
+            string RecentDBList = cfg.appsetting(Config.CFG_RECENTDB);
+            if (!string.IsNullOrEmpty(RecentDBList))
+            {
+                string[] rDBs = RecentDBList.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < rDBs.Length; i++)
+                {
+                    RecentDBs.Add(rDBs[i]);
+                }
+                InitToolStripOpenDropDown(RecentDBs);
+
+            }
+        }
+
+        /// <summary>
+        /// Save key GUI cues to be used at next program execution.
+        /// </summary>
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            cfg.SetSetting(Config.CFG_FTOP, this.Top.ToString());
+            cfg.SetSetting(Config.CFG_FLEFT, this.Left.ToString());
+            cfg.SetSetting(Config.CFG_FHEIGHT, this.Height.ToString());
+            cfg.SetSetting(Config.CFG_FWIDTH, this.Width.ToString());
+            cfg.SetSetting(Config.CFG_VSPLITP, vSplitter.SplitPosition.ToString());
+
+        }
+
+        #endregion
+
         #region Menu Handlers
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
@@ -197,12 +242,79 @@ namespace SQLiteWorkshop
             if (!string.IsNullOrEmpty(db)) LoadDB(db);
         }
 
+        private void sQLFileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(CurrentDB)) return;
+            SqlTab st = new SqlTab();
+            st.BuildTab();
+        }
+
+        private void newQuerytoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            toolStripTbNewQryWin_Click(sender, e);
+        }
+
+        private void savetoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tabMain.TabPages.Count == 0) return;
+            TabPage tb = tabMain.SelectedTab;
+            foreach (Control c in tb.Controls)
+            {
+                if (c.GetType().Equals(typeof(SqlTabControl)))
+                {
+                    ((SqlTabControl)c).SaveSql();
+                }
+            }
+        }
+
+        private void saveAstoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tabMain.TabPages.Count == 0) return;
+            TabPage tb = tabMain.SelectedTab;
+            foreach (Control c in tb.Controls)
+            {
+                if (c.GetType().Equals(typeof(SqlTabControl)))
+                {
+                    ((SqlTabControl)c).SaveSql(true);
+                }
+            }
+        }
+
+        private void saveAlltoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tabMain.TabPages.Count == 0) return;
+            foreach (TabPage tb in tabMain.TabPages)
+            {
+                foreach (Control c in tb.Controls)
+                {
+                    if (c.GetType().Equals(typeof(SqlTabControl)))
+                    {
+                        ((SqlTabControl)c).SaveSql();
+                    }
+                }
+            }
+            WriteStatusStripMessage("All Sql statements saved.");
+        }
+
+        private void openRegisteredDBtoolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void closeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             AboutBox aboutBox = new AboutBox();
             aboutBox.ShowDialog();
         }
+        private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
 
+        }
         #endregion
 
         #region Toolbar Handlers
@@ -346,11 +458,21 @@ namespace SQLiteWorkshop
         private void toolStripTbCreateIndex_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(CurrentDB)) return;
-            if (treeViewMain.SelectedNode == null) return;
-            if (treeViewMain.SelectedNode.Parent == null) return;
-            if (treeViewMain.SelectedNode.Text != "Indexes" && treeViewMain.SelectedNode.Parent.Text != "Indexes") return;
             BuildIndex bi = new BuildIndex();
-            bi.TableName = treeViewMain.SelectedNode.Text == "Indexes" ? treeViewMain.SelectedNode.Parent.Text : treeViewMain.SelectedNode.Parent.Parent.Text;
+
+            if (treeViewMain.SelectedNode != null)
+            {
+                TreeNode tgtNode = treeViewMain.SelectedNode;
+                while (tgtNode.Parent != null)
+                {
+                    if (tgtNode.Parent.Text == "Tables")
+                    {
+                        bi.TableName = tgtNode.Text;
+                        break;
+                    }
+                    tgtNode = tgtNode.Parent;
+                }
+            }
             bi.Show();
         }
 
@@ -685,6 +807,12 @@ namespace SQLiteWorkshop
                 case "new view":
                     toolStripTbCreateView_Click(sender, e);
                     break;
+                case "export view":
+                    ExportWiz exp = new ExportWiz();
+                    exp.DatabaseLocation = CurrentDB;
+                    exp.TableName = treeViewMain.SelectedNode.Text;
+                    exp.ShowDialog();
+                    break;
                 case "delete view":
                     ef = new ExecuteForm();
                     ef.execType = SQLType.SQLDeleteView;
@@ -778,7 +906,6 @@ namespace SQLiteWorkshop
             if (openFile.ShowDialog() != DialogResult.OK) return string.Empty;
             cfg.SetSetting(Config.CFG_LASTOPEN, Path.GetDirectoryName(openFile.FileName));
             return openFile.FileName;
-
         }
 
         /// <summary>
@@ -806,6 +933,7 @@ namespace SQLiteWorkshop
             }
             return false;
         }
+
         /// <summary>
         /// Rebuild/Refresh the GridView
         /// </summary>
@@ -819,7 +947,7 @@ namespace SQLiteWorkshop
             }
 
             CurrentDB = DBLocation;
-            toolStripStatusDBName.Text = CurrentDB;
+            toolStripStatusMain.Text = CurrentDB;
             BuildTreeView(DBLocation);
             if (RecentDBs.Contains(DBLocation)) RecentDBs.Remove(DBLocation);
             RecentDBs.Add(DBLocation);
@@ -1004,6 +1132,11 @@ namespace SQLiteWorkshop
             topNode.Expand();
             treeViewMain.Nodes.Add(topNode);
         }
+
+        internal void WriteStatusStripMessage(string message)
+        {
+            toolStripStatusMain.Text = message;
+        }
         #endregion
         
         #region Form Sizing and Control
@@ -1059,6 +1192,28 @@ namespace SQLiteWorkshop
                     break;
            }
         }
+
+        #region Form Dragging Event Handler
+
+        public const int WM_NCLBUTTONDOWN = 0xA1;
+        public const int HT_CAPTION = 0x2;
+
+        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
+        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
+        public static extern bool ReleaseCapture();
+
+        private void MainForm_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Main Tab Control
@@ -1188,71 +1343,8 @@ namespace SQLiteWorkshop
             ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
             ((PictureBox)sender).BorderStyle = BorderStyle.None;
         }
-        #endregion
 
-        #region Form Management
-
-        /// <summary>
-        /// Read key GUI cues to make the program appear the same as it did at last closing.
-        /// </summary>
-        private void InitializeFormGUI()
-        {
-            int parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FTOP), out parm)) this.Top = parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FLEFT), out parm)) this.Left = parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FHEIGHT), out parm)) this.Height = parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FWIDTH), out parm)) this.Width = parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_VSPLITP), out parm)) vSplitter.SplitPosition = parm;
-
-            string RecentDBList = cfg.appsetting(Config.CFG_RECENTDB);
-            if (!string.IsNullOrEmpty(RecentDBList))
-            {
-                string[] rDBs = RecentDBList.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
-                for (int i = 0; i <rDBs.Length; i++)
-                {
-                    RecentDBs.Add(rDBs[i]);
-                }
-                InitToolStripOpenDropDown(RecentDBs);
-
-            }
-        }
-
-        /// <summary>
-        /// Save key GUI cues to be used at next program execution.
-        /// </summary>
-
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            cfg.SetSetting(Config.CFG_FTOP, this.Top.ToString());
-            cfg.SetSetting(Config.CFG_FLEFT, this.Left.ToString());
-            cfg.SetSetting(Config.CFG_FHEIGHT, this.Height.ToString());
-            cfg.SetSetting(Config.CFG_FWIDTH, this.Width.ToString());
-            cfg.SetSetting(Config.CFG_VSPLITP, vSplitter.SplitPosition.ToString());
-
-        }
-
-        #region Form Dragging Event Handler
-
-        public const int WM_NCLBUTTONDOWN = 0xA1;
-        public const int HT_CAPTION = 0x2;
-
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern bool ReleaseCapture();
-
-        private void MainForm_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
-            }
-        }
 
         #endregion
-
-        #endregion
-
     }
 }

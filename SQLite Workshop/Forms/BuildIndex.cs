@@ -29,27 +29,39 @@ namespace SQLiteWorkshop
         private void BuildIndex_Load(object sender, EventArgs e)
         {
             lblFormHeading.Text = "Build Index";
-            lblTableName.Text = TableName;
             toolStripStatusLabelResult.Text = string.Empty;
 
             DatabaseLocation = MainForm.mInstance.CurrentDB;
             sd = DataAccess.SchemaDefinitions[DatabaseLocation];
 
+            comboBoxTableName.Items.Clear();
+            foreach (var table in sd.Tables)
+            {
+                if (!Common.IsSystemTable(table.Key)) comboBoxTableName.Items.Add(table.Key);
+            }
+            if (!string.IsNullOrEmpty(TableName)) comboBoxTableName.SelectedItem = TableName;
 
             // Establish ToolTips for various controls.
             toolTip = new ToolTip();
             toolTip.SetToolTip(pbClose, "Close");
-
-            foreach (var col in sd.Tables[TableName].Columns)
-            {
-                dgvColumns.Rows.Add(new string[] { col.Key, col.Value.ColumnType });
-            }
 
             dgiContextMenu = new ContextMenu();
             dgiContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Move Up", dgiContextMenu_Clicked, dgiContextMenu_Popup, dgiContextMenu_Selected, null) { Name = "MoveUp" });
             dgiContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Move Down", dgiContextMenu_Clicked, dgiContextMenu_Popup, dgiContextMenu_Selected, null) { Name = "MoveDown" });
             dgiContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Remove", dgiContextMenu_Clicked, dgiContextMenu_Popup, dgiContextMenu_Selected, null) { Name = "Remove" });
             dgvIndexColumns.ContextMenu = dgiContextMenu;
+
+        }
+
+        private void comboBoxTableName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (comboBoxTableName.SelectedIndex < 0) return;
+
+            dgvColumns.Rows.Clear();
+            foreach (var col in sd.Tables[comboBoxTableName.SelectedItem.ToString()].Columns)
+            {
+                dgvColumns.Rows.Add(new string[] { col.Key, col.Value.ColumnType });
+            }
 
         }
 
@@ -96,6 +108,13 @@ namespace SQLiteWorkshop
 
         private bool ValidateInput()
         {
+            if (comboBoxTableName.SelectedIndex < 0)
+            {
+                ErrorMessage = "Please select a table.";
+                comboBoxTableName.Focus();
+                return false;
+            }
+
             if (string.IsNullOrEmpty(txtIndexName.Text))
             {
                 ErrorMessage = "Please enter an Index Name.";
@@ -119,7 +138,7 @@ namespace SQLiteWorkshop
 
             sb.Append("Create");
             if (ChkUnique.Checked) sb.Append(" Unique");
-            sb.Append(" Index \"").Append(txtIndexName.Text).Append("\" On \"").Append(TableName).Append("\"\r\n(");
+            sb.Append(" Index \"").Append(txtIndexName.Text).Append("\" On \"").Append(comboBoxTableName.SelectedItem.ToString()).Append("\"\r\n(");
             for (int i = 0; i < dgvIndexColumns.RowCount - 1; i++)
             {
                 if (i > 0) sb.Append(",");
@@ -269,8 +288,8 @@ namespace SQLiteWorkshop
 
 
 
-        #endregion
 
+        #endregion
 
     }
 }

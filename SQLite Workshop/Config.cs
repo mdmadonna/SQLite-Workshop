@@ -22,6 +22,7 @@ namespace SQLiteWorkshop
         internal const string CFG_LASTOPEN          = "LASTOPEN";                   //Last directory with a DB successfully opened by FileOpen dialog
         internal const string CFG_LASTBKPOPEN       = "LASTBKPOPEN";                //Last directory with a successful backup DB selection
         internal const string CFG_TABLEEDITHSPLITP  = "iCFG_TABLEEDITHSPLITP";      //Table Editor Splitter position
+        internal const string CFG_DFLTSQLDIR        = "DEFAULTSQLDIR";              //Default Directory for SQL Files
 
 
         //Configuration File

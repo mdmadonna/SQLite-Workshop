@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,11 +15,10 @@ namespace SQLiteWorkshop
 {
     internal partial class SqlTabControl : UserControl
     {
-        private string _databasename;
 
         internal SqlTabControl(string DBName)
         {
-            _databasename = DBName;
+            DatabaseName = DBName;
             InitializeComponent();
             txtSqlStatement.ScrollBars = RichTextBoxScrollBars.Both;
             toolStripRowCount.Alignment = ToolStripItemAlignment.Right;
@@ -30,10 +30,8 @@ namespace SQLiteWorkshop
             if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_HSPLITP), out int parm)) hSplitter.SplitPosition = parm;
         }
 
-        internal string DatabaseName {
-            get { return _databasename; }
-            set { _databasename = value; }
-        }
+        internal string DatabaseName { get; set; }
+        internal string SqlFileName { get; set; }
 
         internal string SqlStatement
         {
@@ -46,6 +44,74 @@ namespace SQLiteWorkshop
             MainForm.cfg.SetSetting(Config.CFG_HSPLITP, hSplitter.SplitPosition.ToString());
         }
         
+        internal void SaveSql(bool saveAs = false)
+        {
+
+            Control c = this.Parent;
+            string filename = null;
+
+            if (string.IsNullOrEmpty(SqlFileName) || saveAs)
+            {
+                filename = ((TabPage)c).Text.Trim();
+                filename = GetFile(filename);
+                if (string.IsNullOrEmpty(filename)) return;
+            }
+            else
+            { filename = SqlFileName;  }
+
+            if (string.IsNullOrEmpty(SqlFileName) || saveAs)
+            {
+                FileInfo fi = new FileInfo(filename);
+                if (fi.Exists)
+                {
+                    DialogResult dr = Common.ShowMsg(string.Format("{0} already exists.\r\nDo you want to replace it?", filename), MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                    if (dr != DialogResult.Yes) return;
+                }
+            }
+
+            try
+            {
+                StreamWriter sw = new StreamWriter(filename);
+                sw.Write(txtSqlStatement.Text);
+                sw.Close();
+                MainForm.mInstance.WriteStatusStripMessage(string.Format("{0} Saved.", Path.GetFileName(filename)));
+            }
+            catch (Exception ex)
+            {
+                Common.ShowMsg(string.Format("An error occurred while writing {0}.\r\n{1}", filename, ex.Message));
+            }
+            SqlFileName = filename;
+            ((TabPage)c).Text = string.Format("  {0}          ", Path.GetFileName(filename)); ;
+            return;
+        }
+
+        protected string GetFile(string filename)
+        {
+            string path = MainForm.cfg.appsetting(Config.CFG_DFLTSQLDIR);
+            if (string.IsNullOrEmpty(path))
+            {
+                path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDoc‌​uments), "SQLite Workshop");
+                if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+                MainForm.cfg.SetSetting(Config.CFG_DFLTSQLDIR, path);
+            }
+
+            SaveFileDialog saveFile = new SaveFileDialog();
+            saveFile.Title = "Select Destination File";
+            saveFile.Filter = "All files (*.*)|*.*|Sql Files (*.sql)|*.sql";
+            saveFile.FilterIndex = 2;
+            saveFile.AddExtension = true;
+            saveFile.AutoUpgradeEnabled = true;
+            saveFile.DefaultExt = "sql";
+            saveFile.InitialDirectory = path;
+            saveFile.RestoreDirectory = true;
+            saveFile.ValidateNames = true;
+            saveFile.OverwritePrompt = false;
+            saveFile.FileName = filename;
+
+            if (saveFile.ShowDialog() != DialogResult.OK) return string.Empty;
+            return saveFile.FileName;
+        }
+
         internal bool Execute()
         {
             DataTable dt;
@@ -60,7 +126,7 @@ namespace SQLiteWorkshop
                 MainForm.mInstance.Cursor = Cursors.WaitCursor;
                 if (sql.ToLower().StartsWith("select") || sql.ToLower().StartsWith("pragma"))
                 {
-                    dt = DataAccess.ExecuteDataTable(_databasename, sql, out SQLiteErrorCode returnCode);
+                    dt = DataAccess.ExecuteDataTable(DatabaseName, sql, out SQLiteErrorCode returnCode);
                     if (returnCode == SQLiteErrorCode.Ok)
                     {
                         //Populate DataGridView
@@ -85,7 +151,7 @@ namespace SQLiteWorkshop
                     gvResults.Visible = false;
                     txtSqlResults.Visible = true;
 
-                    int count = DataAccess.ExecuteNonQuery(_databasename, sql, out SQLiteErrorCode returnCode);
+                    int count = DataAccess.ExecuteNonQuery(DatabaseName, sql, out SQLiteErrorCode returnCode);
                     if (returnCode != SQLiteErrorCode.Ok)
                     {
                         txtSqlResults.Text = string.Format(Common.ERR_SQL, DataAccess.LastError, returnCode.ToString());
@@ -126,7 +192,7 @@ namespace SQLiteWorkshop
 
             Int64 startclock = Timers.QueryPerformanceCounter();
             sql = ExplainPlan ? string.Format("Explain Query Plan {0}", sql) : string.Format("Explain {0}", sql);
-            DataTable dt = DataAccess.ExecuteDataTable(_databasename, sql, out SQLiteErrorCode returnCode);
+            DataTable dt = DataAccess.ExecuteDataTable(DatabaseName, sql, out SQLiteErrorCode returnCode);
             if (returnCode == SQLiteErrorCode.Ok)
             {
                 gvResults.DataSource = dt;

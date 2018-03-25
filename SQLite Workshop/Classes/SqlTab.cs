@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace SQLiteWorkshop
 
         MainForm m;
         TabPage sTab;
+        int curtab;
         SqlTabControl sqlTabControl;
         SchemaDefinition sd;
 
@@ -25,18 +27,57 @@ namespace SQLiteWorkshop
         {
             m = MainForm.mInstance;
             m.tabMain.Visible = true;
-        }
-
-        internal void BuildTab(TreeNode TargetNode, SQLType sqlType)
-        {
             m.sqlTabTrack++;
-            int curtab = m.sqlTabTrack;
+            curtab = m.sqlTabTrack;
 
             DatabaseLocation = MainForm.mInstance.CurrentDB;
             sd = DataAccess.SchemaDefinitions[DatabaseLocation];
             BuildTab(sd.DBLocation);
+        }
 
-            sTab.Text = string.Format("  Query{0}.sql - {1}          ", curtab, sd.DBName);
+        internal void BuildTab()
+        {
+            string filename = FindSqlFile();
+            if (string.IsNullOrEmpty(filename)) return;
+            sTab.Text = string.Format("  {0}          ", Path.GetFileName(filename));
+            sqlTabControl.SqlFileName = filename;
+            try
+            {
+                StreamReader sr = new StreamReader(filename);
+                sqlTabControl.SqlStatement = sr.ReadToEnd();
+                sr.Close();
+            }
+            catch (Exception ex)
+            {
+                Common.ShowMsg(string.Format("Cannot open {0}\r\n{1}", filename, ex.Message));
+            }
+        }
+
+        private string FindSqlFile()
+        {
+            OpenFileDialog openFile = new OpenFileDialog();
+            openFile.Title = "Open SQLite DB";
+            openFile.Filter = "All files (*.*)|*.*|Sql Files (*.sql)|*.sql";
+            openFile.FilterIndex = 2;
+            openFile.CheckFileExists = true;
+            openFile.AddExtension = true;
+            openFile.AutoUpgradeEnabled = true;
+            openFile.DefaultExt = "db";
+            openFile.InitialDirectory = MainForm.cfg.appsetting(Config.CFG_DFLTSQLDIR);
+            openFile.RestoreDirectory = true;
+            openFile.Multiselect = false;
+            openFile.ShowReadOnly = false;
+            openFile.ValidateNames = true;
+            if (openFile.ShowDialog() != DialogResult.OK) return string.Empty;
+            return openFile.FileName;
+        }
+
+
+        internal void BuildTab(TreeNode TargetNode, SQLType sqlType)
+        {
+
+
+            sTab.Text = string.Format("  Query{0}.sql          ", curtab);
 
             switch (sqlType)
             {

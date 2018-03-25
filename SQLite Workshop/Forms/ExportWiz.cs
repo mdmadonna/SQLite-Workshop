@@ -42,7 +42,11 @@ namespace SQLiteWorkshop
             listBoxTables.Items.Clear();
             foreach (var table in DataAccess.SchemaDefinitions[DatabaseLocation].Tables)
             {
-                listBoxTables.Items.Add(table.Key);
+                if (!Common.IsSystemTable(table.Key)) listBoxTables.Items.Add(table.Key);
+            }
+            foreach (var view in DataAccess.SchemaDefinitions[DatabaseLocation].Views)
+            {
+                listBoxTables.Items.Add(view.Key);
             }
             if (!string.IsNullOrEmpty(TableName))
             {

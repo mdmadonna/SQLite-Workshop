@@ -30,31 +30,32 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BuildIndex));
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.toolStripStatusLabelResult = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelTop = new System.Windows.Forms.Panel();
             this.lblFormHeading = new System.Windows.Forms.Label();
             this.pbIcon = new System.Windows.Forms.PictureBox();
             this.panelControls = new System.Windows.Forms.Panel();
             this.pbClose = new System.Windows.Forms.PictureBox();
             this.panelBottom = new System.Windows.Forms.Panel();
+            this.btnShowSQL = new System.Windows.Forms.Button();
+            this.btnCreate = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtIndexName = new System.Windows.Forms.TextBox();
-            this.lblTableName = new System.Windows.Forms.Label();
+            this.txtWhereClause = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.ChkUnique = new System.Windows.Forms.CheckBox();
+            this.dgvIndexColumns = new System.Windows.Forms.DataGridView();
+            this.IdxColName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ColOrder = new System.Windows.Forms.DataGridViewComboBoxColumn();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
             this.dgvColumns = new System.Windows.Forms.DataGridView();
             this.ColumnName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.label1 = new System.Windows.Forms.Label();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.dgvIndexColumns = new System.Windows.Forms.DataGridView();
-            this.ChkUnique = new System.Windows.Forms.CheckBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtWhereClause = new System.Windows.Forms.TextBox();
-            this.btnCreate = new System.Windows.Forms.Button();
-            this.toolStripStatusLabelResult = new System.Windows.Forms.ToolStripStatusLabel();
-            this.IdxColName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColOrder = new System.Windows.Forms.DataGridViewComboBoxColumn();
-            this.btnShowSQL = new System.Windows.Forms.Button();
+            this.lblTableName = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.comboBoxTableName = new System.Windows.Forms.ComboBox();
+            this.txtIndexName = new System.Windows.Forms.TextBox();
             this.statusStrip1.SuspendLayout();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
@@ -62,9 +63,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbClose)).BeginInit();
             this.panelBottom.SuspendLayout();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).BeginInit();
-            this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvIndexColumns)).BeginInit();
+            this.panel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -77,6 +78,12 @@
             this.statusStrip1.Size = new System.Drawing.Size(792, 22);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabelResult
+            // 
+            this.toolStripStatusLabelResult.Name = "toolStripStatusLabelResult";
+            this.toolStripStatusLabelResult.Size = new System.Drawing.Size(118, 17);
+            this.toolStripStatusLabelResult.Text = "toolStripStatusLabel1";
             // 
             // panelTop
             // 
@@ -149,6 +156,26 @@
             this.panelBottom.Size = new System.Drawing.Size(792, 39);
             this.panelBottom.TabIndex = 2;
             // 
+            // btnShowSQL
+            // 
+            this.btnShowSQL.Location = new System.Drawing.Point(578, 6);
+            this.btnShowSQL.Name = "btnShowSQL";
+            this.btnShowSQL.Size = new System.Drawing.Size(96, 23);
+            this.btnShowSQL.TabIndex = 4;
+            this.btnShowSQL.Text = "Show SQL";
+            this.btnShowSQL.UseVisualStyleBackColor = true;
+            this.btnShowSQL.Click += new System.EventHandler(this.btnShowSQL_Click);
+            // 
+            // btnCreate
+            // 
+            this.btnCreate.Location = new System.Drawing.Point(485, 6);
+            this.btnCreate.Name = "btnCreate";
+            this.btnCreate.Size = new System.Drawing.Size(75, 23);
+            this.btnCreate.TabIndex = 1;
+            this.btnCreate.Text = "Create";
+            this.btnCreate.UseVisualStyleBackColor = true;
+            this.btnCreate.Click += new System.EventHandler(this.btnCreate_Click);
+            // 
             // btnClose
             // 
             this.btnClose.Location = new System.Drawing.Point(692, 6);
@@ -162,6 +189,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.Window;
+            this.panel1.Controls.Add(this.comboBoxTableName);
             this.panel1.Controls.Add(this.txtWhereClause);
             this.panel1.Controls.Add(this.label3);
             this.panel1.Controls.Add(this.ChkUnique);
@@ -176,32 +204,81 @@
             this.panel1.Size = new System.Drawing.Size(792, 454);
             this.panel1.TabIndex = 3;
             // 
-            // label2
+            // txtWhereClause
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(35, 46);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(67, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "Index Name:";
+            this.txtWhereClause.Location = new System.Drawing.Point(82, 409);
+            this.txtWhereClause.Name = "txtWhereClause";
+            this.txtWhereClause.Size = new System.Drawing.Size(685, 20);
+            this.txtWhereClause.TabIndex = 12;
             // 
-            // txtIndexName
+            // label3
             // 
-            this.txtIndexName.Location = new System.Drawing.Point(109, 46);
-            this.txtIndexName.Name = "txtIndexName";
-            this.txtIndexName.Size = new System.Drawing.Size(198, 20);
-            this.txtIndexName.TabIndex = 2;
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(41, 412);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(42, 13);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Where:";
             // 
-            // lblTableName
+            // ChkUnique
             // 
-            this.lblTableName.AutoSize = true;
-            this.lblTableName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblTableName.ForeColor = System.Drawing.Color.DimGray;
-            this.lblTableName.Location = new System.Drawing.Point(29, 17);
-            this.lblTableName.Name = "lblTableName";
-            this.lblTableName.Size = new System.Drawing.Size(95, 16);
-            this.lblTableName.TabIndex = 5;
-            this.lblTableName.Text = "lblTableName";
+            this.ChkUnique.AutoSize = true;
+            this.ChkUnique.Location = new System.Drawing.Point(41, 86);
+            this.ChkUnique.Name = "ChkUnique";
+            this.ChkUnique.Size = new System.Drawing.Size(60, 17);
+            this.ChkUnique.TabIndex = 10;
+            this.ChkUnique.Text = "Unique";
+            this.ChkUnique.UseVisualStyleBackColor = true;
+            // 
+            // dgvIndexColumns
+            // 
+            this.dgvIndexColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvIndexColumns.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.IdxColName,
+            this.ColOrder});
+            this.dgvIndexColumns.Location = new System.Drawing.Point(41, 121);
+            this.dgvIndexColumns.MultiSelect = false;
+            this.dgvIndexColumns.Name = "dgvIndexColumns";
+            this.dgvIndexColumns.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvIndexColumns.Size = new System.Drawing.Size(266, 266);
+            this.dgvIndexColumns.TabIndex = 9;
+            this.dgvIndexColumns.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dgvIndexColumns_MouseDown);
+            // 
+            // IdxColName
+            // 
+            this.IdxColName.HeaderText = "Column Name";
+            this.IdxColName.Name = "IdxColName";
+            this.IdxColName.ReadOnly = true;
+            this.IdxColName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            // 
+            // ColOrder
+            // 
+            this.ColOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ColOrder.HeaderText = "Sort Order";
+            this.ColOrder.Items.AddRange(new object[] {
+            "Ascending",
+            "Descending"});
+            this.ColOrder.Name = "ColOrder";
+            this.ColOrder.ReadOnly = true;
+            // 
+            // panel2
+            // 
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.label1);
+            this.panel2.Controls.Add(this.dgvColumns);
+            this.panel2.Location = new System.Drawing.Point(335, 6);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(432, 381);
+            this.panel2.TabIndex = 8;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(16, 10);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(217, 13);
+            this.label1.TabIndex = 7;
+            this.label1.Text = "Double Click Columns to include in the Index";
             // 
             // dgvColumns
             // 
@@ -232,107 +309,42 @@
             this.ColumnType.ReadOnly = true;
             this.ColumnType.Width = 150;
             // 
-            // label1
+            // lblTableName
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(16, 10);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(217, 13);
-            this.label1.TabIndex = 7;
-            this.label1.Text = "Double Click Columns to include in the Index";
+            this.lblTableName.AutoSize = true;
+            this.lblTableName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTableName.ForeColor = System.Drawing.Color.DimGray;
+            this.lblTableName.Location = new System.Drawing.Point(15, 15);
+            this.lblTableName.Name = "lblTableName";
+            this.lblTableName.Size = new System.Drawing.Size(87, 16);
+            this.lblTableName.TabIndex = 5;
+            this.lblTableName.Text = "Table Name:";
             // 
-            // panel2
+            // label2
             // 
-            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.label1);
-            this.panel2.Controls.Add(this.dgvColumns);
-            this.panel2.Location = new System.Drawing.Point(335, 6);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(432, 381);
-            this.panel2.TabIndex = 8;
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(35, 46);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(67, 13);
+            this.label2.TabIndex = 1;
+            this.label2.Text = "Index Name:";
             // 
-            // dgvIndexColumns
+            // comboBoxTableName
             // 
-            this.dgvIndexColumns.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvIndexColumns.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.IdxColName,
-            this.ColOrder});
-            this.dgvIndexColumns.Location = new System.Drawing.Point(41, 121);
-            this.dgvIndexColumns.MultiSelect = false;
-            this.dgvIndexColumns.Name = "dgvIndexColumns";
-            this.dgvIndexColumns.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvIndexColumns.Size = new System.Drawing.Size(266, 266);
-            this.dgvIndexColumns.TabIndex = 9;
-            this.dgvIndexColumns.MouseDown += new System.Windows.Forms.MouseEventHandler(this.dgvIndexColumns_MouseDown);
+            this.comboBoxTableName.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxTableName.FormattingEnabled = true;
+            this.comboBoxTableName.Location = new System.Drawing.Point(109, 14);
+            this.comboBoxTableName.Name = "comboBoxTableName";
+            this.comboBoxTableName.Size = new System.Drawing.Size(166, 21);
+            this.comboBoxTableName.TabIndex = 13;
+            this.comboBoxTableName.SelectedIndexChanged += new System.EventHandler(this.comboBoxTableName_SelectedIndexChanged);
             // 
-            // ChkUnique
+            // txtIndexName
             // 
-            this.ChkUnique.AutoSize = true;
-            this.ChkUnique.Location = new System.Drawing.Point(41, 86);
-            this.ChkUnique.Name = "ChkUnique";
-            this.ChkUnique.Size = new System.Drawing.Size(60, 17);
-            this.ChkUnique.TabIndex = 10;
-            this.ChkUnique.Text = "Unique";
-            this.ChkUnique.UseVisualStyleBackColor = true;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(41, 412);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(42, 13);
-            this.label3.TabIndex = 11;
-            this.label3.Text = "Where:";
-            // 
-            // txtWhereClause
-            // 
-            this.txtWhereClause.Location = new System.Drawing.Point(82, 409);
-            this.txtWhereClause.Name = "txtWhereClause";
-            this.txtWhereClause.Size = new System.Drawing.Size(685, 20);
-            this.txtWhereClause.TabIndex = 12;
-            // 
-            // btnCreate
-            // 
-            this.btnCreate.Location = new System.Drawing.Point(485, 6);
-            this.btnCreate.Name = "btnCreate";
-            this.btnCreate.Size = new System.Drawing.Size(75, 23);
-            this.btnCreate.TabIndex = 1;
-            this.btnCreate.Text = "Create";
-            this.btnCreate.UseVisualStyleBackColor = true;
-            this.btnCreate.Click += new System.EventHandler(this.btnCreate_Click);
-            // 
-            // toolStripStatusLabelResult
-            // 
-            this.toolStripStatusLabelResult.Name = "toolStripStatusLabelResult";
-            this.toolStripStatusLabelResult.Size = new System.Drawing.Size(118, 17);
-            this.toolStripStatusLabelResult.Text = "toolStripStatusLabel1";
-            // 
-            // IdxColName
-            // 
-            this.IdxColName.HeaderText = "Column Name";
-            this.IdxColName.Name = "IdxColName";
-            this.IdxColName.ReadOnly = true;
-            this.IdxColName.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            // 
-            // ColOrder
-            // 
-            this.ColOrder.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.ColOrder.HeaderText = "Sort Order";
-            this.ColOrder.Items.AddRange(new object[] {
-            "Ascending",
-            "Descending"});
-            this.ColOrder.Name = "ColOrder";
-            this.ColOrder.ReadOnly = true;
-            // 
-            // btnShowSQL
-            // 
-            this.btnShowSQL.Location = new System.Drawing.Point(578, 6);
-            this.btnShowSQL.Name = "btnShowSQL";
-            this.btnShowSQL.Size = new System.Drawing.Size(96, 23);
-            this.btnShowSQL.TabIndex = 4;
-            this.btnShowSQL.Text = "Show SQL";
-            this.btnShowSQL.UseVisualStyleBackColor = true;
-            this.btnShowSQL.Click += new System.EventHandler(this.btnShowSQL_Click);
+            this.txtIndexName.Location = new System.Drawing.Point(109, 46);
+            this.txtIndexName.Name = "txtIndexName";
+            this.txtIndexName.Size = new System.Drawing.Size(198, 20);
+            this.txtIndexName.TabIndex = 2;
             // 
             // BuildIndex
             // 
@@ -360,10 +372,10 @@
             this.panelBottom.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvIndexColumns)).EndInit();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvIndexColumns)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvColumns)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -380,7 +392,6 @@
         private System.Windows.Forms.Panel panelBottom;
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.TextBox txtIndexName;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label lblTableName;
         private System.Windows.Forms.DataGridView dgvColumns;
@@ -397,5 +408,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn IdxColName;
         private System.Windows.Forms.DataGridViewComboBoxColumn ColOrder;
         private System.Windows.Forms.Button btnShowSQL;
+        private System.Windows.Forms.ComboBox comboBoxTableName;
+        private System.Windows.Forms.TextBox txtIndexName;
     }
 }
