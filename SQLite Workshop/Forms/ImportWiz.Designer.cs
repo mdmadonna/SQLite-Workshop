@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportWiz));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelTop = new System.Windows.Forms.Panel();
@@ -42,18 +42,49 @@
             this.btnNext = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
             this.panelWizMain = new System.Windows.Forms.Panel();
-            this.btnFileSearch = new System.Windows.Forms.Button();
-            this.txtFileName = new System.Windows.Forms.TextBox();
+            this.panelWizMainText = new System.Windows.Forms.Panel();
+            this.txtPassword = new System.Windows.Forms.TextBox();
+            this.lblPassword = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.cmbSourceDB = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.txtFileName = new System.Windows.Forms.TextBox();
+            this.btnFileSearch = new System.Windows.Forms.Button();
+            this.panelWizMainMySql = new System.Windows.Forms.Panel();
+            this.comboBoxMySqlDatabaseList = new System.Windows.Forms.ComboBox();
+            this.txtMySqlPassword = new System.Windows.Forms.TextBox();
+            this.txtMySqlUserName = new System.Windows.Forms.TextBox();
+            this.txtMySqlServer = new System.Windows.Forms.TextBox();
+            this.label21 = new System.Windows.Forms.Label();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.panelWizMainODBC = new System.Windows.Forms.Panel();
+            this.txtOdbcPassword = new System.Windows.Forms.TextBox();
+            this.txtOdbcUserName = new System.Windows.Forms.TextBox();
+            this.label17 = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
+            this.comboBoxOdbcDataSource = new System.Windows.Forms.ComboBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.panelWizMainDB = new System.Windows.Forms.Panel();
+            this.comboBoxDatabaseList = new System.Windows.Forms.ComboBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.txtDbPassword = new System.Windows.Forms.TextBox();
+            this.txtDbUserName = new System.Windows.Forms.TextBox();
+            this.label13 = new System.Windows.Forms.Label();
+            this.label12 = new System.Windows.Forms.Label();
+            this.radioSqlServerAuth = new System.Windows.Forms.RadioButton();
+            this.radioWinAuth = new System.Windows.Forms.RadioButton();
+            this.txtServer = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.panelWizMainTop = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cmbSourceDB = new System.Windows.Forms.ComboBox();
             this.panelWizText = new System.Windows.Forms.Panel();
-            this.panelWizTextTop = new System.Windows.Forms.Panel();
-            this.lblFileName = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
             this.tabText = new System.Windows.Forms.TabControl();
             this.tabTextGeneral = new System.Windows.Forms.TabPage();
+            this.cmbDestinationTable = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.groupBoxDelimiter = new System.Windows.Forms.GroupBox();
             this.txtOtherDelimiter = new System.Windows.Forms.TextBox();
             this.radioButtonTab = new System.Windows.Forms.RadioButton();
@@ -74,51 +105,20 @@
             this.dataGridViewText = new System.Windows.Forms.DataGridView();
             this.panelWizTextTab = new System.Windows.Forms.Panel();
             this.lblRowCount = new System.Windows.Forms.Label();
-            this.cmbDestinationTable = new System.Windows.Forms.ComboBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.panelWizMainTop = new System.Windows.Forms.Panel();
-            this.panelWizMainText = new System.Windows.Forms.Panel();
-            this.lblPassword = new System.Windows.Forms.Label();
-            this.txtPassword = new System.Windows.Forms.TextBox();
+            this.panelWizTextTop = new System.Windows.Forms.Panel();
+            this.lblFileName = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.panelWizDB = new System.Windows.Forms.Panel();
-            this.label9 = new System.Windows.Forms.Label();
-            this.lblDBName = new System.Windows.Forms.Label();
-            this.panelWizDBTop = new System.Windows.Forms.Panel();
             this.dgvTables = new System.Windows.Forms.DataGridView();
-            this.panelWizDBMid = new System.Windows.Forms.Panel();
-            this.label10 = new System.Windows.Forms.Label();
             this.CheckBoxSelectedTable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Source = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Destination = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Map = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.panelWizMainDB = new System.Windows.Forms.Panel();
-            this.label11 = new System.Windows.Forms.Label();
-            this.txtServer = new System.Windows.Forms.TextBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.radioWinAuth = new System.Windows.Forms.RadioButton();
-            this.radioSqlServerAuth = new System.Windows.Forms.RadioButton();
-            this.label12 = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
-            this.txtDbUserName = new System.Windows.Forms.TextBox();
-            this.txtDbPassword = new System.Windows.Forms.TextBox();
-            this.label14 = new System.Windows.Forms.Label();
-            this.comboBoxDatabaseList = new System.Windows.Forms.ComboBox();
-            this.panelWizMainODBC = new System.Windows.Forms.Panel();
-            this.label15 = new System.Windows.Forms.Label();
-            this.comboBoxOdbcDataSource = new System.Windows.Forms.ComboBox();
-            this.label16 = new System.Windows.Forms.Label();
-            this.label17 = new System.Windows.Forms.Label();
-            this.txtOdbcUserName = new System.Windows.Forms.TextBox();
-            this.txtOdbcPassword = new System.Windows.Forms.TextBox();
-            this.panelWizMainMySql = new System.Windows.Forms.Panel();
-            this.label18 = new System.Windows.Forms.Label();
-            this.label19 = new System.Windows.Forms.Label();
-            this.label20 = new System.Windows.Forms.Label();
-            this.label21 = new System.Windows.Forms.Label();
-            this.txtMySqlServer = new System.Windows.Forms.TextBox();
-            this.txtMySqlUserName = new System.Windows.Forms.TextBox();
-            this.txtMySqlPassword = new System.Windows.Forms.TextBox();
-            this.comboBoxMySqlDatabaseList = new System.Windows.Forms.ComboBox();
+            this.panelWizDBMid = new System.Windows.Forms.Panel();
+            this.label10 = new System.Windows.Forms.Label();
+            this.panelWizDBTop = new System.Windows.Forms.Panel();
+            this.label9 = new System.Windows.Forms.Label();
+            this.lblDBName = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
@@ -126,8 +126,13 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbClose)).BeginInit();
             this.panelBottom.SuspendLayout();
             this.panelWizMain.SuspendLayout();
+            this.panelWizMainText.SuspendLayout();
+            this.panelWizMainMySql.SuspendLayout();
+            this.panelWizMainODBC.SuspendLayout();
+            this.panelWizMainDB.SuspendLayout();
+            this.groupBox1.SuspendLayout();
+            this.panelWizMainTop.SuspendLayout();
             this.panelWizText.SuspendLayout();
-            this.panelWizTextTop.SuspendLayout();
             this.tabText.SuspendLayout();
             this.tabTextGeneral.SuspendLayout();
             this.groupBoxDelimiter.SuspendLayout();
@@ -136,16 +141,11 @@
             this.tabTextPreview.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewText)).BeginInit();
             this.panelWizTextTab.SuspendLayout();
-            this.panelWizMainTop.SuspendLayout();
-            this.panelWizMainText.SuspendLayout();
+            this.panelWizTextTop.SuspendLayout();
             this.panelWizDB.SuspendLayout();
-            this.panelWizDBTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTables)).BeginInit();
             this.panelWizDBMid.SuspendLayout();
-            this.panelWizMainDB.SuspendLayout();
-            this.groupBox1.SuspendLayout();
-            this.panelWizMainODBC.SuspendLayout();
-            this.panelWizMainMySql.SuspendLayout();
+            this.panelWizDBTop.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -279,6 +279,52 @@
             this.panelWizMain.Size = new System.Drawing.Size(649, 74);
             this.panelWizMain.TabIndex = 3;
             // 
+            // panelWizMainText
+            // 
+            this.panelWizMainText.Controls.Add(this.txtPassword);
+            this.panelWizMainText.Controls.Add(this.lblPassword);
+            this.panelWizMainText.Controls.Add(this.label4);
+            this.panelWizMainText.Controls.Add(this.txtFileName);
+            this.panelWizMainText.Controls.Add(this.btnFileSearch);
+            this.panelWizMainText.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelWizMainText.Location = new System.Drawing.Point(0, 100);
+            this.panelWizMainText.Name = "panelWizMainText";
+            this.panelWizMainText.Size = new System.Drawing.Size(649, 0);
+            this.panelWizMainText.TabIndex = 17;
+            // 
+            // txtPassword
+            // 
+            this.txtPassword.Location = new System.Drawing.Point(124, 83);
+            this.txtPassword.Name = "txtPassword";
+            this.txtPassword.Size = new System.Drawing.Size(237, 20);
+            this.txtPassword.TabIndex = 15;
+            this.txtPassword.UseSystemPasswordChar = true;
+            // 
+            // lblPassword
+            // 
+            this.lblPassword.AutoSize = true;
+            this.lblPassword.Location = new System.Drawing.Point(44, 86);
+            this.lblPassword.Name = "lblPassword";
+            this.lblPassword.Size = new System.Drawing.Size(56, 13);
+            this.lblPassword.TabIndex = 14;
+            this.lblPassword.Text = "Password:";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(43, 32);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(57, 13);
+            this.label4.TabIndex = 11;
+            this.label4.Text = "File Name:";
+            // 
+            // txtFileName
+            // 
+            this.txtFileName.Location = new System.Drawing.Point(124, 29);
+            this.txtFileName.Name = "txtFileName";
+            this.txtFileName.Size = new System.Drawing.Size(365, 20);
+            this.txtFileName.TabIndex = 12;
+            // 
             // btnFileSearch
             // 
             this.btnFileSearch.Location = new System.Drawing.Point(508, 27);
@@ -289,21 +335,302 @@
             this.btnFileSearch.UseVisualStyleBackColor = true;
             this.btnFileSearch.Click += new System.EventHandler(this.btnFileSearch_Click);
             // 
-            // txtFileName
+            // panelWizMainMySql
             // 
-            this.txtFileName.Location = new System.Drawing.Point(124, 29);
-            this.txtFileName.Name = "txtFileName";
-            this.txtFileName.Size = new System.Drawing.Size(365, 20);
-            this.txtFileName.TabIndex = 12;
+            this.panelWizMainMySql.Controls.Add(this.comboBoxMySqlDatabaseList);
+            this.panelWizMainMySql.Controls.Add(this.txtMySqlPassword);
+            this.panelWizMainMySql.Controls.Add(this.txtMySqlUserName);
+            this.panelWizMainMySql.Controls.Add(this.txtMySqlServer);
+            this.panelWizMainMySql.Controls.Add(this.label21);
+            this.panelWizMainMySql.Controls.Add(this.label20);
+            this.panelWizMainMySql.Controls.Add(this.label19);
+            this.panelWizMainMySql.Controls.Add(this.label18);
+            this.panelWizMainMySql.Location = new System.Drawing.Point(403, 109);
+            this.panelWizMainMySql.Name = "panelWizMainMySql";
+            this.panelWizMainMySql.Size = new System.Drawing.Size(200, 100);
+            this.panelWizMainMySql.TabIndex = 20;
             // 
-            // label4
+            // comboBoxMySqlDatabaseList
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(43, 32);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(57, 13);
-            this.label4.TabIndex = 11;
-            this.label4.Text = "File Name:";
+            this.comboBoxMySqlDatabaseList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxMySqlDatabaseList.FormattingEnabled = true;
+            this.comboBoxMySqlDatabaseList.Location = new System.Drawing.Point(124, 143);
+            this.comboBoxMySqlDatabaseList.Name = "comboBoxMySqlDatabaseList";
+            this.comboBoxMySqlDatabaseList.Size = new System.Drawing.Size(212, 21);
+            this.comboBoxMySqlDatabaseList.TabIndex = 7;
+            this.comboBoxMySqlDatabaseList.DropDown += new System.EventHandler(this.comboBoxMySqlDatabaseList_DropDown);
+            // 
+            // txtMySqlPassword
+            // 
+            this.txtMySqlPassword.Location = new System.Drawing.Point(124, 104);
+            this.txtMySqlPassword.Name = "txtMySqlPassword";
+            this.txtMySqlPassword.Size = new System.Drawing.Size(295, 20);
+            this.txtMySqlPassword.TabIndex = 6;
+            this.txtMySqlPassword.UseSystemPasswordChar = true;
+            // 
+            // txtMySqlUserName
+            // 
+            this.txtMySqlUserName.Location = new System.Drawing.Point(124, 62);
+            this.txtMySqlUserName.Name = "txtMySqlUserName";
+            this.txtMySqlUserName.Size = new System.Drawing.Size(295, 20);
+            this.txtMySqlUserName.TabIndex = 5;
+            // 
+            // txtMySqlServer
+            // 
+            this.txtMySqlServer.Location = new System.Drawing.Point(124, 22);
+            this.txtMySqlServer.Name = "txtMySqlServer";
+            this.txtMySqlServer.Size = new System.Drawing.Size(339, 20);
+            this.txtMySqlServer.TabIndex = 4;
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.Location = new System.Drawing.Point(46, 148);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(56, 13);
+            this.label21.TabIndex = 3;
+            this.label21.Text = "Database:";
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(46, 107);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(56, 13);
+            this.label20.TabIndex = 2;
+            this.label20.Text = "Password:";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(46, 65);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(63, 13);
+            this.label19.TabIndex = 1;
+            this.label19.Text = "User Name:";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(46, 25);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(41, 13);
+            this.label18.TabIndex = 0;
+            this.label18.Text = "Server:";
+            // 
+            // panelWizMainODBC
+            // 
+            this.panelWizMainODBC.Controls.Add(this.txtOdbcPassword);
+            this.panelWizMainODBC.Controls.Add(this.txtOdbcUserName);
+            this.panelWizMainODBC.Controls.Add(this.label17);
+            this.panelWizMainODBC.Controls.Add(this.label16);
+            this.panelWizMainODBC.Controls.Add(this.comboBoxOdbcDataSource);
+            this.panelWizMainODBC.Controls.Add(this.label15);
+            this.panelWizMainODBC.Location = new System.Drawing.Point(451, 192);
+            this.panelWizMainODBC.Name = "panelWizMainODBC";
+            this.panelWizMainODBC.Size = new System.Drawing.Size(198, 109);
+            this.panelWizMainODBC.TabIndex = 19;
+            // 
+            // txtOdbcPassword
+            // 
+            this.txtOdbcPassword.Location = new System.Drawing.Point(124, 86);
+            this.txtOdbcPassword.Name = "txtOdbcPassword";
+            this.txtOdbcPassword.Size = new System.Drawing.Size(212, 20);
+            this.txtOdbcPassword.TabIndex = 5;
+            this.txtOdbcPassword.UseSystemPasswordChar = true;
+            // 
+            // txtOdbcUserName
+            // 
+            this.txtOdbcUserName.Location = new System.Drawing.Point(124, 56);
+            this.txtOdbcUserName.Name = "txtOdbcUserName";
+            this.txtOdbcUserName.Size = new System.Drawing.Size(212, 20);
+            this.txtOdbcUserName.TabIndex = 4;
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.Location = new System.Drawing.Point(46, 89);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(56, 13);
+            this.label17.TabIndex = 3;
+            this.label17.Text = "Password:";
+            // 
+            // label16
+            // 
+            this.label16.AutoSize = true;
+            this.label16.Location = new System.Drawing.Point(46, 59);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(63, 13);
+            this.label16.TabIndex = 2;
+            this.label16.Text = "User Name:";
+            // 
+            // comboBoxOdbcDataSource
+            // 
+            this.comboBoxOdbcDataSource.FormattingEnabled = true;
+            this.comboBoxOdbcDataSource.Location = new System.Drawing.Point(124, 21);
+            this.comboBoxOdbcDataSource.Name = "comboBoxOdbcDataSource";
+            this.comboBoxOdbcDataSource.Size = new System.Drawing.Size(322, 21);
+            this.comboBoxOdbcDataSource.TabIndex = 1;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Location = new System.Drawing.Point(43, 23);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(70, 13);
+            this.label15.TabIndex = 0;
+            this.label15.Text = "Data Source:";
+            // 
+            // panelWizMainDB
+            // 
+            this.panelWizMainDB.Controls.Add(this.comboBoxDatabaseList);
+            this.panelWizMainDB.Controls.Add(this.label14);
+            this.panelWizMainDB.Controls.Add(this.groupBox1);
+            this.panelWizMainDB.Controls.Add(this.txtServer);
+            this.panelWizMainDB.Controls.Add(this.label11);
+            this.panelWizMainDB.Location = new System.Drawing.Point(172, 138);
+            this.panelWizMainDB.Name = "panelWizMainDB";
+            this.panelWizMainDB.Size = new System.Drawing.Size(200, 100);
+            this.panelWizMainDB.TabIndex = 18;
+            // 
+            // comboBoxDatabaseList
+            // 
+            this.comboBoxDatabaseList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBoxDatabaseList.FormattingEnabled = true;
+            this.comboBoxDatabaseList.Location = new System.Drawing.Point(124, 160);
+            this.comboBoxDatabaseList.Name = "comboBoxDatabaseList";
+            this.comboBoxDatabaseList.Size = new System.Drawing.Size(195, 21);
+            this.comboBoxDatabaseList.TabIndex = 4;
+            this.comboBoxDatabaseList.DropDown += new System.EventHandler(this.comboBoxDatabaseList_DropDown);
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(43, 163);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(56, 13);
+            this.label14.TabIndex = 3;
+            this.label14.Text = "Database:";
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.txtDbPassword);
+            this.groupBox1.Controls.Add(this.txtDbUserName);
+            this.groupBox1.Controls.Add(this.label13);
+            this.groupBox1.Controls.Add(this.label12);
+            this.groupBox1.Controls.Add(this.radioSqlServerAuth);
+            this.groupBox1.Controls.Add(this.radioWinAuth);
+            this.groupBox1.Location = new System.Drawing.Point(46, 48);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(464, 100);
+            this.groupBox1.TabIndex = 2;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Authentication";
+            // 
+            // txtDbPassword
+            // 
+            this.txtDbPassword.Enabled = false;
+            this.txtDbPassword.Location = new System.Drawing.Point(105, 69);
+            this.txtDbPassword.Name = "txtDbPassword";
+            this.txtDbPassword.Size = new System.Drawing.Size(247, 20);
+            this.txtDbPassword.TabIndex = 5;
+            this.txtDbPassword.UseSystemPasswordChar = true;
+            // 
+            // txtDbUserName
+            // 
+            this.txtDbUserName.Enabled = false;
+            this.txtDbUserName.Location = new System.Drawing.Point(105, 47);
+            this.txtDbUserName.Name = "txtDbUserName";
+            this.txtDbUserName.Size = new System.Drawing.Size(247, 20);
+            this.txtDbUserName.TabIndex = 4;
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(25, 77);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(56, 13);
+            this.label13.TabIndex = 3;
+            this.label13.Text = "Password:";
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(25, 50);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(63, 13);
+            this.label12.TabIndex = 2;
+            this.label12.Text = "User Name:";
+            // 
+            // radioSqlServerAuth
+            // 
+            this.radioSqlServerAuth.AutoSize = true;
+            this.radioSqlServerAuth.Location = new System.Drawing.Point(194, 19);
+            this.radioSqlServerAuth.Name = "radioSqlServerAuth";
+            this.radioSqlServerAuth.Size = new System.Drawing.Size(151, 17);
+            this.radioSqlServerAuth.TabIndex = 1;
+            this.radioSqlServerAuth.Text = "SQL Server Authentication";
+            this.radioSqlServerAuth.UseVisualStyleBackColor = true;
+            this.radioSqlServerAuth.CheckedChanged += new System.EventHandler(this.radioSqlServerAuth_CheckedChanged);
+            // 
+            // radioWinAuth
+            // 
+            this.radioWinAuth.AutoSize = true;
+            this.radioWinAuth.Checked = true;
+            this.radioWinAuth.Location = new System.Drawing.Point(25, 19);
+            this.radioWinAuth.Name = "radioWinAuth";
+            this.radioWinAuth.Size = new System.Drawing.Size(134, 17);
+            this.radioWinAuth.TabIndex = 0;
+            this.radioWinAuth.TabStop = true;
+            this.radioWinAuth.Text = "Windows Authentiction";
+            this.radioWinAuth.UseVisualStyleBackColor = true;
+            // 
+            // txtServer
+            // 
+            this.txtServer.Location = new System.Drawing.Point(124, 18);
+            this.txtServer.Name = "txtServer";
+            this.txtServer.Size = new System.Drawing.Size(195, 20);
+            this.txtServer.TabIndex = 1;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(43, 21);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(41, 13);
+            this.label11.TabIndex = 0;
+            this.label11.Text = "Server:";
+            // 
+            // panelWizMainTop
+            // 
+            this.panelWizMainTop.Controls.Add(this.label1);
+            this.panelWizMainTop.Controls.Add(this.label2);
+            this.panelWizMainTop.Controls.Add(this.cmbSourceDB);
+            this.panelWizMainTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelWizMainTop.Location = new System.Drawing.Point(0, 0);
+            this.panelWizMainTop.Name = "panelWizMainTop";
+            this.panelWizMainTop.Size = new System.Drawing.Size(649, 100);
+            this.panelWizMainTop.TabIndex = 16;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.ForeColor = System.Drawing.Color.DimGray;
+            this.label1.Location = new System.Drawing.Point(34, 16);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(182, 17);
+            this.label1.TabIndex = 6;
+            this.label1.Text = "Database Import Wizard";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(43, 69);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(44, 13);
+            this.label2.TabIndex = 7;
+            this.label2.Text = "Source:";
             // 
             // cmbSourceDB
             // 
@@ -323,26 +650,6 @@
             this.cmbSourceDB.TabIndex = 9;
             this.cmbSourceDB.SelectedIndexChanged += new System.EventHandler(this.cmbSourceDB_SelectedIndexChanged);
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(43, 69);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(44, 13);
-            this.label2.TabIndex = 7;
-            this.label2.Text = "Source:";
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.ForeColor = System.Drawing.Color.DimGray;
-            this.label1.Location = new System.Drawing.Point(34, 16);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(182, 17);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "Database Import Wizard";
-            // 
             // panelWizText
             // 
             this.panelWizText.BackColor = System.Drawing.SystemColors.Window;
@@ -353,36 +660,6 @@
             this.panelWizText.Name = "panelWizText";
             this.panelWizText.Size = new System.Drawing.Size(649, 301);
             this.panelWizText.TabIndex = 4;
-            // 
-            // panelWizTextTop
-            // 
-            this.panelWizTextTop.Controls.Add(this.lblFileName);
-            this.panelWizTextTop.Controls.Add(this.label7);
-            this.panelWizTextTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelWizTextTop.Location = new System.Drawing.Point(0, 0);
-            this.panelWizTextTop.Name = "panelWizTextTop";
-            this.panelWizTextTop.Size = new System.Drawing.Size(649, 50);
-            this.panelWizTextTop.TabIndex = 10;
-            // 
-            // lblFileName
-            // 
-            this.lblFileName.AutoSize = true;
-            this.lblFileName.Location = new System.Drawing.Point(26, 27);
-            this.lblFileName.Name = "lblFileName";
-            this.lblFileName.Size = new System.Drawing.Size(61, 13);
-            this.lblFileName.TabIndex = 1;
-            this.lblFileName.Text = "lblFileName";
-            // 
-            // label7
-            // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.ForeColor = System.Drawing.Color.DimGray;
-            this.label7.Location = new System.Drawing.Point(23, 7);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(85, 16);
-            this.label7.TabIndex = 0;
-            this.label7.Text = "Text Import";
             // 
             // tabText
             // 
@@ -412,6 +689,23 @@
             this.tabTextGeneral.TabIndex = 0;
             this.tabTextGeneral.Text = "General";
             this.tabTextGeneral.UseVisualStyleBackColor = true;
+            // 
+            // cmbDestinationTable
+            // 
+            this.cmbDestinationTable.FormattingEnabled = true;
+            this.cmbDestinationTable.Location = new System.Drawing.Point(129, 141);
+            this.cmbDestinationTable.Name = "cmbDestinationTable";
+            this.cmbDestinationTable.Size = new System.Drawing.Size(195, 21);
+            this.cmbDestinationTable.TabIndex = 12;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(48, 144);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(63, 13);
+            this.label3.TabIndex = 11;
+            this.label3.Text = "Destination:";
             // 
             // groupBoxDelimiter
             // 
@@ -596,8 +890,8 @@
             // 
             this.dataGridViewText.AllowUserToAddRows = false;
             this.dataGridViewText.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridViewText.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGridViewText.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewText.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -624,63 +918,35 @@
             this.lblRowCount.TabIndex = 0;
             this.lblRowCount.Text = "Preview Rows 1-100";
             // 
-            // cmbDestinationTable
+            // panelWizTextTop
             // 
-            this.cmbDestinationTable.FormattingEnabled = true;
-            this.cmbDestinationTable.Location = new System.Drawing.Point(129, 141);
-            this.cmbDestinationTable.Name = "cmbDestinationTable";
-            this.cmbDestinationTable.Size = new System.Drawing.Size(195, 21);
-            this.cmbDestinationTable.TabIndex = 12;
+            this.panelWizTextTop.Controls.Add(this.lblFileName);
+            this.panelWizTextTop.Controls.Add(this.label7);
+            this.panelWizTextTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelWizTextTop.Location = new System.Drawing.Point(0, 0);
+            this.panelWizTextTop.Name = "panelWizTextTop";
+            this.panelWizTextTop.Size = new System.Drawing.Size(649, 50);
+            this.panelWizTextTop.TabIndex = 10;
             // 
-            // label3
+            // lblFileName
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(48, 144);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(63, 13);
-            this.label3.TabIndex = 11;
-            this.label3.Text = "Destination:";
+            this.lblFileName.AutoSize = true;
+            this.lblFileName.Location = new System.Drawing.Point(26, 27);
+            this.lblFileName.Name = "lblFileName";
+            this.lblFileName.Size = new System.Drawing.Size(61, 13);
+            this.lblFileName.TabIndex = 1;
+            this.lblFileName.Text = "lblFileName";
             // 
-            // panelWizMainTop
+            // label7
             // 
-            this.panelWizMainTop.Controls.Add(this.label1);
-            this.panelWizMainTop.Controls.Add(this.label2);
-            this.panelWizMainTop.Controls.Add(this.cmbSourceDB);
-            this.panelWizMainTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelWizMainTop.Location = new System.Drawing.Point(0, 0);
-            this.panelWizMainTop.Name = "panelWizMainTop";
-            this.panelWizMainTop.Size = new System.Drawing.Size(649, 100);
-            this.panelWizMainTop.TabIndex = 16;
-            // 
-            // panelWizMainText
-            // 
-            this.panelWizMainText.Controls.Add(this.txtPassword);
-            this.panelWizMainText.Controls.Add(this.lblPassword);
-            this.panelWizMainText.Controls.Add(this.label4);
-            this.panelWizMainText.Controls.Add(this.txtFileName);
-            this.panelWizMainText.Controls.Add(this.btnFileSearch);
-            this.panelWizMainText.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelWizMainText.Location = new System.Drawing.Point(0, 100);
-            this.panelWizMainText.Name = "panelWizMainText";
-            this.panelWizMainText.Size = new System.Drawing.Size(649, 0);
-            this.panelWizMainText.TabIndex = 17;
-            // 
-            // lblPassword
-            // 
-            this.lblPassword.AutoSize = true;
-            this.lblPassword.Location = new System.Drawing.Point(44, 86);
-            this.lblPassword.Name = "lblPassword";
-            this.lblPassword.Size = new System.Drawing.Size(56, 13);
-            this.lblPassword.TabIndex = 14;
-            this.lblPassword.Text = "Password:";
-            // 
-            // txtPassword
-            // 
-            this.txtPassword.Location = new System.Drawing.Point(124, 83);
-            this.txtPassword.Name = "txtPassword";
-            this.txtPassword.Size = new System.Drawing.Size(237, 20);
-            this.txtPassword.TabIndex = 15;
-            this.txtPassword.UseSystemPasswordChar = true;
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.ForeColor = System.Drawing.Color.DimGray;
+            this.label7.Location = new System.Drawing.Point(23, 7);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(85, 16);
+            this.label7.TabIndex = 0;
+            this.label7.Text = "Text Import";
             // 
             // panelWizDB
             // 
@@ -692,37 +958,6 @@
             this.panelWizDB.Name = "panelWizDB";
             this.panelWizDB.Size = new System.Drawing.Size(200, 100);
             this.panelWizDB.TabIndex = 5;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.ForeColor = System.Drawing.Color.DimGray;
-            this.label9.Location = new System.Drawing.Point(23, 7);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(76, 16);
-            this.label9.TabIndex = 1;
-            this.label9.Text = "DB Import";
-            // 
-            // lblDBName
-            // 
-            this.lblDBName.AutoSize = true;
-            this.lblDBName.Location = new System.Drawing.Point(26, 27);
-            this.lblDBName.Name = "lblDBName";
-            this.lblDBName.Size = new System.Drawing.Size(60, 13);
-            this.lblDBName.TabIndex = 2;
-            this.lblDBName.Text = "lblDBName";
-            // 
-            // panelWizDBTop
-            // 
-            this.panelWizDBTop.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelWizDBTop.Controls.Add(this.label9);
-            this.panelWizDBTop.Controls.Add(this.lblDBName);
-            this.panelWizDBTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelWizDBTop.Location = new System.Drawing.Point(0, 0);
-            this.panelWizDBTop.Name = "panelWizDBTop";
-            this.panelWizDBTop.Size = new System.Drawing.Size(200, 46);
-            this.panelWizDBTop.TabIndex = 3;
             // 
             // dgvTables
             // 
@@ -742,27 +977,6 @@
             this.dgvTables.TabIndex = 4;
             this.dgvTables.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvTables_CellMouseUp);
             this.dgvTables.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvTables_CellValueChanged);
-            // 
-            // panelWizDBMid
-            // 
-            this.panelWizDBMid.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.panelWizDBMid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelWizDBMid.Controls.Add(this.label10);
-            this.panelWizDBMid.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelWizDBMid.Location = new System.Drawing.Point(0, 46);
-            this.panelWizDBMid.Name = "panelWizDBMid";
-            this.panelWizDBMid.Size = new System.Drawing.Size(200, 26);
-            this.panelWizDBMid.TabIndex = 5;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(23, 6);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(139, 13);
-            this.label10.TabIndex = 0;
-            this.label10.Text = "Select Tables to Import";
             // 
             // CheckBoxSelectedTable
             // 
@@ -793,271 +1007,57 @@
             this.Map.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.Map.Width = 50;
             // 
-            // panelWizMainDB
+            // panelWizDBMid
             // 
-            this.panelWizMainDB.Controls.Add(this.comboBoxDatabaseList);
-            this.panelWizMainDB.Controls.Add(this.label14);
-            this.panelWizMainDB.Controls.Add(this.groupBox1);
-            this.panelWizMainDB.Controls.Add(this.txtServer);
-            this.panelWizMainDB.Controls.Add(this.label11);
-            this.panelWizMainDB.Location = new System.Drawing.Point(172, 138);
-            this.panelWizMainDB.Name = "panelWizMainDB";
-            this.panelWizMainDB.Size = new System.Drawing.Size(200, 100);
-            this.panelWizMainDB.TabIndex = 18;
+            this.panelWizDBMid.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.panelWizDBMid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelWizDBMid.Controls.Add(this.label10);
+            this.panelWizDBMid.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelWizDBMid.Location = new System.Drawing.Point(0, 46);
+            this.panelWizDBMid.Name = "panelWizDBMid";
+            this.panelWizDBMid.Size = new System.Drawing.Size(200, 26);
+            this.panelWizDBMid.TabIndex = 5;
             // 
-            // label11
+            // label10
             // 
-            this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(43, 21);
-            this.label11.Name = "label11";
-            this.label11.Size = new System.Drawing.Size(41, 13);
-            this.label11.TabIndex = 0;
-            this.label11.Text = "Server:";
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(23, 6);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(139, 13);
+            this.label10.TabIndex = 0;
+            this.label10.Text = "Select Tables to Import";
             // 
-            // txtServer
+            // panelWizDBTop
             // 
-            this.txtServer.Location = new System.Drawing.Point(124, 18);
-            this.txtServer.Name = "txtServer";
-            this.txtServer.Size = new System.Drawing.Size(195, 20);
-            this.txtServer.TabIndex = 1;
+            this.panelWizDBTop.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelWizDBTop.Controls.Add(this.label9);
+            this.panelWizDBTop.Controls.Add(this.lblDBName);
+            this.panelWizDBTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelWizDBTop.Location = new System.Drawing.Point(0, 0);
+            this.panelWizDBTop.Name = "panelWizDBTop";
+            this.panelWizDBTop.Size = new System.Drawing.Size(200, 46);
+            this.panelWizDBTop.TabIndex = 3;
             // 
-            // groupBox1
+            // label9
             // 
-            this.groupBox1.Controls.Add(this.txtDbPassword);
-            this.groupBox1.Controls.Add(this.txtDbUserName);
-            this.groupBox1.Controls.Add(this.label13);
-            this.groupBox1.Controls.Add(this.label12);
-            this.groupBox1.Controls.Add(this.radioSqlServerAuth);
-            this.groupBox1.Controls.Add(this.radioWinAuth);
-            this.groupBox1.Location = new System.Drawing.Point(46, 48);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(464, 100);
-            this.groupBox1.TabIndex = 2;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Authentication";
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.ForeColor = System.Drawing.Color.DimGray;
+            this.label9.Location = new System.Drawing.Point(23, 7);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(76, 16);
+            this.label9.TabIndex = 1;
+            this.label9.Text = "DB Import";
             // 
-            // radioWinAuth
+            // lblDBName
             // 
-            this.radioWinAuth.AutoSize = true;
-            this.radioWinAuth.Checked = true;
-            this.radioWinAuth.Location = new System.Drawing.Point(25, 19);
-            this.radioWinAuth.Name = "radioWinAuth";
-            this.radioWinAuth.Size = new System.Drawing.Size(134, 17);
-            this.radioWinAuth.TabIndex = 0;
-            this.radioWinAuth.TabStop = true;
-            this.radioWinAuth.Text = "Windows Authentiction";
-            this.radioWinAuth.UseVisualStyleBackColor = true;
-            // 
-            // radioSqlServerAuth
-            // 
-            this.radioSqlServerAuth.AutoSize = true;
-            this.radioSqlServerAuth.Location = new System.Drawing.Point(194, 19);
-            this.radioSqlServerAuth.Name = "radioSqlServerAuth";
-            this.radioSqlServerAuth.Size = new System.Drawing.Size(151, 17);
-            this.radioSqlServerAuth.TabIndex = 1;
-            this.radioSqlServerAuth.Text = "SQL Server Authentication";
-            this.radioSqlServerAuth.UseVisualStyleBackColor = true;
-            this.radioSqlServerAuth.CheckedChanged += new System.EventHandler(this.radioSqlServerAuth_CheckedChanged);
-            // 
-            // label12
-            // 
-            this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(25, 50);
-            this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(63, 13);
-            this.label12.TabIndex = 2;
-            this.label12.Text = "User Name:";
-            // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(25, 77);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(56, 13);
-            this.label13.TabIndex = 3;
-            this.label13.Text = "Password:";
-            // 
-            // txtDbUserName
-            // 
-            this.txtDbUserName.Enabled = false;
-            this.txtDbUserName.Location = new System.Drawing.Point(105, 47);
-            this.txtDbUserName.Name = "txtDbUserName";
-            this.txtDbUserName.Size = new System.Drawing.Size(247, 20);
-            this.txtDbUserName.TabIndex = 4;
-            // 
-            // txtDbPassword
-            // 
-            this.txtDbPassword.Enabled = false;
-            this.txtDbPassword.Location = new System.Drawing.Point(105, 69);
-            this.txtDbPassword.Name = "txtDbPassword";
-            this.txtDbPassword.Size = new System.Drawing.Size(247, 20);
-            this.txtDbPassword.TabIndex = 5;
-            this.txtDbPassword.UseSystemPasswordChar = true;
-            // 
-            // label14
-            // 
-            this.label14.AutoSize = true;
-            this.label14.Location = new System.Drawing.Point(43, 163);
-            this.label14.Name = "label14";
-            this.label14.Size = new System.Drawing.Size(56, 13);
-            this.label14.TabIndex = 3;
-            this.label14.Text = "Database:";
-            // 
-            // comboBoxDatabaseList
-            // 
-            this.comboBoxDatabaseList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxDatabaseList.FormattingEnabled = true;
-            this.comboBoxDatabaseList.Location = new System.Drawing.Point(124, 160);
-            this.comboBoxDatabaseList.Name = "comboBoxDatabaseList";
-            this.comboBoxDatabaseList.Size = new System.Drawing.Size(195, 21);
-            this.comboBoxDatabaseList.TabIndex = 4;
-            this.comboBoxDatabaseList.DropDown += new System.EventHandler(this.comboBoxDatabaseList_DropDown);
-            // 
-            // panelWizMainODBC
-            // 
-            this.panelWizMainODBC.Controls.Add(this.txtOdbcPassword);
-            this.panelWizMainODBC.Controls.Add(this.txtOdbcUserName);
-            this.panelWizMainODBC.Controls.Add(this.label17);
-            this.panelWizMainODBC.Controls.Add(this.label16);
-            this.panelWizMainODBC.Controls.Add(this.comboBoxOdbcDataSource);
-            this.panelWizMainODBC.Controls.Add(this.label15);
-            this.panelWizMainODBC.Location = new System.Drawing.Point(451, 192);
-            this.panelWizMainODBC.Name = "panelWizMainODBC";
-            this.panelWizMainODBC.Size = new System.Drawing.Size(198, 109);
-            this.panelWizMainODBC.TabIndex = 19;
-            // 
-            // label15
-            // 
-            this.label15.AutoSize = true;
-            this.label15.Location = new System.Drawing.Point(43, 23);
-            this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(70, 13);
-            this.label15.TabIndex = 0;
-            this.label15.Text = "Data Source:";
-            // 
-            // comboBoxOdbcDataSource
-            // 
-            this.comboBoxOdbcDataSource.FormattingEnabled = true;
-            this.comboBoxOdbcDataSource.Location = new System.Drawing.Point(124, 21);
-            this.comboBoxOdbcDataSource.Name = "comboBoxOdbcDataSource";
-            this.comboBoxOdbcDataSource.Size = new System.Drawing.Size(322, 21);
-            this.comboBoxOdbcDataSource.TabIndex = 1;
-            // 
-            // label16
-            // 
-            this.label16.AutoSize = true;
-            this.label16.Location = new System.Drawing.Point(46, 59);
-            this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(63, 13);
-            this.label16.TabIndex = 2;
-            this.label16.Text = "User Name:";
-            // 
-            // label17
-            // 
-            this.label17.AutoSize = true;
-            this.label17.Location = new System.Drawing.Point(46, 89);
-            this.label17.Name = "label17";
-            this.label17.Size = new System.Drawing.Size(56, 13);
-            this.label17.TabIndex = 3;
-            this.label17.Text = "Password:";
-            // 
-            // txtOdbcUserName
-            // 
-            this.txtOdbcUserName.Location = new System.Drawing.Point(124, 56);
-            this.txtOdbcUserName.Name = "txtOdbcUserName";
-            this.txtOdbcUserName.Size = new System.Drawing.Size(212, 20);
-            this.txtOdbcUserName.TabIndex = 4;
-            // 
-            // txtOdbcPassword
-            // 
-            this.txtOdbcPassword.Location = new System.Drawing.Point(124, 86);
-            this.txtOdbcPassword.Name = "txtOdbcPassword";
-            this.txtOdbcPassword.Size = new System.Drawing.Size(212, 20);
-            this.txtOdbcPassword.TabIndex = 5;
-            this.txtOdbcPassword.UseSystemPasswordChar = true;
-            // 
-            // panelWizMainMySql
-            // 
-            this.panelWizMainMySql.Controls.Add(this.comboBoxMySqlDatabaseList);
-            this.panelWizMainMySql.Controls.Add(this.txtMySqlPassword);
-            this.panelWizMainMySql.Controls.Add(this.txtMySqlUserName);
-            this.panelWizMainMySql.Controls.Add(this.txtMySqlServer);
-            this.panelWizMainMySql.Controls.Add(this.label21);
-            this.panelWizMainMySql.Controls.Add(this.label20);
-            this.panelWizMainMySql.Controls.Add(this.label19);
-            this.panelWizMainMySql.Controls.Add(this.label18);
-            this.panelWizMainMySql.Location = new System.Drawing.Point(403, 109);
-            this.panelWizMainMySql.Name = "panelWizMainMySql";
-            this.panelWizMainMySql.Size = new System.Drawing.Size(200, 100);
-            this.panelWizMainMySql.TabIndex = 20;
-            // 
-            // label18
-            // 
-            this.label18.AutoSize = true;
-            this.label18.Location = new System.Drawing.Point(46, 25);
-            this.label18.Name = "label18";
-            this.label18.Size = new System.Drawing.Size(41, 13);
-            this.label18.TabIndex = 0;
-            this.label18.Text = "Server:";
-            // 
-            // label19
-            // 
-            this.label19.AutoSize = true;
-            this.label19.Location = new System.Drawing.Point(46, 65);
-            this.label19.Name = "label19";
-            this.label19.Size = new System.Drawing.Size(63, 13);
-            this.label19.TabIndex = 1;
-            this.label19.Text = "User Name:";
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(46, 107);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(56, 13);
-            this.label20.TabIndex = 2;
-            this.label20.Text = "Password:";
-            // 
-            // label21
-            // 
-            this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(46, 148);
-            this.label21.Name = "label21";
-            this.label21.Size = new System.Drawing.Size(56, 13);
-            this.label21.TabIndex = 3;
-            this.label21.Text = "Database:";
-            // 
-            // txtMySqlServer
-            // 
-            this.txtMySqlServer.Location = new System.Drawing.Point(124, 22);
-            this.txtMySqlServer.Name = "txtMySqlServer";
-            this.txtMySqlServer.Size = new System.Drawing.Size(339, 20);
-            this.txtMySqlServer.TabIndex = 4;
-            // 
-            // txtMySqlUserName
-            // 
-            this.txtMySqlUserName.Location = new System.Drawing.Point(124, 62);
-            this.txtMySqlUserName.Name = "txtMySqlUserName";
-            this.txtMySqlUserName.Size = new System.Drawing.Size(295, 20);
-            this.txtMySqlUserName.TabIndex = 5;
-            // 
-            // txtMySqlPassword
-            // 
-            this.txtMySqlPassword.Location = new System.Drawing.Point(124, 104);
-            this.txtMySqlPassword.Name = "txtMySqlPassword";
-            this.txtMySqlPassword.Size = new System.Drawing.Size(295, 20);
-            this.txtMySqlPassword.TabIndex = 6;
-            this.txtMySqlPassword.UseSystemPasswordChar = true;
-            // 
-            // comboBoxMySqlDatabaseList
-            // 
-            this.comboBoxMySqlDatabaseList.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.comboBoxMySqlDatabaseList.FormattingEnabled = true;
-            this.comboBoxMySqlDatabaseList.Location = new System.Drawing.Point(124, 143);
-            this.comboBoxMySqlDatabaseList.Name = "comboBoxMySqlDatabaseList";
-            this.comboBoxMySqlDatabaseList.Size = new System.Drawing.Size(212, 21);
-            this.comboBoxMySqlDatabaseList.TabIndex = 7;
-            this.comboBoxMySqlDatabaseList.DropDown += new System.EventHandler(this.comboBoxMySqlDatabaseList_DropDown);
+            this.lblDBName.AutoSize = true;
+            this.lblDBName.Location = new System.Drawing.Point(26, 27);
+            this.lblDBName.Name = "lblDBName";
+            this.lblDBName.Size = new System.Drawing.Size(60, 13);
+            this.lblDBName.TabIndex = 2;
+            this.lblDBName.Text = "lblDBName";
             // 
             // ImportWiz
             // 
@@ -1074,7 +1074,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "ImportWiz";
             this.Padding = new System.Windows.Forms.Padding(1);
-            this.Text = "Template";
+            this.Text = "Import Wizard";
             this.Load += new System.EventHandler(this.ImportWiz_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
@@ -1085,9 +1085,19 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbClose)).EndInit();
             this.panelBottom.ResumeLayout(false);
             this.panelWizMain.ResumeLayout(false);
+            this.panelWizMainText.ResumeLayout(false);
+            this.panelWizMainText.PerformLayout();
+            this.panelWizMainMySql.ResumeLayout(false);
+            this.panelWizMainMySql.PerformLayout();
+            this.panelWizMainODBC.ResumeLayout(false);
+            this.panelWizMainODBC.PerformLayout();
+            this.panelWizMainDB.ResumeLayout(false);
+            this.panelWizMainDB.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
+            this.panelWizMainTop.ResumeLayout(false);
+            this.panelWizMainTop.PerformLayout();
             this.panelWizText.ResumeLayout(false);
-            this.panelWizTextTop.ResumeLayout(false);
-            this.panelWizTextTop.PerformLayout();
             this.tabText.ResumeLayout(false);
             this.tabTextGeneral.ResumeLayout(false);
             this.tabTextGeneral.PerformLayout();
@@ -1099,24 +1109,14 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewText)).EndInit();
             this.panelWizTextTab.ResumeLayout(false);
             this.panelWizTextTab.PerformLayout();
-            this.panelWizMainTop.ResumeLayout(false);
-            this.panelWizMainTop.PerformLayout();
-            this.panelWizMainText.ResumeLayout(false);
-            this.panelWizMainText.PerformLayout();
+            this.panelWizTextTop.ResumeLayout(false);
+            this.panelWizTextTop.PerformLayout();
             this.panelWizDB.ResumeLayout(false);
-            this.panelWizDBTop.ResumeLayout(false);
-            this.panelWizDBTop.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvTables)).EndInit();
             this.panelWizDBMid.ResumeLayout(false);
             this.panelWizDBMid.PerformLayout();
-            this.panelWizMainDB.ResumeLayout(false);
-            this.panelWizMainDB.PerformLayout();
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
-            this.panelWizMainODBC.ResumeLayout(false);
-            this.panelWizMainODBC.PerformLayout();
-            this.panelWizMainMySql.ResumeLayout(false);
-            this.panelWizMainMySql.PerformLayout();
+            this.panelWizDBTop.ResumeLayout(false);
+            this.panelWizDBTop.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 

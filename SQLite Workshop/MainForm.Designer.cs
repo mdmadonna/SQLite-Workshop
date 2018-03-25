@@ -325,7 +325,7 @@
             this.toolStripToolExport});
             this.toolStripImpExp.Location = new System.Drawing.Point(610, 23);
             this.toolStripImpExp.Name = "toolStripImpExp";
-            this.toolStripImpExp.Size = new System.Drawing.Size(58, 25);
+            this.toolStripImpExp.Size = new System.Drawing.Size(89, 25);
             this.toolStripImpExp.TabIndex = 3;
             // 
             // toolStripToolImport
@@ -348,6 +348,7 @@
             this.toolStripToolExport.Size = new System.Drawing.Size(23, 22);
             this.toolStripToolExport.Text = "Export";
             this.toolStripToolExport.ToolTipText = "Export Data From the Current Database";
+            this.toolStripToolExport.Click += new System.EventHandler(this.toolStripToolExport_Click);
             // 
             // toolStripOps
             // 

@@ -36,6 +36,9 @@
     <ApplicationIcon>Main.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CsvHelper, Version=7.0.0.0, Culture=neutral, PublicKeyToken=8c4959082be5c823, processorArchitecture=MSIL">
+      <HintPath>..\packages\CsvHelper.7.1.0\lib\net45\CsvHelper.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -137,6 +140,12 @@
     <Compile Include="Forms\BuildColumn.Designer.cs">
       <DependentUpon>BuildColumn.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ExportWiz.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ExportWiz.Designer.cs">
+      <DependentUpon>ExportWiz.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Template.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -189,6 +198,9 @@
     <EmbeddedResource Include="Forms\BuildColumn.resx">
       <DependentUpon>BuildColumn.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ExportWiz.resx">
+      <DependentUpon>ExportWiz.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\Template.resx">
       <DependentUpon>Template.cs</DependentUpon>
     </EmbeddedResource>
@@ -206,6 +218,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>

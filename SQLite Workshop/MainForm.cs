@@ -363,13 +363,19 @@ namespace SQLiteWorkshop
             iWiz.DatabaseLocation = CurrentDB;
             iWiz.ShowInTaskbar = true;
             iWiz.ShowDialog();
+        }
 
+        private void toolStripToolExport_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(CurrentDB)) return;
+            ExportWiz eWiz = new ExportWiz();
+            eWiz.DatabaseLocation = CurrentDB;
+            eWiz.ShowInTaskbar = true;
+            eWiz.ShowDialog();
         }
         #endregion
 
         #endregion
-
-
 
         #region Context Menu Handlers
         #region Database Context Menu Handlers
@@ -524,6 +530,12 @@ namespace SQLiteWorkshop
                     ef.TargetNode = treeViewMain.SelectedNode;
                     ef.ShowDialog();
                     if (ef.bActionComplete) treeViewMain.Nodes.Remove(treeViewMain.SelectedNode);
+                    break;
+                case "export":
+                    ExportWiz exp = new ExportWiz();
+                    exp.DatabaseLocation = CurrentDB;
+                    exp.TableName = treeViewMain.SelectedNode.Text;
+                    exp.ShowDialog();
                     break;
                 case "refresh":
                     LoadDB(CurrentDB);
@@ -742,8 +754,7 @@ namespace SQLiteWorkshop
         }
 
         #endregion
-
-
+        
         #region Helpers
         private string FindDBFileLocation(bool bFileExists = true)
         {
@@ -989,8 +1000,7 @@ namespace SQLiteWorkshop
             treeViewMain.Nodes.Add(topNode);
         }
         #endregion
-
-
+        
         #region Form Sizing and Control
 
         bool grabbed = false;
