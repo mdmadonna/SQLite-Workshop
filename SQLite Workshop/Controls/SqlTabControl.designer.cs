@@ -164,6 +164,7 @@
             this.txtSqlStatement.TabIndex = 4;
             this.txtSqlStatement.Text = "";
             this.txtSqlStatement.TextChanged += new System.EventHandler(this.txtSqlStatement_TextChanged);
+            this.txtSqlStatement.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtSqlStatement_KeyDown);
             // 
             // SqlTabControl
             // 

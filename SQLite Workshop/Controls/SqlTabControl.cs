@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Runtime.InteropServices;
 
 namespace SQLiteWorkshop
 {
@@ -201,74 +202,78 @@ namespace SQLiteWorkshop
             e.Graphics.DrawString(rowIdx, this.Font, SystemBrushes.ControlText, headerBounds, centerFormat);
         }
 
+
+        bool ignoreChange = false;
         private void txtSqlStatement_TextChanged(object sender, EventArgs e)
         {
-            int iCursor = txtSqlStatement.SelectionStart;
-            txtSqlStatement.Select(0, txtSqlStatement.Text.Length - 1);
-            txtSqlStatement.SelectionColor = txtSqlStatement.ForeColor;
+            if (ignoreChange) return; 
 
-            MarkComments();
+            int iCursor = txtSqlStatement.SelectionStart;
+            RichTextBox rtb = new RichTextBox();
+            rtb.Rtf = txtSqlStatement.Rtf;
+
+            rtb.Select(0, rtb.Text.Length - 1);
+            rtb.SelectionColor = rtb.ForeColor;
+
+            MarkComments(rtb);
 
             foreach (string keyword in Common.keywords)
             {
-                MarkKeyword(keyword, Color.Blue, 0);
+                MarkKeyword(rtb, keyword, Color.Blue, 0);
             }
-            
+
+            ignoreChange = true;
+            txtSqlStatement.Rtf = rtb.Rtf;
+            ignoreChange = false;
+
             txtSqlStatement.SelectionStart = iCursor < 0 ? 0 : iCursor;
             txtSqlStatement.SelectionLength = 0;
         }
 
-        private void MarkKeyword(string word, Color color, int startIndex)
+        private void MarkKeyword(RichTextBox rtb, string word, Color color, int startIndex)
         {
-            int pos = txtSqlStatement.Find(word, 0, txtSqlStatement.Text.Length, RichTextBoxFinds.WholeWord | RichTextBoxFinds.NoHighlight);
+            int pos = rtb.Find(word, 0, rtb.Text.Length, RichTextBoxFinds.WholeWord);
             while (pos >= 0)
             {
-                txtSqlStatement.Select(pos, word.Length);
-                if (txtSqlStatement.SelectionColor.ToArgb().Equals(txtSqlStatement.ForeColor.ToArgb()))
+                rtb.Select(pos, word.Length);
+                if (rtb.SelectionColor.ToArgb().Equals(txtSqlStatement.ForeColor.ToArgb()))
                 {
-                    txtSqlStatement.SelectionColor = color;
-                    txtSqlStatement.Select(pos + word.Length, 0);
-                    txtSqlStatement.SelectionColor = txtSqlStatement.ForeColor;
+                    rtb.SelectionColor = color;
+                    rtb.Select(pos + word.Length, 0);
+                    rtb.SelectionColor = txtSqlStatement.ForeColor;
                 }
-                pos = txtSqlStatement.Find(word, pos + 1, txtSqlStatement.Text.Length, RichTextBoxFinds.WholeWord | RichTextBoxFinds.NoHighlight);
+                pos = rtb.Find(word, pos + 1, rtb.Text.Length, RichTextBoxFinds.WholeWord);
             }
-
-            /*
-            if (txtSqlStatement.Text.ToUpper().Contains(word))
-            {
-                int index = -1;
-                int selectStart = txtSqlStatement.SelectionStart;
-
-                while ((index = txtSqlStatement.Text.ToUpper().IndexOf(word, (index + 1))) != -1)
-                {
-                    txtSqlStatement.Select((index + startIndex), word.Length);
-                    txtSqlStatement.SelectionColor = color;
-                    txtSqlStatement.Select(selectStart, 0);
-                    txtSqlStatement.SelectionColor = Color.Black;
-                }
-            }
-            */
         }
 
-        private void MarkComments()
+        private void MarkComments(RichTextBox rtb)
         {
-            int length = txtSqlStatement.Text.Length;
+            int length = rtb.Text.Length;
             int pos = 0;
             const string comment = "--";
 
             while (pos < length)
             {
                 // This isn't exactly correct as it will find -- within quotes.  I'll worry about that later
-                pos = txtSqlStatement.Find(comment, pos, length, RichTextBoxFinds.MatchCase);
+                pos = rtb.Find(comment, pos, length, RichTextBoxFinds.MatchCase);
                 if (pos < 0) break;
-                int eol = txtSqlStatement.Find(Environment.NewLine, pos, length, RichTextBoxFinds.MatchCase);
-                if (eol < 0) eol = txtSqlStatement.Find("\n", pos, length, RichTextBoxFinds.MatchCase);
-                if (eol < 0) eol = txtSqlStatement.Find("\r", pos, length, RichTextBoxFinds.MatchCase);
-                txtSqlStatement.Select(pos, eol < 0 ? length - pos : eol - pos);
-                txtSqlStatement.SelectionColor = Color.Green;
-                pos = pos + txtSqlStatement.SelectionLength;
+                int eol = rtb.Find(Environment.NewLine, pos, length, RichTextBoxFinds.MatchCase);
+                if (eol < 0) eol = rtb.Find("\n", pos, length, RichTextBoxFinds.MatchCase);
+                if (eol < 0) eol = rtb.Find("\r", pos, length, RichTextBoxFinds.MatchCase);
+                rtb.Select(pos, eol < 0 ? length - pos : eol - pos);
+                rtb.SelectionColor = Color.Green;
+                pos = pos + rtb.SelectionLength;
             }
         }
 
+        private void txtSqlStatement_KeyDown(object sender, KeyEventArgs e)
+        {
+            
+        }
+
+        private void txtSqlStatement_KeyUp(object sender, KeyEventArgs e)
+        {
+
+        }
     }
 }

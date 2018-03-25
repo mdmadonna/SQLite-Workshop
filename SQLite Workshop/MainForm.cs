@@ -339,11 +339,16 @@ namespace SQLiteWorkshop
         private void toolStripTbCreateView_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(CurrentDB)) return;
+            SqlTab st = new SqlTab();
+            st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLCreateView);
         }
 
         private void toolStripTbCreateIndex_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(CurrentDB)) return;
+            if (treeViewMain.SelectedNode == null) return;
+            if (treeViewMain.SelectedNode.Parent == null) return;
+            if (treeViewMain.SelectedNode.Text != "Indexes" && treeViewMain.SelectedNode.Parent.Text != "Indexes") return;
             BuildIndex bi = new BuildIndex();
             bi.TableName = treeViewMain.SelectedNode.Text == "Indexes" ? treeViewMain.SelectedNode.Parent.Text : treeViewMain.SelectedNode.Parent.Parent.Text;
             bi.Show();
@@ -352,6 +357,8 @@ namespace SQLiteWorkshop
         private void toolStripTbCreateTrigger_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(CurrentDB)) return;
+            SqlTab st = new SqlTab();
+            st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLCreateTrigger);
         }
         #endregion
 
@@ -676,8 +683,7 @@ namespace SQLiteWorkshop
                     st = new SqlTab();
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLSelect1000View); break;
                 case "new view":
-                    st = new SqlTab();
-                    st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLCreateView);
+                    toolStripTbCreateView_Click(sender, e);
                     break;
                 case "delete view":
                     ef = new ExecuteForm();
@@ -722,8 +728,7 @@ namespace SQLiteWorkshop
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLEditTrigger);
                     break;
                 case "new trigger":
-                    st = new SqlTab();
-                    st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLCreateTrigger);
+                    toolStripTbCreateTrigger_Click(sender, e);
                     break;
                 case "delete trigger":
                     ef = new ExecuteForm();

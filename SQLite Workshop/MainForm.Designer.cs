@@ -254,7 +254,7 @@
             this.toolStripTbNewQryWin});
             this.toolStripTb.Location = new System.Drawing.Point(412, 23);
             this.toolStripTb.Name = "toolStripTb";
-            this.toolStripTb.Size = new System.Drawing.Size(196, 25);
+            this.toolStripTb.Size = new System.Drawing.Size(227, 25);
             this.toolStripTb.TabIndex = 2;
             // 
             // toolStripTbCreateTable
@@ -325,7 +325,7 @@
             this.toolStripToolExport});
             this.toolStripImpExp.Location = new System.Drawing.Point(610, 23);
             this.toolStripImpExp.Name = "toolStripImpExp";
-            this.toolStripImpExp.Size = new System.Drawing.Size(89, 25);
+            this.toolStripImpExp.Size = new System.Drawing.Size(58, 25);
             this.toolStripImpExp.TabIndex = 3;
             // 
             // toolStripToolImport
