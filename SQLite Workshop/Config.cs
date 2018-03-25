@@ -23,6 +23,7 @@ namespace SQLiteWorkshop
         internal const string CFG_LASTBKPOPEN       = "LASTBKPOPEN";                //Last directory with a successful backup DB selection
         internal const string CFG_TABLEEDITHSPLITP  = "iCFG_TABLEEDITHSPLITP";      //Table Editor Splitter position
         internal const string CFG_DFLTSQLDIR        = "DEFAULTSQLDIR";              //Default Directory for SQL Files
+        internal const string CFG_REGISTEREDDBS     = "REGISTEREDDBS";              //Registered Databases
 
 
         //Configuration File

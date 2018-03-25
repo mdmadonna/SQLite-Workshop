@@ -24,6 +24,12 @@ namespace SQLiteWorkshop
 
         ToolTip toolTip;
         ArrayList RecentDBs = new ArrayList();
+        internal struct RegisteredDB
+        {
+            internal string Name;
+            internal string Password;
+        }
+        Dictionary<string, RegisteredDB> RegisteredDBs = new Dictionary<string, RegisteredDB>();
 
         //Context Menus
         ContextMenu dbContextMenu;
@@ -65,7 +71,7 @@ namespace SQLiteWorkshop
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Compress Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Encrypt Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem("-"));
-            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Register", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
+            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Register", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null) { Name = "Register" });
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Attach", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Rebuild", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Restore", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
@@ -207,6 +213,9 @@ namespace SQLiteWorkshop
                 InitToolStripOpenDropDown(RecentDBs);
 
             }
+
+            Common.password = "SQLite Workshop";
+            LoadRegisteredDBs();
         }
 
         /// <summary>
@@ -519,9 +528,6 @@ namespace SQLiteWorkshop
 
         private void dbContextMenu_Clicked(object sender, EventArgs e)
         {
-            //SqlTab st;
-            //DBEditorTab dbEditor;
-            //TableEditorTab tbt;
             ExecuteForm ef;
             switch (((MenuItem)sender).Text.ToLower())
             {
@@ -560,7 +566,10 @@ namespace SQLiteWorkshop
                     LoadDB(CurrentDB);
                     break;
                 case "register":
-                    Common.ShowMsg(Common.NOTIMPLEMENTED);
+                    RegisterDB();
+                    break;
+                case "unregister":
+                    UnRegisterDB();
                     break;
                 case "rebuild":
                     Common.ShowMsg(Common.NOTIMPLEMENTED);
@@ -967,6 +976,9 @@ namespace SQLiteWorkshop
             //Note that the 'New...' item uses a different Event Handler
             toolStripDBOpenDropDown.DropDownItems.Clear();
             toolStripDBOpenDropDown.DropDownItems.Add("New...", null, toolStripOpen_Click);
+            databaseToolStripMenuItem.DropDown.Items.Clear();
+            databaseToolStripMenuItem.DropDownItems.Add("New...", null, toolStripOpen_Click);
+
             for (int i = dbQ.Count; i > 0; --i)
             {
                 ToolStripMenuItem tdi = new ToolStripMenuItem();
@@ -976,18 +988,47 @@ namespace SQLiteWorkshop
                 tdi.Click += toolStripDBOpenDropDownItem_Click;
                 toolStripDBOpenDropDown.DropDownItems.Add(tdi);
 
+                ToolStripMenuItem tdj = new ToolStripMenuItem();
+                tdj.ToolTipText = dbName;
+                tdj.Text = dbName.Substring(dbName.LastIndexOf('\\') + 1);
+                tdj.Click += toolStripDBOpenDropDownItem_Click;
+                databaseToolStripMenuItem.DropDownItems.Add(tdj);
             }
         }
+
+        internal void InitToolStripRegisteredDBDropDown(Dictionary<string, RegisteredDB> dbQ)
+        {
+            openRegisteredDBtoolStripMenuItem.DropDownItems.Clear();
+
+            var sortedDictionary = from entry in dbQ orderby entry.Value.Name ascending select entry;
+
+            foreach (var rDB in sortedDictionary)
+            {
+                ToolStripMenuItem tdi = new ToolStripMenuItem();
+                tdi.ToolTipText = rDB.Key;
+                tdi.Text = rDB.Value.Name;
+                tdi.Tag = rDB.Value.Password;
+                tdi.Click += toolStripDBOpenDropDownItem_Click;
+                openRegisteredDBtoolStripMenuItem.DropDownItems.Add(tdi);
+            }
+        }
+
         protected void BuildTreeView(string DBLocation)
         {
 
             treeViewMain.Nodes.Clear();
 
             SchemaDefinition sd = DataAccess.GetSchema(DBLocation);
-            if (sd.LoadStatus != 0) return;
+            if (sd.LoadStatus != 0)
+            {
+                Common.ShowMsg(string.Format("The database {0} cannot be loaded.\r\n{1}", CurrentDB, DataAccess.LastError));
+                return;
+            }
 
             TreeNode topNode = new TreeNode(sd.DBName, 0, 0);
             topNode.ContextMenu = dbContextMenu;
+            MenuItem mi = topNode.ContextMenu.MenuItems["Register"];
+            mi.Text = RegisteredDBs.Keys.Contains(DBLocation) ? "Unregister" : "Register";
 
             // Add System Tables & Tables to Treeview
             TreeNode systablesNode = new TreeNode("System Tables", 2, 2);
@@ -1137,8 +1178,73 @@ namespace SQLiteWorkshop
         {
             toolStripStatusMain.Text = message;
         }
+
+        internal void RegisterDB()
+        {
+            if (RegisteredDBs.Keys.Contains(CurrentDB)) return;
+
+            RegisteredDB rDB = new RegisteredDB();
+            rDB.Name = Path.GetFileName(CurrentDB);
+            rDB.Password = string.Empty;            //when implemented, always keep this encrypted
+
+            RegisteredDBs.Add(CurrentDB, rDB);
+            SaveRegisteredDBSetting(RegisteredDBs);
+
+            MenuItem mi = treeViewMain.TopNode.ContextMenu.MenuItems["Register"];
+            mi.Text = "Unregister";
+
+            WriteStatusStripMessage(string.Format("Database {0} has been added to the SQLite Workshop registry.", CurrentDB));
+        }
+
+        internal void UnRegisterDB()
+        {
+            if (!RegisteredDBs.Keys.Contains(CurrentDB)) return;
+
+            RegisteredDBs.Remove(CurrentDB);
+            SaveRegisteredDBSetting(RegisteredDBs);
+
+            MenuItem mi = treeViewMain.TopNode.ContextMenu.MenuItems["Register"];
+            mi.Text = "Register";
+
+            WriteStatusStripMessage(string.Format("Database {0} has been deleted from the SQLite Workshop registry.", CurrentDB));
+        }
+
+        internal void SaveRegisteredDBSetting(Dictionary<string, RegisteredDB> dbQ)
+        {
+            StringBuilder sb = new StringBuilder();
+            string comma = string.Empty;
+            
+            foreach (var rDB in dbQ)
+            {
+                string token = string.Format("{0}|{1}|{2}", rDB.Key, rDB.Value.Name, rDB.Value.Password);
+                sb.Append(comma).Append(Common.Encrypt(token));
+                comma = ";";
+            }
+            cfg.SetSetting(Config.CFG_REGISTEREDDBS, sb.ToString());
+            InitToolStripRegisteredDBDropDown(dbQ);
+        }
+
+        internal void LoadRegisteredDBs()
+        {
+            RegisteredDBs.Clear();
+            string rDBList = cfg.appsetting(Config.CFG_REGISTEREDDBS);
+            if (string.IsNullOrEmpty(rDBList)) return;
+
+            string[] rDBs = rDBList.Split(';');
+            foreach (string r in rDBs)
+            {
+                string token = Common.Decrypt(r);
+                string[] tokens = token.Split('|');
+                RegisteredDB rDB = new RegisteredDB();
+                rDB.Name = tokens[1];
+                rDB.Password = tokens[2];
+                RegisteredDBs.Add(tokens[0], rDB);
+            }
+            InitToolStripRegisteredDBDropDown(RegisteredDBs);
+        }
+
         #endregion
-        
+
         #region Form Sizing and Control
 
         bool grabbed = false;

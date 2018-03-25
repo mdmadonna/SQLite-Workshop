@@ -135,7 +135,8 @@ namespace SQLiteWorkshop
             SchemaDefinitions.Clear();
 
             FileInfo f = new FileInfo(DBLocation);
-            if (!f.Exists) return sd;
+            if (!f.Exists)
+                { _lasterror = "Database not found."; sd.LoadStatus = -1; return sd; }
 
             if (DataAccess.IsEncrypted(DBLocation))
             {

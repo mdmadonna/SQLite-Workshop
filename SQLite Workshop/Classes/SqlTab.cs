@@ -41,6 +41,13 @@ namespace SQLiteWorkshop
             if (string.IsNullOrEmpty(filename)) return;
             sTab.Text = string.Format("  {0}          ", Path.GetFileName(filename));
             sqlTabControl.SqlFileName = filename;
+            FileInfo fi = new FileInfo(filename);
+            if (fi.Length > Common.MAX_SQL_FILESIZE)
+            {
+                Common.ShowMsg(string.Format("Cannot open {0}\r\n{1}", filename, string.Format("File Exceeds {0} bytes.", Common.MAX_SQL_FILESIZE.ToString())));
+                return;
+            }
+
             try
             {
                 StreamReader sr = new StreamReader(filename);

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
+using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -52,6 +55,8 @@ namespace SQLiteWorkshop
     {
         #region Constants
         internal const string APPNAME                   = "SQLite Workshop";
+
+        internal const int MAX_SQL_FILESIZE             = 1048576;
 
         internal const string NOTIMPLEMENTED            = "This feature is not yet implemented.";
         internal const string MSG_FILEEXISTS            = "This file already exists.  Do you want to overwrite it?";
@@ -453,6 +458,96 @@ namespace SQLiteWorkshop
                 if (ColType.StartsWith(szType)) return true;
             }
             return false;
+        }
+        #endregion
+
+        #region encryption
+        static string _password = null;
+        static byte[] _salt = new byte[] { 0x05, 0x6A, 0xE7, 0x6e, 0x20, 0x00, 0x01, 0x67, 0x76, 0x65, 0x9a, 0x03, 0x6F };
+
+        internal static string password
+        {
+            get { return _password; }
+            set { _password = value; }
+        }
+        /// <summary>
+        /// Decrypt a string - initialize password before using
+        /// </summary>
+        /// <param name="cipherText">string to decrypt</param>
+        /// <returns></returns>
+        [PermissionSetAttribute(SecurityAction.Demand, Name = "FullTrust")]
+        internal static string Decrypt(string cipherText)
+        {
+            if (string.IsNullOrEmpty(_password)) throw new Exception("Password not initialized.");
+            if (string.IsNullOrEmpty(cipherText)) return null;
+            byte[] cipherBytes = Convert.FromBase64String(cipherText);
+            Rfc2898DeriveBytes db = new Rfc2898DeriveBytes(_password, _salt);
+            byte[] dd = Decrypt(cipherBytes, db.GetBytes(32), db.GetBytes(16));
+            return System.Text.Encoding.Unicode.GetString(dd);
+        }
+        private static byte[] Decrypt(byte[] cipherData, byte[] Key, byte[] IV)
+        {
+            MemoryStream ms = new MemoryStream();
+            CryptoStream cs = null;
+            try
+            {
+                Rijndael alg = Rijndael.Create();
+                alg.Key = Key;
+                alg.IV = IV;
+                cs = new CryptoStream(ms, alg.CreateDecryptor(), CryptoStreamMode.Write);
+                cs.Write(cipherData, 0, cipherData.Length);
+                cs.FlushFinalBlock();
+                return ms.ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Decryption Error: " + ex.Message);
+            }
+            finally
+            {
+                cs.Close();
+            }
+        }
+
+        /// <summary>
+        /// Encrypt a string - initialize password before using
+        /// </summary>
+        /// <param name="clearText">string to encrypt</param>
+        /// <returns></returns>
+        [PermissionSetAttribute(SecurityAction.Demand, Name = "FullTrust")]
+        internal static string Encrypt(string clearText)
+        {
+            if (string.IsNullOrEmpty(_password)) throw new Exception("Password not initialized.");
+            if (string.IsNullOrEmpty(clearText)) return null;
+            byte[] clearBytes = System.Text.Encoding.Unicode.GetBytes(clearText);
+            Rfc2898DeriveBytes db = new Rfc2898DeriveBytes(_password, _salt);
+            byte[] encryptedData = Encrypt(clearBytes, db.GetBytes(32), db.GetBytes(16));
+            return Convert.ToBase64String(encryptedData);
+        }
+
+
+        private static byte[] Encrypt(byte[] clearData, byte[] Key, byte[] IV)
+        {
+            MemoryStream ms = new MemoryStream();
+            CryptoStream cs = null;
+            try
+            {
+                Rijndael alg = Rijndael.Create();
+                alg.Key = Key;
+                alg.IV = IV;
+                cs = new CryptoStream(ms, alg.CreateEncryptor(), CryptoStreamMode.Write);
+                cs.Write(clearData, 0, clearData.Length);
+                cs.FlushFinalBlock();
+                return ms.ToArray();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Encryption Error: " + ex.Message);
+            }
+            finally
+            {
+                cs.Close();
+            }
         }
         #endregion
     }
