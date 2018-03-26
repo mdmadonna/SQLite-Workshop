@@ -2,7 +2,7 @@
 # SQLite-Workshop
 Database Manager for SQLite
 
-This is still a work in progress and not yet redy for Beta.  SQLite Workshop has a wide range of features and capabilities including:
+This is still a work in progress and not yet ready for Beta.  SQLite Workshop has a wide range of features and capabilities including:
 
 1.  Create a database.
 2.  Browse tables and views in a database.
