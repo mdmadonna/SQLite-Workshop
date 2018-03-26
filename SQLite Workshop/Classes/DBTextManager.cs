@@ -11,6 +11,7 @@ namespace SQLiteWorkshop
 {
     class DBTextManager : DBManager
     {
+        
         internal string FileName { get; set; }
         internal string LastError { get; set; }
         internal bool FirstRowHasHeadings { get; set; }
@@ -82,7 +83,7 @@ namespace SQLiteWorkshop
             int recCount = 0;
             int i;
             SQLiteTransaction sqlT = null;
-            StreamReader sr;
+            StreamReader sr = null; ;
 
             SQLiteErrorCode returnCode;
 
@@ -138,14 +139,16 @@ namespace SQLiteWorkshop
                     }
                     SQCmd.ExecuteNonQuery();
                     recCount++;
+                    if (recCount % 100 == 0) FireStatusEvent(ImportStatus.InProgress, recCount);
                 }
                 sr.Close();
                 sqlT.Commit();
-                DataAccess.CloseDB(SQConn);
+                FireStatusEvent(ImportStatus.Complete, recCount);
             }
             catch (Exception ex)
             {
                 sqlT.Rollback();
+                try { if (sr != null) sr.Close(); } catch { }
                 rtnCode = DataAccess.ExecuteNonQuery(SQCmd, out returnCode);
                 Common.ShowMsg(string.Format(Common.ERR_SQL, ex.Message, SQLiteErrorCode.Ok));
                 return false;

@@ -177,6 +177,8 @@ namespace SQLiteWorkshop
                     lblFileName.Text = txtFileName.Text;
                     tabText.SelectedTab = tabTextGeneral;
                     db = new DBTextManager(txtFileName.Text);
+                    cmbDestinationTable.Text = Path.GetFileNameWithoutExtension(txtFileName.Text);
+                    InitializeTextColumns();
                     break;
                 case ImportSource.SQLite:
                     if (!ValidateTextPanel()) return;
@@ -314,17 +316,15 @@ namespace SQLiteWorkshop
         protected void InitializeTextColumns()
         {
             UpdateTextManager();
-            if (listBoxColumns.Items.Count == 0)
-            {
-                textColumns = db.GetColumns(txtFileName.Text);
-                if (textColumns.Count == 0) return;
+            listBoxColumns.Items.Clear();
+            textColumns = db.GetColumns(txtFileName.Text);
+            if (textColumns.Count == 0) return;
 
-                foreach (var textColumn in textColumns)
-                {
-                    listBoxColumns.Items.Add(textColumn.Key);
-                }
-                PopulatePropertyGrid();
+            foreach (var textColumn in textColumns)
+            {
+                listBoxColumns.Items.Add(textColumn.Key);
             }
+            PopulatePropertyGrid();
         }
 
         /// <summary>
@@ -333,11 +333,11 @@ namespace SQLiteWorkshop
         /// <returns>Separator</returns>
         private char GetSeparator()
         {
-            if (radioButtonComma.Checked) return ',';
-            if (radioButtonPipe.Checked) return '|';
-            if (radioButtonSemiColon.Checked) return ';';
-            if (radioButtonSpace.Checked) return ' ';
-            if (radioButtonTab.Checked) return '\t';
+            if (radioButtonComma.Enabled && radioButtonComma.Checked) return ',';
+            if (radioButtonPipe.Enabled && radioButtonPipe.Checked) return '|';
+            if (radioButtonSemiColon.Enabled && radioButtonSemiColon.Checked) return ';';
+            if (radioButtonSpace.Enabled && radioButtonSpace.Checked) return ' ';
+            if (radioButtonTab.Enabled && radioButtonTab.Checked) return '\t';
             return (Convert.ToChar(txtOtherDelimiter.Text));
         }
 
@@ -366,25 +366,20 @@ namespace SQLiteWorkshop
         /// <param name="column"></param>
         private void PopulatePropertyGrid(string column = null)
         {
-            if (ColumnSettings == null)
+            ColumnSettings = new Dictionary<string, ImportWizTextPropertySettings>();
+            for (int i = 0; i < listBoxColumns.Items.Count; i++)
             {
-                ColumnSettings = new Dictionary<string, ImportWizTextPropertySettings>();
-                for (int i = 0; i < listBoxColumns.Items.Count; i++ )
-                {
-                    ImportWizTextPropertySettings ips = new ImportWizTextPropertySettings();
-                    ips.Name = listBoxColumns.Items[i].ToString();
-                    ips.ColumnDelimeter = GetSeparator().ToString();
-                    ips.ColumnWidth = 255;
-                    ips.Type = "TEXT";
-                    ips.Exclude = false;
-                    ColumnSettings.Add(ips.Name, ips);
-                }
+                ImportWizTextPropertySettings ips = new ImportWizTextPropertySettings();
+                ips.Name = listBoxColumns.Items[i].ToString();
+                ips.ColumnWidth = 255;
+                ips.Type = "varchar";
+                ips.Exclude = false;
+                ColumnSettings.Add(ips.Name, ips);
             }
 
             if (column == null) column = listBoxColumns.Items[0].ToString();
             listBoxColumns.SelectedIndex = 0;
             propertyGridColumns.SelectedObject = ColumnSettings[column];
-
         }
 
         /// <summary>
@@ -440,29 +435,52 @@ namespace SQLiteWorkshop
 
             GridItem p = (GridItem)e.ChangedItem;
 
+            ImportWizTextPropertySettings iw = (ImportWizTextPropertySettings)propertyGridColumns.SelectedObject;
+            iw.SetReadOnly("Name", false);
+            iw.SetReadOnly("Type", false);
+            iw.SetReadOnly("ColumnWidth", false);
+            iw.SetReadOnly("Exclude", false);
+            iw.SetReadOnly("PrimaryKey", false);
+            iw.SetReadOnly("Unique", false);
+            iw.SetReadOnly("AllowNulls", false);
             switch (p.PropertyDescriptor.Name)
             {
                 case "Name":
-                    string newName = ((ImportWizTextPropertySettings)propertyGridColumns.SelectedObject).Name;
+                    string newName = iw.Name;
                     if (!ValidateColumnName(newName))
                     {
-                        ((ImportWizTextPropertySettings)propertyGridColumns.SelectedObject).Name = listBoxColumns.Items[listBoxColumns.SelectedIndex].ToString();
+                        iw.Name = listBoxColumns.Items[listBoxColumns.SelectedIndex].ToString();
                         return;
                     }
-                    listBoxColumns.Items[listBoxColumns.SelectedIndex] = ((ImportWizTextPropertySettings)propertyGridColumns.SelectedObject).Name;
+                    listBoxColumns.Items[listBoxColumns.SelectedIndex] = iw.Name;
                     break;
 
                 case "Type":
-                    string newType = ((ImportWizTextPropertySettings)propertyGridColumns.SelectedObject).Type;
+                    string newType = iw.Type;
+                    if (Common.IsNumber(newType))
+                    {
+                        iw.SetReadOnly("PrimaryKey", false);
+                        iw.ColumnWidth = 0;
+                        iw.SetReadOnly("ColumnWidth", true);
+                        break;
+                    }
                     if (Common.IsText(newType))
                     {
-                        ((ImportWizTextPropertySettings)propertyGridColumns.SelectedObject).AutoIncrement = false;
-                        //p.Parent.GridItems["Auto Increment"].PropertyDescriptor.IsReadOnly = true;
+                        iw.SetReadOnly("ColumnWidth", false);
                     }
+                    break;
+                case "Exclude":
+                    iw.SetReadOnly("Name", iw.Exclude);
+                    iw.SetReadOnly("Type", iw.Exclude);
+                    iw.SetReadOnly("ColumnWidth", iw.Exclude);
+                    iw.SetReadOnly("PrimaryKey", iw.Exclude);
+                    iw.SetReadOnly("Unique", iw.Exclude);
+                    iw.SetReadOnly("AllowNulls", iw.Exclude);
                     break;
                 default:
                     break;
             }
+            propertyGridColumns.Refresh();
         }
 
         /// <summary>
@@ -843,6 +861,18 @@ namespace SQLiteWorkshop
         #endregion
 
         #region Import Routines
+
+        /// <summary>
+        /// The DB Managers will periodically fire this event to relay current import status to the user.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        internal void StatusReport(object sender, StatusEventArgs e)
+        {
+            toolStripStatusMsg.Text = string.Format("{0}{1} rows imported.", e.Status == ImportStatus.Complete ? "Import Complete. " : string.Empty, e.RowCount.ToString());
+            Application.DoEvents();
+        }
+
         #region Import Text
         private void ImportText()
         {
@@ -856,7 +886,6 @@ namespace SQLiteWorkshop
                 column.Name = columnSetting.Value.Name;
                 column.DefaultValue = string.Empty;
                 column.HasDefault = false;
-                column.IsAutoIncrement = columnSetting.Value.AutoIncrement;
                 column.IsKey = false;
                 column.IsNullable = columnSetting.Value.AllowNulls;
                 column.IsUnique = columnSetting.Value.Unique;
@@ -866,9 +895,10 @@ namespace SQLiteWorkshop
                 column.PrimaryKey = columnSetting.Value.PrimaryKey;
                 Columns.Add(columnSetting.Value.Name, column);
             }
+            db.StatusReport += StatusReport;
             db.Import(txtFileName.Text, cmbDestinationTable.Text, Columns);
+            db.StatusReport -= StatusReport;
         }
-
         #endregion
 
         #region ImportDB
@@ -901,6 +931,7 @@ namespace SQLiteWorkshop
         private void Import_SQLite()
         {
             this.Cursor = Cursors.WaitCursor;
+            db.StatusReport += StatusReport;
             try
             {
                 for (int i = 1; i < dgvTables.RowCount; i++)
@@ -912,14 +943,17 @@ namespace SQLiteWorkshop
                         db.Import(dgvr.Cells[1].Value.ToString(), dgvr.Cells[2].Value.ToString());
                     }
                 }
-                this.Cursor = Cursors.Default;
                 toolStripStatusMsg.Text = "Import Complete.";
             }
             catch (Exception ex)
             {
-                this.Cursor = Cursors.Default;
                 Common.ShowMsg(string.Format("Import Failed: {0}", ex.Message));
                 toolStripStatusMsg.Text = "Import Failed.";
+            }
+            finally
+            {
+                db.StatusReport -= StatusReport;
+                this.Cursor = Cursors.Default;
             }
         }
 
@@ -936,6 +970,7 @@ namespace SQLiteWorkshop
         #endregion
         #endregion
 
+        #region helpers
         private void cmbSourceDB_SelectedIndexChanged(object sender, EventArgs e)
         {
             ComboBox c = (ComboBox)sender;
@@ -1011,10 +1046,34 @@ namespace SQLiteWorkshop
                 default:
                     break;
             }
-            //cmbSourceTables.Items.Clear();
         }
 
-        #region helpers
+        private void radioButton_Click(object sender, EventArgs e)
+        {
+            InitializeTextColumns();
+        }
+
+        private void txtOtherDelimiter_TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(txtOtherDelimiter.Text))
+            {
+                setRadioButtons(true);
+            }
+            else
+            {
+                setRadioButtons(false);
+            }
+            InitializeTextColumns();
+        }
+
+        private void setRadioButtons(bool enabled)
+        {
+            radioButtonComma.Enabled = enabled;
+            radioButtonPipe.Enabled = enabled;
+            radioButtonSemiColon.Enabled = enabled;
+            radioButtonSpace.Enabled = enabled;
+            radioButtonTab.Enabled = enabled;
+        }
 
         /// <summary>
         /// Retrieve all Table Names from the source and place them into the Source ComboBox
@@ -1094,6 +1153,7 @@ namespace SQLiteWorkshop
             return;
         }
         #endregion
+
         #region ControlBox Handlers
         private void pbClose_Click(object sender, EventArgs e)
         {
@@ -1149,6 +1209,7 @@ namespace SQLiteWorkshop
 
 
         #endregion
+
        
     }
 }

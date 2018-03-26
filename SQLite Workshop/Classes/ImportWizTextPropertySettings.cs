@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace SQLiteWorkshop
 {
@@ -7,16 +9,15 @@ namespace SQLiteWorkshop
     {
 
         private string name;
-        private string columnDelimiter;
         private int columnWidth;
         private string type;
         private bool exclude;
         private int primarykey;
-        private bool autoincrement;
         private bool unique;
         private bool allownulls;
 
         [DisplayName("Column Name"),
+        ReadOnly(false),
         DescriptionAttribute("The Name of this column.")]
         public string Name
         {
@@ -24,16 +25,19 @@ namespace SQLiteWorkshop
             set { name = value; }
         }
 
-        [DisplayName("Column Delimeter"),
-        TypeConverter(typeof(ColumnDelimeterConverter)),
-        DescriptionAttribute("The Delimeter used to separate this columns from others in the file.")]
-        public string ColumnDelimeter
+        [DisplayName("Type"),
+        ReadOnly(false),
+        TypeConverter(typeof(TypeConverter)),
+        DescriptionAttribute("The data type of this column.  Note that internally, SQLite only uses datatypes of integer, text, real, blob and numeric.")]
+        public string Type
         {
-            get { return columnDelimiter; }
-            set { columnDelimiter = value; }
+            get { return type; }
+            set { type = value; }
         }
 
+        
         [DisplayName("Column Width"),
+        ReadOnly(false),
         DescriptionAttribute("The maximum width of the column being imported.  This is ignored for all non-text columns.")]
         public int ColumnWidth
         {
@@ -41,17 +45,10 @@ namespace SQLiteWorkshop
             set { columnWidth = value; }
         }
 
-        [DisplayName("Type"),
-        TypeConverter(typeof(TypeConverter)),
-        DescriptionAttribute("The data type of this column.  Note that internally, SQLite really has datatypes of INTEGER, TEXT, REAL, BLOB and NUMERIC.")]
-        public string Type
-        {
-            get { return type; }
-            set { type = value; }
-        }
 
         [DisplayName("Exclude"),
-        DescriptionAttribute("Do not import this column.")]
+        ReadOnly(false),
+        DescriptionAttribute("True to exclude this column from import.")]
         public bool Exclude
         {
             get { return exclude; }
@@ -59,6 +56,7 @@ namespace SQLiteWorkshop
         }
 
         [DisplayName("Primary Key"),
+        ReadOnly(true),
         DescriptionAttribute("If this column is a primary key or part of a primary key, enter the sequence number of it's position in the primary key (i.e. 1 for 1st column in the key, 2 for the 2nd column in the key, etc.).")]
         public int PrimaryKey
         {
@@ -66,15 +64,8 @@ namespace SQLiteWorkshop
             set { primarykey = value; }
         }
 
-        [DisplayName("Auto Increment"),
-        DescriptionAttribute("Answer true if this column should autoincrement.")]
-        public bool AutoIncrement
-        {
-            get { return autoincrement; }
-            set { exclude = autoincrement; }
-        }
-
         [DisplayName("Unique"),
+        ReadOnly(false),
         DescriptionAttribute("Answer true if all rows contain a unique value in this column.")]
         public bool Unique
         {
@@ -83,17 +74,27 @@ namespace SQLiteWorkshop
         }
 
         [DisplayName("Allow Null Values"),
+        ReadOnly(false),
         DescriptionAttribute("Answer true if this column may contain a Null Value.")]
         public bool AllowNulls
         {
             get { return allownulls; }
             set { exclude = allownulls; }
         }
+
+        public void SetReadOnly(string property, bool value)
+        {
+            PropertyDescriptor descriptor = TypeDescriptor.GetProperties(this.GetType())[property];
+            ReadOnlyAttribute attrib = (ReadOnlyAttribute)descriptor.Attributes[typeof(ReadOnlyAttribute)];
+            FieldInfo isReadOnly = attrib.GetType().GetField("isReadOnly", BindingFlags.NonPublic | BindingFlags.Instance);
+            isReadOnly.SetValue(attrib, value);
+        }
     }
 
     internal class TypeConverter : StringConverter
     {
-        private string[] TypeChoices = new string[] { "TEXT", "INTEGER", "REAL", "NUMERIC", "BLOB" };
+        private string[] TypeChoices = Common.SQLiteTypes;
+
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {
             return true;
@@ -101,12 +102,13 @@ namespace SQLiteWorkshop
 
         public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
         {
+            Array.Sort(TypeChoices);
             return new StandardValuesCollection(TypeChoices);
         }
 
     }
 
-    internal class ColumnDelimeterConverter : StringConverter
+    internal class ColumnDelimiterConverter : StringConverter
     {
         private string[] ColumnDelimeterChoices = new string[] { ",", "|", ";", "TAB", "SPACE" };
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
@@ -120,4 +122,5 @@ namespace SQLiteWorkshop
         }
 
     }
+
 }

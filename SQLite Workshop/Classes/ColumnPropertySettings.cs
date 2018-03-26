@@ -17,7 +17,7 @@ namespace SQLiteWorkshop
         private string fkOnUpdate;
         private string fkOnDelete;
         private string type;
-        private int size;
+        private int columnwidth;
         private int precision;
         private int scale;
         private bool allownull;
@@ -28,7 +28,7 @@ namespace SQLiteWorkshop
 
         [DisplayName("Type"),
         RefreshProperties(RefreshProperties.All),
-        TypeConverter(typeof(ColumnTypeConverter)),
+        TypeConverter(typeof(TypeConverter)),
         DescriptionAttribute("The type of data this column will hold.")]
         public string Type
         {
@@ -36,16 +36,16 @@ namespace SQLiteWorkshop
             set
             {
                 type = value;
-                SetReadOnly(new string[] { "Size" }, type == "integer" ? true : false);
+                SetReadOnly(new string[] { "ColumnWidth" }, type == "integer" ? true : false);
             }
         }
 
-        [DisplayName("Size"),
+        [DisplayName("ColumnWidth"),
         DescriptionAttribute("The size of this column.")]
         public int Size
         {
-            get { return size; }
-            set { size = value; }
+            get { return columnwidth; }
+            set { columnwidth = value; }
         }
 
         [DisplayName("Precision"),
@@ -141,7 +141,7 @@ namespace SQLiteWorkshop
                 "ForeignKeyOnUpdate",
                 "ForeignKeyOnDelete",
                 "Type",
-                "Size",
+                "ColumnWidth",
                 "Precision",
                 "Scale",
                 "AllowNull",
@@ -204,21 +204,6 @@ namespace SQLiteWorkshop
                 }
 
                 return columnList.ToArray(typeof(string)) as string[];
-            }
-
-        }
-
-        internal class ColumnTypeConverter : StringConverter
-        {
-            private string[] TypeChoices = new string[] { "char", "varchar", "text", "integer", "datetime", "date", "float", "single", "double", "decimal" };
-            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
-            {
-                return true;
-            }
-
-            public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
-            {
-                return new StandardValuesCollection(TypeChoices);
             }
 
         }

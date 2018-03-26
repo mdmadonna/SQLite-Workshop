@@ -77,13 +77,34 @@ namespace SQLiteWorkshop
             SQLiteErrorCode returnCode;
             
             SQLiteCommand cmd = DataAccess.AttachDatabase(MainForm.mInstance.CurrentDB, DatabaseName, "Import", out returnCode);
+            if (returnCode != SQLiteErrorCode.Ok)
+            {
+                Common.ShowMsg(String.Format("Could not attach {0}\r\n{1}", DatabaseName, DataAccess.LastError));
+                return false;
+            }
+
             cmd.CommandText = string.Format("CREATE TABLE {0} AS SELECT * FROM Import.{1}", DestTable, SourceTable);
             int count = DataAccess.ExecuteNonQuery(cmd, out returnCode);
+            if (count < 0 || returnCode != SQLiteErrorCode.Ok)
+            {
+                Common.ShowMsg(String.Format("Could not create table {0}\r\n{1}", DestTable, DataAccess.LastError));
+                DataAccess.DetachDatabase(cmd, "Import", out returnCode);
+                return false;
+            }
 
             cmd.CommandText = string.Format("Insert into {0} Select * From Import.{1}", DestTable,  SourceTable);
             count = DataAccess.ExecuteNonQuery(cmd, out returnCode);
-            bool result = DataAccess.DetachDatabase(cmd, "Import", out returnCode);
+            if (count < 0 || returnCode != SQLiteErrorCode.Ok)
+            {
+                Common.ShowMsg(String.Format("Import failed.\r\n{0}", DataAccess.LastError));
+                DataAccess.DetachDatabase(cmd, "Import", out returnCode);
+                return false;
+            }
 
+            DataAccess.DetachDatabase(cmd, "Import", out returnCode);
+            //cmd.CommandText = string.Format("Select Count(*) From {0}", DestTable);
+            //long recCount = Convert.ToInt64(DataAccess.ExecuteScalar(MainForm.mInstance.CurrentDB, string.Format("Select Count(*) From {0}", DestTable), out returnCode));
+            FireStatusEvent(ImportStatus.Complete, count);
             return true;
         }
 

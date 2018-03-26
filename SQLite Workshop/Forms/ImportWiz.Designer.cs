@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportWiz));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelTop = new System.Windows.Forms.Panel();
@@ -730,6 +730,7 @@
             this.txtOtherDelimiter.Name = "txtOtherDelimiter";
             this.txtOtherDelimiter.Size = new System.Drawing.Size(24, 20);
             this.txtOtherDelimiter.TabIndex = 6;
+            this.txtOtherDelimiter.TextChanged += new System.EventHandler(this.txtOtherDelimiter_TextChanged);
             // 
             // radioButtonTab
             // 
@@ -740,6 +741,7 @@
             this.radioButtonTab.TabIndex = 1;
             this.radioButtonTab.Text = "tab";
             this.radioButtonTab.UseVisualStyleBackColor = true;
+            this.radioButtonTab.Click += new System.EventHandler(this.radioButton_Click);
             // 
             // radioButtonSpace
             // 
@@ -750,6 +752,7 @@
             this.radioButtonSpace.TabIndex = 5;
             this.radioButtonSpace.Text = "space";
             this.radioButtonSpace.UseVisualStyleBackColor = true;
+            this.radioButtonSpace.Click += new System.EventHandler(this.radioButton_Click);
             // 
             // radioButtonComma
             // 
@@ -762,6 +765,7 @@
             this.radioButtonComma.TabStop = true;
             this.radioButtonComma.Text = "comma";
             this.radioButtonComma.UseVisualStyleBackColor = true;
+            this.radioButtonComma.Click += new System.EventHandler(this.radioButton_Click);
             // 
             // label5
             // 
@@ -781,6 +785,7 @@
             this.radioButtonPipe.TabIndex = 2;
             this.radioButtonPipe.Text = "pipe";
             this.radioButtonPipe.UseVisualStyleBackColor = true;
+            this.radioButtonPipe.Click += new System.EventHandler(this.radioButton_Click);
             // 
             // radioButtonSemiColon
             // 
@@ -791,6 +796,7 @@
             this.radioButtonSemiColon.TabIndex = 3;
             this.radioButtonSemiColon.Text = "semi-colon";
             this.radioButtonSemiColon.UseVisualStyleBackColor = true;
+            this.radioButtonSemiColon.Click += new System.EventHandler(this.radioButton_Click);
             // 
             // label6
             // 
@@ -841,6 +847,7 @@
             this.propertyGridColumns.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGridColumns.Location = new System.Drawing.Point(206, 3);
             this.propertyGridColumns.Name = "propertyGridColumns";
+            this.propertyGridColumns.PropertySort = System.Windows.Forms.PropertySort.NoSort;
             this.propertyGridColumns.Size = new System.Drawing.Size(432, 217);
             this.propertyGridColumns.TabIndex = 2;
             this.propertyGridColumns.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGridColumns_PropertyValueChanged);
@@ -890,8 +897,8 @@
             // 
             this.dataGridViewText.AllowUserToAddRows = false;
             this.dataGridViewText.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridViewText.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGridViewText.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewText.Dock = System.Windows.Forms.DockStyle.Fill;

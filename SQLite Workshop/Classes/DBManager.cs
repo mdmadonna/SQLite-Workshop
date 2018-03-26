@@ -69,9 +69,32 @@ namespace SQLiteWorkshop
         internal Dictionary<string, DBInfo> Databases;
     }
 
+    internal enum ImportStatus
+    {
+        InProgress,
+        Complete
+    }
+
+    internal class StatusEventArgs : EventArgs
+    {
+        internal ImportStatus Status;
+        internal long RowCount;
+    }
+
     abstract class DBManager
     {
-        
+     
+        internal event EventHandler<StatusEventArgs> StatusReport;
+
+        protected void FireStatusEvent(ImportStatus status, long RecordCount)
+        {
+            StatusEventArgs e = new StatusEventArgs();
+            e.Status = status;
+            e.RowCount = RecordCount;
+            EventHandler<StatusEventArgs> eventHandler = StatusReport;
+            eventHandler(this, e);
+        }
+
         internal DBManager(string ConnectionString)
         { }
 

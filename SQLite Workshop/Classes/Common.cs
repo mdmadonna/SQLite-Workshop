@@ -348,13 +348,14 @@ namespace SQLiteWorkshop
         #endregion
 
         #region Type Checking
-        private static string[] TextTypes       = new string[] { "char", "nchar", "varchar", "nvarchar", "text" };
-        private static string[] IntegerTypes    = new string[] { "autoincrement", "bigint", "boolean", "int", "mediumint", "smallint", "tinyint", "unsigned" };
-        private static string[] RealTypes       = new string[] { "double", "float", "real" };
-        private static string[] BooleanTypes    = new string[] { "boolean" };
-        private static string[] NumericTypes    = new string[] { "boolean", "decimal", "numeric"};
-        private static string[] DateTypes       = new string[] { "date", "datetime" };
-        private static string[] NumberTypes     = new string[] { "bigint", "boolean", "decimal", "double", "float", "int", "mediumint", "numeric", "real", "smallint", "tinyint", "unsigned" };
+        internal static string[] TextTypes       = new string[] { "char", "nchar", "varchar", "nvarchar", "text" };
+        internal static string[] IntegerTypes    = new string[] { "autoincrement", "bigint", "boolean", "int", "mediumint", "smallint", "tinyint", "unsigned" };
+        internal static string[] RealTypes       = new string[] { "double", "float", "real" };
+        internal static string[] BooleanTypes    = new string[] { "boolean" };
+        internal static string[] NumericTypes    = new string[] { "boolean", "decimal", "numeric"};
+        internal static string[] DateTypes       = new string[] { "date", "datetime" };
+        internal static string[] NumberTypes     = new string[] { "bigint", "boolean", "decimal", "double", "float", "int", "mediumint", "numeric", "real", "smallint", "tinyint", "unsigned" };
+        internal static string[] SQLiteTypes     = TextTypes.Concat(IntegerTypes).Concat(RealTypes).Concat(BooleanTypes).Concat(NumericTypes).Concat(DateTypes).Concat(NumberTypes).ToArray().Distinct().ToArray();
 
         /// <summary>
         /// Determine if a column type has Text affinity.  Used to determine if column should be wrapped in quotes.

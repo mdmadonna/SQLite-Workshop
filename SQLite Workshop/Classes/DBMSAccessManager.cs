@@ -190,11 +190,13 @@ namespace SQLiteWorkshop
                     }
                     SQCmd.ExecuteNonQuery();
                     recCount++;
+                    if (recCount % 100 == 0) FireStatusEvent(ImportStatus.InProgress, recCount);
                 }
                 dr.Close();
                 CloseDB();
                 sqlT.Commit();
                 DataAccess.CloseDB(SQConn);
+                FireStatusEvent(ImportStatus.Complete, recCount);
             }
             catch (Exception ex)
             {
