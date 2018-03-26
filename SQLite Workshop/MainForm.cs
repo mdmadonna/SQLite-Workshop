@@ -201,7 +201,7 @@ namespace SQLiteWorkshop
             if (Int32.TryParse(cfg.appsetting(Config.CFG_FHEIGHT), out parm)) this.Height = parm;
             if (Int32.TryParse(cfg.appsetting(Config.CFG_FWIDTH), out parm)) this.Width = parm;
             if (Int32.TryParse(cfg.appsetting(Config.CFG_VSPLITP), out parm)) vSplitter.SplitPosition = parm;
-            if (Int32.TryParse(cfg.appsetting(Config.CFG_TSPLITP), out parm)) spTemplate.SplitPosition = parm;
+            if (Int32.TryParse(cfg.appsetting(Config.CFG_TSPLITP), out parm)) spTemplate.SplitPosition = Math.Max(parm, 100);
 
             // Setting the Visible
             bool b = true;
@@ -238,7 +238,7 @@ namespace SQLiteWorkshop
             cfg.SetSetting(Config.CFG_FWIDTH, this.Width.ToString());
             cfg.SetSetting(Config.CFG_VSPLITP, vSplitter.SplitPosition.ToString());
             cfg.SetSetting(Config.CFG_TEMPLATESVISIBLE, treeTemplates.Visible.ToString());
-            cfg.SetSetting(Config.CFG_TSPLITP, spTemplate.SplitPosition.ToString());
+            if (spTemplate.Visible) cfg.SetSetting(Config.CFG_TSPLITP, spTemplate.SplitPosition.ToString());
         }
 
         #endregion

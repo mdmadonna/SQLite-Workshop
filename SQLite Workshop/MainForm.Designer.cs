@@ -104,9 +104,9 @@
             this.toolStripStatusMain = new System.Windows.Forms.ToolStripStatusLabel();
             this.spRight = new System.Windows.Forms.Splitter();
             this.treeTemplates = new System.Windows.Forms.TreeView();
-            this.spTemplate = new System.Windows.Forms.Splitter();
             this.templatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.propertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.spTemplate = new System.Windows.Forms.Splitter();
             this.panelMain.SuspendLayout();
             this.panelTop.SuspendLayout();
             this.panelMenu.SuspendLayout();
@@ -171,8 +171,8 @@
             // 
             this.panelMain.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(30)))));
             this.panelMain.Controls.Add(this.spTemplate);
-            this.panelMain.Controls.Add(this.treeTemplates);
             this.panelMain.Controls.Add(this.tabMain);
+            this.panelMain.Controls.Add(this.treeTemplates);
             this.panelMain.Controls.Add(this.vSplitter);
             this.panelMain.Controls.Add(this.treeViewMain);
             this.panelMain.Controls.Add(this.panelTop);
@@ -190,7 +190,7 @@
             this.tabMain.Location = new System.Drawing.Point(124, 80);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(723, 296);
+            this.tabMain.Size = new System.Drawing.Size(602, 296);
             this.tabMain.TabIndex = 4;
             this.tabMain.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.tabMain_DrawItem);
             this.tabMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseDown);
@@ -888,15 +888,6 @@
             this.treeTemplates.TabIndex = 5;
             this.treeTemplates.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeTemplates_AfterSelect);
             // 
-            // spTemplate
-            // 
-            this.spTemplate.Dock = System.Windows.Forms.DockStyle.Right;
-            this.spTemplate.Location = new System.Drawing.Point(723, 80);
-            this.spTemplate.Name = "spTemplate";
-            this.spTemplate.Size = new System.Drawing.Size(3, 296);
-            this.spTemplate.TabIndex = 6;
-            this.spTemplate.TabStop = false;
-            // 
             // templatesToolStripMenuItem
             // 
             this.templatesToolStripMenuItem.Name = "templatesToolStripMenuItem";
@@ -910,6 +901,15 @@
             this.propertiesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.propertiesToolStripMenuItem.Text = "Properties";
             this.propertiesToolStripMenuItem.Click += new System.EventHandler(this.propertiesToolStripMenuItem_Click);
+            // 
+            // spTemplate
+            // 
+            this.spTemplate.Dock = System.Windows.Forms.DockStyle.Right;
+            this.spTemplate.Location = new System.Drawing.Point(723, 80);
+            this.spTemplate.Name = "spTemplate";
+            this.spTemplate.Size = new System.Drawing.Size(3, 296);
+            this.spTemplate.TabIndex = 6;
+            this.spTemplate.TabStop = false;
             // 
             // MainForm
             // 
@@ -1035,10 +1035,10 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator9;
         private System.Windows.Forms.ToolStripMenuItem optionsToolStripMenuItem;
-        private System.Windows.Forms.Splitter spTemplate;
         private System.Windows.Forms.TreeView treeTemplates;
         private System.Windows.Forms.ToolStripMenuItem templatesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem propertiesToolStripMenuItem;
+        private System.Windows.Forms.Splitter spTemplate;
     }
 }
 
