@@ -35,29 +35,36 @@ namespace SQLiteWorkshop
             BuildTab(sd.DBLocation);
         }
 
-        internal void BuildTab()
+        internal void BuildTab(FileInfo fi)
         {
-            string filename = FindSqlFile();
-            if (string.IsNullOrEmpty(filename)) return;
-            sTab.Text = string.Format("  {0}          ", Path.GetFileName(filename));
-            sqlTabControl.SqlFileName = filename;
-            FileInfo fi = new FileInfo(filename);
+            string filename = fi.FullName;
             if (fi.Length > Common.MAX_SQL_FILESIZE)
             {
                 Common.ShowMsg(string.Format("Cannot open {0}\r\n{1}", filename, string.Format("File Exceeds {0} bytes.", Common.MAX_SQL_FILESIZE.ToString())));
                 return;
             }
 
+            sTab.Text = string.Format("  {0}          ", Path.GetFileName(filename));
+            sqlTabControl.SqlFileName = filename;
             try
             {
-                StreamReader sr = new StreamReader(filename);
-                sqlTabControl.SqlStatement = sr.ReadToEnd();
-                sr.Close();
+                using (StreamReader sr = new StreamReader(filename))
+                {
+                    sqlTabControl.SqlStatement = sr.ReadToEnd();
+                }
             }
             catch (Exception ex)
             {
                 Common.ShowMsg(string.Format("Cannot open {0}\r\n{1}", filename, ex.Message));
             }
+
+        }
+
+        internal void BuildTab()
+        {
+            string filename = FindSqlFile();
+            if (string.IsNullOrEmpty(filename)) return;
+            BuildTab(new FileInfo(filename));
         }
 
         private string FindSqlFile()

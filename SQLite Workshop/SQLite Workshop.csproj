@@ -275,6 +275,9 @@
     <None Include="assets\MainSmall.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Templates\View\Create View.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="assets\DB New.png" />
     <None Include="assets\DB Open.png" />
     <None Include="assets\Encrypt.png" />
@@ -297,6 +300,12 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
+    <Folder Include="Templates\Backup\" />
+    <Folder Include="Templates\Database\" />
+    <Folder Include="Templates\Index\" />
+    <Folder Include="Templates\Query\" />
+    <Folder Include="Templates\Table\" />
+    <Folder Include="Templates\Trigger\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -6,6 +6,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -183,7 +184,6 @@ namespace SQLiteWorkshop
             toolTip.SetToolTip(pbMax, "Maximize");
             toolTip.SetToolTip(pbClose, "Close");
             sqlTabTrack = 0;
-
         }
 
         #endregion
@@ -196,11 +196,18 @@ namespace SQLiteWorkshop
         private void InitializeFormGUI()
         {
             int parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FTOP), out parm)) this.Top = parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FLEFT), out parm)) this.Left = parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FHEIGHT), out parm)) this.Height = parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_FWIDTH), out parm)) this.Width = parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_VSPLITP), out parm)) vSplitter.SplitPosition = parm;
+            if (Int32.TryParse(cfg.appsetting(Config.CFG_FTOP), out parm)) this.Top = parm;
+            if (Int32.TryParse(cfg.appsetting(Config.CFG_FLEFT), out parm)) this.Left = parm;
+            if (Int32.TryParse(cfg.appsetting(Config.CFG_FHEIGHT), out parm)) this.Height = parm;
+            if (Int32.TryParse(cfg.appsetting(Config.CFG_FWIDTH), out parm)) this.Width = parm;
+            if (Int32.TryParse(cfg.appsetting(Config.CFG_VSPLITP), out parm)) vSplitter.SplitPosition = parm;
+            if (Int32.TryParse(cfg.appsetting(Config.CFG_TSPLITP), out parm)) spTemplate.SplitPosition = parm;
+
+            // Setting the Visible
+            bool b = true;
+            if (bool.TryParse(cfg.appsetting(Config.CFG_TEMPLATESVISIBLE), out b)) treeTemplates.Visible = b;
+            templatesToolStripMenuItem.Checked = b;
+            spTemplate.Visible = b;
 
             string RecentDBList = cfg.appsetting(Config.CFG_RECENTDB);
             if (!string.IsNullOrEmpty(RecentDBList))
@@ -215,6 +222,7 @@ namespace SQLiteWorkshop
             }
 
             Common.password = "SQLite Workshop";
+            LoadTemplates();
             LoadRegisteredDBs();
         }
 
@@ -229,7 +237,8 @@ namespace SQLiteWorkshop
             cfg.SetSetting(Config.CFG_FHEIGHT, this.Height.ToString());
             cfg.SetSetting(Config.CFG_FWIDTH, this.Width.ToString());
             cfg.SetSetting(Config.CFG_VSPLITP, vSplitter.SplitPosition.ToString());
-
+            cfg.SetSetting(Config.CFG_TEMPLATESVISIBLE, treeTemplates.Visible.ToString());
+            cfg.SetSetting(Config.CFG_TSPLITP, spTemplate.SplitPosition.ToString());
         }
 
         #endregion
@@ -324,6 +333,21 @@ namespace SQLiteWorkshop
         {
 
         }
+
+        private void templatesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            treeTemplates.Visible = !treeTemplates.Visible;
+            templatesToolStripMenuItem.Checked = treeTemplates.Visible;
+            spTemplate.Visible = treeTemplates.Visible;
+            cfg.SetSetting(Config.CFG_TEMPLATESVISIBLE, treeTemplates.Visible.ToString());
+            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_TSPLITP), out int parm)) spTemplate.SplitPosition = parm;
+        }
+
+        private void propertiesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            toolStripDBProperties_Click(sender, e);
+        }
+
         #endregion
 
         #region Toolbar Handlers
@@ -896,7 +920,80 @@ namespace SQLiteWorkshop
         }
 
         #endregion
-        
+
+        #region Template Treeview Handlers
+
+        internal void LoadTemplates()
+        {
+            ContextMenu tmpContextMenu = new ContextMenu();
+            tmpContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Refresh", tmpContextMenu_Clicked, tmpContextMenu_Popup, tmpContextMenu_Selected, null));
+            treeTemplates.Nodes.Clear();
+
+            TreeNode topNode = new TreeNode("Sql Templates", 0, 0);
+            topNode.ContextMenu = tmpContextMenu;
+
+            string templatesDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates");
+            DirectoryInfo di = new DirectoryInfo(templatesDirectory);
+            if (!di.Exists) return;
+
+            string[] dirs = Directory.GetDirectories(templatesDirectory);
+            foreach (string dir in dirs)
+            {
+                TreeNode dirNode = new TreeNode(new DirectoryInfo(dir).Name, 2, 2);
+                string[] files = Directory.GetFiles(dir, "*.sql");
+                foreach (string file in files)
+                {
+                    TreeNode sqlNode = new TreeNode(Path.GetFileNameWithoutExtension(file), 3, 3);
+                    sqlNode.Tag = file;
+                    dirNode.Nodes.Add(sqlNode);
+                }
+                topNode.Nodes.Add(dirNode);
+            }
+            treeTemplates.Nodes.Add(topNode);
+        }
+
+        private void treeTemplates_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            TreeNode sqlNode = treeTemplates.SelectedNode;
+            if (sqlNode == null) return;
+            if (sqlNode.Tag == null) return;
+            if (string.IsNullOrEmpty(CurrentDB)) return;
+
+            FileInfo fi = new FileInfo(sqlNode.Tag.ToString());
+            if (!fi.Exists)
+            {
+                Common.ShowMsg(string.Format("{0} sql is no longer available.", sqlNode.Text));
+                return;
+            }
+
+            SqlTab st = new SqlTab();
+            st.BuildTab(fi);
+
+        }
+
+        private void tmpContextMenu_Popup(object sender, EventArgs e)
+        {
+
+        }
+
+        private void tmpContextMenu_Selected(object sender, EventArgs e)
+        {
+        }
+
+        private void tmpContextMenu_Clicked(object sender, EventArgs e)
+        {
+            switch (((MenuItem)sender).Text.ToLower())
+            {
+                case "refresh":
+                    LoadTemplates();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        #endregion
+
         #region Helpers
         private string FindDBFileLocation(bool bFileExists = true)
         {
@@ -1452,5 +1549,6 @@ namespace SQLiteWorkshop
 
 
         #endregion
+
     }
 }

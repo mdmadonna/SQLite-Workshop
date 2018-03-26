@@ -24,6 +24,8 @@ namespace SQLiteWorkshop
         internal const string CFG_TABLEEDITHSPLITP  = "iCFG_TABLEEDITHSPLITP";      //Table Editor Splitter position
         internal const string CFG_DFLTSQLDIR        = "DEFAULTSQLDIR";              //Default Directory for SQL Files
         internal const string CFG_REGISTEREDDBS     = "REGISTEREDDBS";              //Registered Databases
+        internal const string CFG_TEMPLATESVISIBLE  = "TEMPLATESVISIBLE";           //Template tree visible
+        internal const string CFG_TSPLITP           = "TSPLITP";                    //Template splitter position
 
 
         //Configuration File
@@ -46,16 +48,23 @@ namespace SQLiteWorkshop
 
         internal void SetSetting(string setting, string value)
         {
-            if (appsetting(setting) == null)
+            try
             {
-                cfg.AppSettings.Settings.Add(setting, value);
+                if (appsetting(setting) == null)
+                {
+                    cfg.AppSettings.Settings.Add(setting, value);
+                }
+                else
+                {
+                    cfg.AppSettings.Settings[setting].Value = value;
+                }
+                cfg.Save(ConfigurationSaveMode.Minimal, true);
+                ConfigurationManager.RefreshSection("appSettings");
             }
-            else
+            catch (Exception ex)
             {
-                cfg.AppSettings.Settings[setting].Value = value;
+                Common.ShowMsg(string.Format("Error Saving SQLite Workshop Configuration Data\r\n{0}", ex.Message));
             }
-            cfg.Save(ConfigurationSaveMode.Minimal, true);
-            ConfigurationManager.RefreshSection("appSettings");
             Properties.Settings.Default.Reload();
             return;
 
