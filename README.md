@@ -1,3 +1,4 @@
+
 # SQLite-Workshop
 Database Manager for SQLite
 
@@ -34,6 +35,10 @@ This is still a work in progress.  There are many DB Managers available for SQLi
 29. Import from comma-delimited Text, SQLite, SQL Server, MS Access, ODBC, MySql and Excel.
 30. Export to comma-delimited text.
 31. Explain and Explain Plan.
+32. Multiple Windows to view many tables at once.
+33. Example Sql templates for a variety of common activities.
+34. Load/Save SQL capabilities.
+35. Register database locations.
 
 All in a user friendly interface.
 
