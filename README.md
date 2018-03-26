@@ -2,7 +2,7 @@
 # SQLite-Workshop
 Database Manager for SQLite
 
-This is still a work in progress.  There are many DB Managers available for SQLite and I've used most of the free/open source tools.  I have always found them to be great tools but lacking key features that I was looking for.  SQLite Workshop has a wide range of features and capabilities including:
+This is still a work in progress and not yet redy for Beta.  SQLite Workshop has a wide range of features and capabilities including:
 
 1.  Create a database.
 2.  Browse tables and views in a database.
