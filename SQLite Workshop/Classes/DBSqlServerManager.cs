@@ -235,7 +235,7 @@ namespace SQLiteWorkshop
                         //SQCmd.Parameters.AddWithValue(string.Format("p{0}", i.ToString()), dr[i]);
                         SQCmd.Parameters.AddWithValue(String.Empty, dr[i]);
                     }
-                    SQCmd.ExecuteNonQuery();
+                    int cnt = SQCmd.ExecuteNonQuery();
                     recCount++;
                     if (recCount % 100 == 0) FireStatusEvent(ImportStatus.InProgress, recCount);
                 }

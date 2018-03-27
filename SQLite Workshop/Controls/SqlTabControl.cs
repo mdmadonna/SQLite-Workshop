@@ -124,7 +124,7 @@ namespace SQLiteWorkshop
             try
             {
                 MainForm.mInstance.Cursor = Cursors.WaitCursor;
-                if (sql.ToLower().StartsWith("select") || sql.ToLower().StartsWith("pragma"))
+                if (Common.IsSelect(sql))
                 {
                     dt = DataAccess.ExecuteDataTable(DatabaseName, sql, out SQLiteErrorCode returnCode);
                     if (returnCode == SQLiteErrorCode.Ok)

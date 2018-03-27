@@ -950,6 +950,7 @@ namespace SQLiteWorkshop
                 topNode.Nodes.Add(dirNode);
             }
             treeTemplates.Nodes.Add(topNode);
+            topNode.Expand();
         }
 
         private void treeTemplates_AfterSelect(object sender, TreeViewEventArgs e)

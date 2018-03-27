@@ -275,6 +275,9 @@
     <None Include="assets\MainSmall.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Templates\Query\Column Profile.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Templates\Query\Summary Counts.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

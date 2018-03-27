@@ -10,6 +10,8 @@ namespace SQLiteWorkshop
 {
     enum ColumnType
     {
+        Blob,
+        Decimal,
         Char,
         Varchar,
         nChar,
@@ -20,13 +22,14 @@ namespace SQLiteWorkshop
         Float,
         Numeric,
         Integer,
-        LongInteger,
+        BigInteger,
         ShortInteger,
         TinyInteger,
         Currency,
         Boolean,
         Date,
-        Datetime
+        Datetime,
+        Text
     }
     internal struct DBColumn
     {
@@ -166,7 +169,7 @@ namespace SQLiteWorkshop
                 sb.Append("\r\n\t").Append(colCount == 0 ? string.Empty : ",").Append("\"").Append(column.Value.Name).Append("\" ");
                 sbI.Append(colCount == 0 ? string.Empty : ",").Append("\"").Append(column.Value.Name).Append("\" ");
                 sbV.Append(colCount == 0 ? string.Empty : ",").Append("?");
-                sb.Append(GetColumnType(column.Value.Type, column.Value.Size, out ColumnType colType, out bool isText));
+                sb.Append(GetColumnType(column.Value.SqlType, column.Value.Size, column.Value.NumericPrecision, column.Value.NumericScale, out ColumnType colType, out bool isText));
                 if (column.Value.IsAutoIncrement) sb.Append(" auto_increment");
                 sb.Append(column.Value.IsNullable ? " Null" : "Not Null");
                 if (column.Value.HasDefault)
@@ -183,18 +186,99 @@ namespace SQLiteWorkshop
             return sb.ToString();
         }
 
-        protected string GetColumnType(string ColType, int ColSize, out ColumnType colType, out bool isText)
+        protected string GetColumnType(string ColType, int ColSize, int Precision, int Scale, out ColumnType colType, out bool isText)
         {
-            switch (ColType)
+            switch (ColType.ToLower())
             {
-                case "System.String":
+                case "bigint":
+                    colType = ColumnType.BigInteger;
+                    isText = false;
+                    return "bigint";
+                case "binary":
+                case "image":
+                case "varbinary":
+                    colType = ColumnType.Blob;
+                    isText = false;
+                    return "blob";
+                case "bit":
+                    colType = ColumnType.Boolean;
+                    isText = false;
+                    return "boolean";
+                case "char":
+                    colType = ColumnType.Char;
+                    isText = true;
+                    return string.Format("char({0})", ColSize.ToString());
+                case "currency":
+                case "money":
+                case "smallmoney":
+                    colType = ColumnType.Currency;
+                    isText = false;
+                    return "decimal(18,2)";
+                case "date":
+                    colType = ColumnType.Date;
+                    isText = false;
+                    return "date";
+                case "datetimeoffset":
+                case "datetime2":
+                case "datetime":
+                case "smalldatetime":
+                case "time":
+                case "timestamp":
+                    colType = ColumnType.Datetime;
+                    isText = false;
+                    return "datetime";
+                case "decimal":
+                    colType = ColumnType.Decimal;
+                    isText = false;
+                    return string.Format("decimal({0}, {1})", Precision.ToString(), Scale.ToString());
+                case "double":
+                    colType = ColumnType.Double;
+                    isText = false;
+                    return "double";
+                case "int":
+                case "system.int32":
+                    colType = ColumnType.Integer;
+                    isText = false;
+                    return "int";
+                case "float":
+                    colType = ColumnType.Float;
+                    isText = false;
+                    return "float";
+                case "nchar":
+                    colType = ColumnType.nChar;
+                    isText = true;
+                    return string.Format("nchar({0})", ColSize.ToString());
+                case "ntext":
+                case "text":
+                case "xml":
+                    colType = ColumnType.Text;
+                    isText = true;
+                    return "text";
+                case "nvarchar":
+                    colType = ColumnType.nVarchar;
+                    isText = true;
+                    return string.Format("nvarchar({0})", ColSize.ToString());
+                case "real":
+                    colType = ColumnType.Real;
+                    isText = false;
+                    return "real";
+                case "smallint":
+                    colType = ColumnType.ShortInteger;
+                    isText = false;
+                    return "smallint";
+                case "tinyint":
+                    colType = ColumnType.TinyInteger;
+                    isText = false;
+                    return "tinyint";
+                case "varchar":
+                case "system.string":
                     colType = ColumnType.Varchar;
                     isText = true;
                     return string.Format("varchar({0})", ColSize.ToString());
                 default:
-                    colType = ColumnType.Double;
+                    colType = ColumnType.Blob;
                     isText = false;
-                    return "double";
+                    return "blob";
             }
         }
     }
