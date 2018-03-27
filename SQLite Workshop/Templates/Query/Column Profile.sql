@@ -1,6 +1,6 @@
 --***************************************************************************************************************************
 --
---     SQL Template for to Profile a column. It returns all values in a column along with the number of
+--     SQL Template to Profile a column. It returns all values in a column along with the number of
 --       occurrences.
 --
 --***************************************************************************************************************************

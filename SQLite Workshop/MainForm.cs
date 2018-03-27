@@ -434,7 +434,20 @@ namespace SQLiteWorkshop
 
         private void toolStripOpsCancel_Click(object sender, EventArgs e)
         {
-            DataAccess.CancelSqlExecution();
+            if (tabMain.TabPages.Count == 0) return;
+            TabPage activeTab = tabMain.SelectedTab;
+            foreach (Control c in activeTab.Controls)
+            {
+                string cType = c.GetType().ToString();
+                switch (cType)
+                {
+                    case "SQLiteWorkshop.SqlTabControl":
+                        ((SqlTabControl)c).CancelExecution = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         private void toolStripOpsExplain_Click(object sender, EventArgs e)

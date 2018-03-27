@@ -15,6 +15,7 @@ namespace SQLiteWorkshop
 {
     internal partial class SqlTabControl : UserControl
     {
+        Int64 startclock;
 
         internal SqlTabControl(string DBName)
         {
@@ -27,9 +28,11 @@ namespace SQLiteWorkshop
             toolStripClock.Text = string.Empty;
             toolStripRowCount.Text = string.Empty; toolStripResult.Text = string.Empty;
             this.Dock = DockStyle.Fill;
+            tabResults.TabPages.Remove(tabErrors);
             if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_HSPLITP), out int parm)) hSplitter.SplitPosition = parm;
         }
 
+        internal bool CancelExecution;
         internal string DatabaseName { get; set; }
         internal string SqlFileName { get; set; }
 
@@ -112,37 +115,63 @@ namespace SQLiteWorkshop
             return saveFile.FileName;
         }
 
+        internal void ProgressEventHandler(object sender, ProgressEventArgs e)
+        {
+            e.ReturnCode = CancelExecution ? SQLiteProgressReturnCode.Interrupt : SQLiteProgressReturnCode.Continue;
+            toolStripClock.Text = Timers.DisplayTime(Timers.QueryLapsedTime(startclock));
+            Application.DoEvents();
+        }
+
         internal bool Execute()
         {
-            DataTable dt;
             string sql = GetSQL();
             toolStripResult.Text = string.Empty;
             toolStripRowCount.Text = string.Empty;
             toolStripClock.Text = string.Empty;
+            CancelExecution = false;
+            
+            startclock = Timers.QueryPerformanceCounter();
+            MainForm.mInstance.Cursor = Cursors.WaitCursor;
+            if (tabResults.Controls.Contains(tabErrors)) tabResults.TabPages.Remove(tabErrors);
 
-            Int64 startclock = Timers.QueryPerformanceCounter();
+            // This is a static event so be sure to unsubscribe
+            DataAccess.ProgressReport += ProgressEventHandler;
+            if (Common.IsSelect(sql))
+            { ExecuteNonQuery(sql); }
+            else
+            { ExecuteNonQuery(sql); }
+            DataAccess.ProgressReport += ProgressEventHandler;
+
+            MainForm.mInstance.Cursor = Cursors.Default;
+            toolStripClock.Text = Timers.DisplayTime(Timers.QueryLapsedTime(startclock));
+
+            return true;
+        }
+
+        private void ExecuteSelect(string sql)
+        {
+            DataTable dt;
             try
             {
-                MainForm.mInstance.Cursor = Cursors.WaitCursor;
-                if (Common.IsSelect(sql))
+                dt = DataAccess.ExecuteDataTable(DatabaseName, sql, out SQLiteErrorCode returnCode);
+                //SQLiteDataAdapter da  = DataAccess.ExecuteDataAdapter(DatabaseName, sql, out dt, out SQLiteErrorCode returnCode);
+                if (returnCode == SQLiteErrorCode.Ok || (returnCode == SQLiteErrorCode.Error && DataAccess.FormatErrorCount > 0))
                 {
-                    dt = DataAccess.ExecuteDataTable(DatabaseName, sql, out SQLiteErrorCode returnCode);
+                    //Populate DataGridView
+                    gvResults.DataError += GvResults_DataError;
+                    gvResults.DataSource = dt;
+                    gvResults.Refresh();
+                    gvResults.Visible = true;
+                    txtSqlResults.Visible = false;
+                    toolStripRowCount.Text = string.Format("{0} rows", dt.Rows.Count.ToString());
                     if (returnCode == SQLiteErrorCode.Ok)
                     {
-                        //Populate DataGridView
-                        gvResults.DataError += GvResults_DataError;
-                        gvResults.DataSource = dt;
-                        gvResults.Refresh();
-                        gvResults.Visible = true;
-                        txtSqlResults.Visible = false;
-                        toolStripRowCount.Text = string.Format("{0} rows", dt.Rows.Count.ToString());
                         toolStripResult.Text = Common.OK_QUERY;
                     }
                     else
                     {
-                        gvResults.Visible = false;
-                        txtSqlResults.Visible = true;
-                        txtSqlResults.Text = string.Format(Common.ERR_SQL, DataAccess.LastError, returnCode.ToString());
+                        richTextErrors.Text = string.Format(Common.ERR_SQLWIDE, DataAccess.FormatErrorCount.ToString(), returnCode.ToString(), Math.Min(DataAccess.MAX_ERRORS, DataAccess.FormatErrorCount).ToString(), String.Join("\r\n", DataAccess.FormatErrors.ToArray()));
+                        if (!tabResults.Controls.Contains(tabErrors)) tabResults.TabPages.Add(tabErrors);
                         toolStripResult.Text = Common.ERR_QUERY;
                     }
                 }
@@ -150,31 +179,46 @@ namespace SQLiteWorkshop
                 {
                     gvResults.Visible = false;
                     txtSqlResults.Visible = true;
-
-                    int count = DataAccess.ExecuteNonQuery(DatabaseName, sql, out SQLiteErrorCode returnCode);
-                    if (returnCode != SQLiteErrorCode.Ok)
-                    {
-                        txtSqlResults.Text = string.Format(Common.ERR_SQL, DataAccess.LastError, returnCode.ToString());
-                        toolStripResult.Text = Common.ERR_SQLERR;
-                    }
-                    else
-                    {
-                        txtSqlResults.Text = string.Format(Common.OK_RECORDSAFFECTED, count.ToString());
-                        toolStripResult.Text = Common.OK_SQL;
-                    }
+                    txtSqlResults.Text = string.Format(Common.ERR_SQL, DataAccess.LastError, returnCode);
                 }
             }
             catch (Exception ex)
             {
+                // Most likely an Sql syntax error
                 gvResults.Visible = false;
                 txtSqlResults.Visible = true;
                 txtSqlResults.Text = ex.Message;
                 toolStripResult.Text = Common.ERR_SQLERR;
             }
-            finally { MainForm.mInstance.Cursor = Cursors.Default; }
-            toolStripClock.Text = Timers.DisplayTime(Timers.QueryLapsedTime(startclock));
+        }
 
-            return true;
+        private void ExecuteNonQuery(string sql)
+        {
+            try
+            {
+                gvResults.Visible = false;
+                txtSqlResults.Visible = true;
+
+                int count = DataAccess.ExecuteNonQuery(DatabaseName, sql, out SQLiteErrorCode returnCode);
+                if (returnCode != SQLiteErrorCode.Ok)
+                {
+                    txtSqlResults.Text = string.Format(Common.ERR_SQL, DataAccess.LastError, returnCode.ToString());
+                    toolStripResult.Text = Common.ERR_SQLERR;
+                }
+                else
+                {
+                    txtSqlResults.Text = string.Format(Common.OK_RECORDSAFFECTED, count.ToString());
+                    toolStripResult.Text = Common.OK_SQL;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Most likely an Sql syntax error
+                gvResults.Visible = false;
+                txtSqlResults.Visible = true;
+                txtSqlResults.Text = ex.Message;
+                toolStripResult.Text = Common.ERR_SQLERR;
+            }
         }
 
         /// <summary>
@@ -274,7 +318,12 @@ namespace SQLiteWorkshop
         {
             if (ignoreChange) return; 
 
+           
+            int firstVisibleChar = txtSqlStatement.GetCharIndexFromPosition(new Point(0, 1));
+            int lineIndex = txtSqlStatement.GetLineFromCharIndex(firstVisibleChar);
+            string firstVisibleLine = txtSqlStatement.Lines[lineIndex];
             int iCursor = txtSqlStatement.SelectionStart;
+
             RichTextBox rtb = new RichTextBox();
             rtb.Rtf = txtSqlStatement.Rtf;
 
@@ -291,6 +340,9 @@ namespace SQLiteWorkshop
             ignoreChange = true;
             txtSqlStatement.Rtf = rtb.Rtf;
             ignoreChange = false;
+
+            txtSqlStatement.SelectionStart = txtSqlStatement.Find(txtSqlStatement.Lines[lineIndex], RichTextBoxFinds.NoHighlight);
+            txtSqlStatement.ScrollToCaret();
 
             txtSqlStatement.SelectionStart = iCursor < 0 ? 0 : iCursor;
             txtSqlStatement.SelectionLength = 0;

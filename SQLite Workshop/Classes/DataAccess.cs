@@ -102,20 +102,21 @@ namespace SQLiteWorkshop
         internal string CreateSQL;
     }
 
-    class DataAccess
+    abstract class DataAccess
     {
-
-        // I'll need to clean these up and make then dynamic
-        internal static string _lasterror = null;
-        internal static bool bProgressInterrupt = false;
-        internal static int FormatErrors = 0;
+        public static event EventHandler<ProgressEventArgs> ProgressReport = delegate { };
+        public static void ProgressEventHandler(object sender, ProgressEventArgs e)
+        {
+            ProgressReport(sender, e);
+        }
 
         internal static Dictionary<string, SchemaDefinition> SchemaDefinitions = new Dictionary<string, SchemaDefinition>();
 
-        internal static string LastError { get { return _lasterror; } }
+        internal static string LastError { get; private set; } = null;
+        internal static int FormatErrorCount { get; private set; } = 0;
+        internal static ArrayList FormatErrors { get; private set; } = null;
+        internal const int MAX_ERRORS = 100;
 
-        internal event EventHandler SQLiteEvent;
-        
         const string QRY_TABLES = "SELECT * FROM sqlite_master WHERE type = 'table' ORDER BY name";
         const string QRY_VIEWS = "SELECT * FROM sqlite_master WHERE type = 'view' ORDER BY name";
         const string QRY_TRIGGERS = "SELECT * FROM sqlite_master WHERE type = 'trigger' ORDER BY name";
@@ -136,7 +137,7 @@ namespace SQLiteWorkshop
 
             FileInfo f = new FileInfo(DBLocation);
             if (!f.Exists)
-                { _lasterror = "Database not found."; sd.LoadStatus = -1; return sd; }
+                { LastError = "Database not found."; sd.LoadStatus = -1; return sd; }
 
             if (DataAccess.IsEncrypted(DBLocation))
             {
@@ -462,7 +463,7 @@ namespace SQLiteWorkshop
             catch (Exception ex)
             {
                 returnCode = conn.ExtendedResultCode();
-                _lasterror = ex.Message;
+                LastError = ex.Message;
                 return false;
             }
             finally { CloseDB(conn); }
@@ -497,16 +498,17 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                _lasterror = ex.Message;
+                LastError = ex.Message;
             }
             returnCode = cmd.Connection.ExtendedResultCode();
             return dr;
 
         }
 
-        internal static SQLiteDataAdapter ExecuteDataAdapter(string DBLocation, string SqlStatement, out SQLiteErrorCode returnCode)
+        internal static SQLiteDataAdapter ExecuteDataAdapter(string DBLocation, string SqlStatement, out DataTable dt, out SQLiteErrorCode returnCode)
         {
             returnCode = SQLiteErrorCode.Ok;
+            dt = null;
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
@@ -514,18 +516,20 @@ namespace SQLiteWorkshop
             if (returnCode != SQLiteErrorCode.Ok) return null;
 
             cmd.CommandText = SqlStatement;
-            SQLiteDataAdapter da = ExecuteDataAdapter(cmd, out returnCode);
+            SQLiteDataAdapter da = ExecuteDataAdapter(cmd, out dt, out returnCode);
 
             CloseDB(conn);
             return da;
         }
 
-        protected static SQLiteDataAdapter ExecuteDataAdapter(SQLiteCommand cmd, out SQLiteErrorCode returnCode)
+        protected static SQLiteDataAdapter ExecuteDataAdapter(SQLiteCommand cmd, out DataTable dt, out SQLiteErrorCode returnCode)
         {
-            DataTable dt = new DataTable();
+            dt = new DataTable();
             SQLiteDataAdapter da = new SQLiteDataAdapter(cmd);
 
-            FormatErrors = 0;
+            FormatErrorCount = 0;
+            FormatErrors = new ArrayList();
+
             try
             {
                 da.FillError += Da_FillError;
@@ -533,17 +537,18 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                _lasterror = ex.Message;
+                LastError = ex.Message;
             }
 
-            returnCode = FormatErrors == 0 ? cmd.Connection.ExtendedResultCode() : SQLiteErrorCode.Error;
+            returnCode = FormatErrorCount == 0 ? cmd.Connection.ExtendedResultCode() : SQLiteErrorCode.Error;
             return da;
         }
 
         private static void Da_FillError(object sender, FillErrorEventArgs e)
         {
             e.Continue = true;
-            FormatErrors++;
+            FormatErrorCount++;
+            if (FormatErrorCount <= MAX_ERRORS) FormatErrors.Add(string.Format("Format Error: {0}", e.Errors.Message));
         }
 
         internal static DataTable ExecuteDataTable(string DBLocation, string SqlStatement, out SQLiteErrorCode returnCode)
@@ -563,6 +568,9 @@ namespace SQLiteWorkshop
 
         internal static DataTable ExecuteDataTable(SQLiteCommand cmd, out SQLiteErrorCode returnCode)
         {
+            FormatErrors = new ArrayList();
+            FormatErrorCount = 0;
+            int recordcount = 0;
 
             // Cannot use a dataadapter here because of potential format errors
             DataTable dt = new DataTable();
@@ -572,7 +580,7 @@ namespace SQLiteWorkshop
             try { dr = cmd.ExecuteReader(); }
             catch (Exception ex)
             {
-                _lasterror = ex.Message;
+                LastError = ex.Message;
                 returnCode = cmd.Connection.ExtendedResultCode();
                 return null;
             }
@@ -587,20 +595,29 @@ namespace SQLiteWorkshop
             {
                 while (dr.Read())
                 {
+                    recordcount++;
                     DataRow dRow = dt.NewRow();
                     for (int i = 0; i < dr.FieldCount; i++)
                     {
-                        dRow[i] = dr[i] == null ? string.Empty : dr[i].ToString();
+                        try
+                        {
+                            dRow[i] = dr[i] == null ? string.Empty : dr[i].ToString();
+                        }
+                        catch (Exception ex)
+                        {
+                            FormatErrorCount++;
+                            if ((FormatErrorCount <= MAX_ERRORS)) FormatErrors.Add(string.Format("Format Error on Record {0} Column {1}: {2}", recordcount, dr.GetName(i), ex.Message));
+                        }
                     }
                     dt.Rows.Add(dRow);
                 }
             }
             catch (Exception ex)
             {
-                _lasterror = ex.Message;
+                LastError = ex.Message;
             }
             finally { dr.Close(); }
-            returnCode = cmd.Connection.ExtendedResultCode();
+            returnCode = FormatErrorCount > 0 ? SQLiteErrorCode.Error : cmd.Connection.ExtendedResultCode();
             return dt;
         }
 
@@ -639,6 +656,8 @@ namespace SQLiteWorkshop
         {
             returnCode = SQLiteErrorCode.Ok;
             LastInsertID = -1;
+            int result;
+
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
@@ -648,7 +667,7 @@ namespace SQLiteWorkshop
                 cmd.Parameters.Add(new SQLiteParameter() { Value = parms[i] });
             }
             cmd.CommandText = SqlStatement;
-            int result = ExecuteNonQuery(cmd, out returnCode);
+            result = ExecuteNonQuery(cmd, out returnCode);
             LastInsertID = conn.LastInsertRowId;
             CloseDB(conn);
             return result;
@@ -658,13 +677,18 @@ namespace SQLiteWorkshop
         {
             int RecordCount = 0;
             returnCode = SQLiteErrorCode.Ok;
+            SQLiteTransaction tran;
+            tran = cmd.Connection.BeginTransaction();
+
             try
             {
                 RecordCount = cmd.ExecuteNonQuery();
+                tran.Commit();
             }
             catch (Exception ex)
             {
-                _lasterror = ex.Message;
+                tran.Rollback();
+                LastError = ex.Message;
                 returnCode = cmd.Connection.ExtendedResultCode();
                 return -1;
             }
@@ -716,7 +740,7 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                _lasterror = ex.Message;
+                LastError = ex.Message;
                 returnCode = cmd.Connection.ExtendedResultCode();
             }
             return obj;
@@ -753,7 +777,6 @@ namespace SQLiteWorkshop
                 // Initialize ProgressOps before registering the handler.  It will not work if you don't do it this way.
                 Conn.ProgressOps = 100;
                 Conn.Progress += ProgressEventHandler;
-                bProgressInterrupt = false;
                 Cmd = new SQLiteCommand();
                 Cmd.Connection = Conn;
                 returnCode = SQLiteErrorCode.Ok;
@@ -762,7 +785,7 @@ namespace SQLiteWorkshop
             catch (Exception ex)
             {
                 returnCode = SQLiteErrorCode.CantOpen;
-                _lasterror = ex.Message;
+                LastError = ex.Message;
                 try { returnCode = Conn.ExtendedResultCode(); } catch { }
                 return false;
             }
@@ -771,34 +794,10 @@ namespace SQLiteWorkshop
         internal static bool CloseDB(SQLiteConnection Conn)
         {
             if (Conn.State == ConnectionState.Open) Conn.Close();
+            Conn.Progress -= ProgressEventHandler;
             return true;
         }
 
-
-        /// <summary>
-        /// Cancel any SQL statement currently executing.
-        /// </summary>
-        internal static void CancelSqlExecution()
-        {
-            bProgressInterrupt = true;
-        }
-
-        public static void ProgressEventHandler(object Sender, ProgressEventArgs e)
-        {
-            System.Windows.Forms.Application.DoEvents();
-            e.ReturnCode = bProgressInterrupt ? SQLiteProgressReturnCode.Interrupt : SQLiteProgressReturnCode.Continue;
-            if (bProgressInterrupt) bProgressInterrupt = false;
-
-        }
-
-        protected virtual void OnSQLiteEvent(ProgressEventArgs e)
-        {
-            EventHandler handler = SQLiteEvent;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
 
         /// <summary>
         /// Determine if an SQLite database is encrypted.
@@ -894,7 +893,7 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                _lasterror = ex.Message;
+                LastError = ex.Message;
                 returnCode = conn.ExtendedResultCode();
                 return false;
             }

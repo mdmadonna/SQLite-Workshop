@@ -76,7 +76,7 @@ namespace SQLiteWorkshop
                 dt = DataAccess.ExecuteDataTable(DatabaseName, BuildSelectSql(), out SQLiteErrorCode returnCode);
                 if (returnCode == SQLiteErrorCode.Error)
                 {
-                    toolStripStatusLabelMsg.Text = string.Format("{0} Format Errors detected.", DataAccess.FormatErrors.ToString());
+                    toolStripStatusLabelMsg.Text = string.Format("{0} Format Errors detected.", DataAccess.FormatErrorCount.ToString());
                     Common.ShowMsg(Common.ERR_FORMATERROR);
                 }
             }
