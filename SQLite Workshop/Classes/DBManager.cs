@@ -173,10 +173,7 @@ namespace SQLiteWorkshop
                 if (column.Value.IsAutoIncrement) sb.Append(" auto_increment");
                 sb.Append(column.Value.IsNullable ? " Null" : "Not Null");
                 if (column.Value.HasDefault)
-                {
-                    string sep = isText ? "\"" : string.Empty;
-                    sb.Append(" ").Append(sep).Append(column.Value.DefaultValue).Append(sep);
-                }
+                {  sb.Append(" Default ").Append(column.Value.DefaultValue);  }
                 colCount++;
             }
             if (!string.IsNullOrEmpty(primaryKey)) sb.Append("\t,Primary Key(\"").Append(primaryKey).Append("\"");
@@ -197,10 +194,13 @@ namespace SQLiteWorkshop
                 case "binary":
                 case "image":
                 case "varbinary":
+                case "dbtype_wlongvarchar":
+                case "dbtype_longvarbinary":
                     colType = ColumnType.Blob;
                     isText = false;
                     return "blob";
                 case "bit":
+                case "dbtype_bool":
                     colType = ColumnType.Boolean;
                     isText = false;
                     return "boolean";
@@ -211,6 +211,7 @@ namespace SQLiteWorkshop
                 case "currency":
                 case "money":
                 case "smallmoney":
+                case "dbtype_cy":
                     colType = ColumnType.Currency;
                     isText = false;
                     return "decimal(18,2)";
@@ -224,6 +225,7 @@ namespace SQLiteWorkshop
                 case "smalldatetime":
                 case "time":
                 case "timestamp":
+                case "dbtype_date":
                     colType = ColumnType.Datetime;
                     isText = false;
                     return "datetime";
@@ -232,11 +234,13 @@ namespace SQLiteWorkshop
                     isText = false;
                     return string.Format("decimal({0}, {1})", Precision.ToString(), Scale.ToString());
                 case "double":
+                case "dbtype_r8":
                     colType = ColumnType.Double;
                     isText = false;
                     return "double";
                 case "int":
                 case "system.int32":
+                case "dbtype_i4":
                     colType = ColumnType.Integer;
                     isText = false;
                     return "int";
@@ -251,22 +255,36 @@ namespace SQLiteWorkshop
                 case "ntext":
                 case "text":
                 case "xml":
+                case "dbtype_guid":
                     colType = ColumnType.Text;
                     isText = true;
                     return "text";
                 case "nvarchar":
+                case "dbtype_wvarchar":
                     colType = ColumnType.nVarchar;
                     isText = true;
                     return string.Format("nvarchar({0})", ColSize.ToString());
+                case "numeric":
+                case "dbtype_numeric":
+                    colType = ColumnType.Numeric;
+                    isText = false;
+                    return "numeric";
                 case "real":
                     colType = ColumnType.Real;
                     isText = false;
                     return "real";
+                case "single":
+                case "dbtype_r4":
+                    colType = ColumnType.Single;
+                    isText = false;
+                    return "single";
                 case "smallint":
+                case "dbtype_i2":
                     colType = ColumnType.ShortInteger;
                     isText = false;
                     return "smallint";
                 case "tinyint":
+                case "dbtype_ui1":
                     colType = ColumnType.TinyInteger;
                     isText = false;
                     return "tinyint";
