@@ -7,18 +7,17 @@ using System.Windows.Forms;
 
 namespace SQLiteWorkshop
 {
-    class DBEditorTab
+    class RecordEditorTab
     {
-
         MainForm m;
         TabPage sTab;
-        DBEditorTabControl dbeTabControl;
+        RecordEditTabControl dbeTabControl;
         SchemaDefinition sd;
 
         static string SPACER = Environment.NewLine + "\t";
 
         internal string DatabaseLocation { get; set; }
-        internal DBEditorTab()
+        internal RecordEditorTab()
         {
             m = MainForm.mInstance;
             m.tabMain.Visible = true;
@@ -45,7 +44,7 @@ namespace SQLiteWorkshop
 
             sTab = new TabPage();
 
-            dbeTabControl = new DBEditorTabControl(dbName, tblname);
+            dbeTabControl = new RecordEditTabControl(dbName, tblname);
             sTab.Controls.Add(dbeTabControl);
             m.tabMain.TabPages.Add(sTab);
             m.SetTabHeader();

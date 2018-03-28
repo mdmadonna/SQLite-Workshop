@@ -137,7 +137,7 @@ namespace SQLiteWorkshop
             // This is a static event so be sure to unsubscribe
             DataAccess.ProgressReport += ProgressEventHandler;
             if (Common.IsSelect(sql))
-            { ExecuteNonQuery(sql); }
+            { ExecuteSelect(sql); }
             else
             { ExecuteNonQuery(sql); }
             DataAccess.ProgressReport += ProgressEventHandler;

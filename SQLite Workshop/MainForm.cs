@@ -107,6 +107,7 @@ namespace SQLiteWorkshop
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Design", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Select Top 1000 rows", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Edit Top 1000 rows", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
+                //new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Edit Records", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 tblScript,
                 new MenuItem("-"),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Export", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
@@ -679,13 +680,16 @@ namespace SQLiteWorkshop
                     st = new SqlTab();
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLSelect1000);
                     break;
-
                 case "edit top 1000 rows":
                     if (DBEditInProgress(treeViewMain.SelectedNode)) return;
                     dbEditor = new DBEditorTab();
                     dbEditor.BuildTab(treeViewMain.SelectedNode);
                     break;
-
+                case "edit records":
+                    if (RecordEditInProgress(treeViewMain.SelectedNode)) return;
+                    RecordEditorTab RecEditor = new RecordEditorTab();
+                    RecEditor.BuildTab(treeViewMain.SelectedNode);
+                    break;
                 case "rename table":
                     ef = new ExecuteForm();
                     ef.execType = SQLType.SQLRename;
@@ -1044,6 +1048,32 @@ namespace SQLiteWorkshop
                     if (c.GetType().Equals(typeof(DBEditorTabControl)))
                     {
                         if (((DBEditorTabControl)c).TableName == tablename)
+                        {
+                            tabMain.SelectedTab = tb;
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Determine if a Record editor for a specific table is open and, if yes,
+        /// display the corresponding tab.
+        /// </summary>
+        /// <param name="tablename">Table being edited.</param>
+        /// <returns></returns>
+        protected bool RecordEditInProgress(TreeNode tn)
+        {
+            string tablename = tn.Text;
+            foreach (TabPage tb in tabMain.TabPages)
+            {
+                foreach (Control c in tb.Controls)
+                {
+                    if (c.GetType().Equals(typeof(RecordEditTabControl)))
+                    {
+                        if (((RecordEditTabControl)c).TableName == tablename)
                         {
                             tabMain.SelectedTab = tb;
                             return true;
