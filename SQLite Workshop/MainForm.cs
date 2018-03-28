@@ -107,7 +107,7 @@ namespace SQLiteWorkshop
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Design", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Select Top 1000 rows", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Edit Top 1000 rows", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
-                //new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Edit Records", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
+                new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Edit Records", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 tblScript,
                 new MenuItem("-"),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Export", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),

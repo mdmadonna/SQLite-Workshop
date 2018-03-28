@@ -907,5 +907,45 @@ namespace SQLiteWorkshop
         {
             return !bCancelBackup;
         }
+
+        internal static bool CheckForRowID(string DatabaseName, string table, out string rowidName, out string PrimaryKeyName)
+        {
+
+            string[] Rowids = new string[] { "rowid", "_rowid_", "OID" };
+
+            rowidName = string.Empty;
+            for (int i = 0; i < Rowids.Length; i++)
+            {
+                if (!DataAccess.SchemaDefinitions[DatabaseName].Tables[table].Columns.ContainsKey(Rowids[i]))
+                {
+                    rowidName = Rowids[i];
+                    break;
+                }
+            }
+
+            if (string.IsNullOrEmpty(rowidName)) return GetPrimaryKey(table, out rowidName, out PrimaryKeyName);
+
+            SQLiteConnection conn = new SQLiteConnection();
+            SQLiteCommand cmd = new SQLiteCommand();
+            SQLiteErrorCode returnCode;
+
+            DataAccess.OpenDB(DatabaseName, ref conn, ref cmd, out returnCode, false);
+
+            cmd.CommandText = string.Format("Select {0} from \"{1}\" Limit 1", rowidName, table);
+            SQLiteDataReader dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly);
+            PrimaryKeyName = dr.GetName(0);
+            dr.Close();
+            DataAccess.CloseDB(conn);
+            return PrimaryKeyName == rowidName ? true : false;
+        }
+
+
+        protected static bool GetPrimaryKey(string table, out string rowid, out string PrimaryKey)
+        {
+            // only reason we're here is that all rowid synonyms are used
+            rowid = string.Empty;
+            PrimaryKey = string.Empty;
+            return false;
+        }
     }
 }

@@ -19,8 +19,6 @@ namespace SQLiteWorkshop
         string PrimaryKeyName;
         bool tableHasRowID;
 
-        string[] Rowids = new string[] {"rowid", "_rowid_", "OID"};
-
         public string DatabaseName { get; set; }
         public string TableName { get; set; }
 
@@ -72,7 +70,7 @@ namespace SQLiteWorkshop
 
             try
             {
-                tableHasRowID = CheckForRowID(TableName, out RowIDColName, out PrimaryKeyName);
+                tableHasRowID = DataAccess.CheckForRowID(DatabaseName, TableName, out RowIDColName, out PrimaryKeyName);
                 dt = DataAccess.ExecuteDataTable(DatabaseName, BuildSelectSql(), out SQLiteErrorCode returnCode);
                 if (returnCode == SQLiteErrorCode.Error)
                 {
@@ -397,42 +395,5 @@ namespace SQLiteWorkshop
             returnCode = cmd.Connection.ExtendedResultCode();
             return dt;
         }
-
-        protected bool CheckForRowID(string table, out string rowidName, out string PrimaryKeyName)
-        {
-            rowidName = string.Empty;
-            for (int i = 0; i < Rowids.Length; i++)
-            {
-                if (!DataAccess.SchemaDefinitions[DatabaseName].Tables[table].Columns.ContainsKey(Rowids[i]))
-                {
-                    rowidName = Rowids[i];
-                    break;
-                }
-            }
-
-            if (string.IsNullOrEmpty(rowidName)) return GetPrimaryKey(table, out rowidName, out PrimaryKeyName);
-
-            SQLiteConnection conn = new SQLiteConnection();
-            SQLiteCommand cmd = new SQLiteCommand();
-            SQLiteErrorCode returnCode;
-
-            DataAccess.OpenDB(DatabaseName, ref conn, ref cmd, out returnCode, false);
-
-            cmd.CommandText = string.Format("Select {0} from \"{1}\" Limit 1", rowidName, table);
-            SQLiteDataReader dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly);
-            PrimaryKeyName = dr.GetName(0);
-            dr.Close();
-            DataAccess.CloseDB(conn);
-            return PrimaryKeyName == rowidName ? true : false;
-        }
-
-        protected bool GetPrimaryKey(string table, out string rowid, out string PrimaryKey)
-        {
-            // only reason we're here is that all rowid synonyms are used
-            rowid = string.Empty;
-            PrimaryKey = string.Empty;
-            return false;
-        }
-
     }
 }
