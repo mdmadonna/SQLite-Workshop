@@ -45,6 +45,8 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
             this.panelTop = new System.Windows.Forms.Panel();
+            this.lblTable = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.richTextWhere = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.panelBody = new System.Windows.Forms.Panel();
@@ -190,6 +192,8 @@
             // panelTop
             // 
             this.panelTop.BackColor = System.Drawing.SystemColors.Window;
+            this.panelTop.Controls.Add(this.lblTable);
+            this.panelTop.Controls.Add(this.label2);
             this.panelTop.Controls.Add(this.richTextWhere);
             this.panelTop.Controls.Add(this.label1);
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
@@ -197,6 +201,28 @@
             this.panelTop.Name = "panelTop";
             this.panelTop.Size = new System.Drawing.Size(802, 63);
             this.panelTop.TabIndex = 1;
+            // 
+            // lblTable
+            // 
+            this.lblTable.AutoSize = true;
+            this.lblTable.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblTable.ForeColor = System.Drawing.Color.DimGray;
+            this.lblTable.Location = new System.Drawing.Point(28, 36);
+            this.lblTable.Name = "lblTable";
+            this.lblTable.Size = new System.Drawing.Size(41, 15);
+            this.lblTable.TabIndex = 3;
+            this.lblTable.Text = "label3";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.ForeColor = System.Drawing.Color.DimGray;
+            this.label2.Location = new System.Drawing.Point(25, 17);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(77, 15);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Row Editor";
             // 
             // richTextWhere
             // 
@@ -265,5 +291,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
+        private System.Windows.Forms.Label lblTable;
+        private System.Windows.Forms.Label label2;
     }
 }

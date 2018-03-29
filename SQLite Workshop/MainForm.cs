@@ -107,7 +107,7 @@ namespace SQLiteWorkshop
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Design", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Select Top 1000 rows", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Edit Top 1000 rows", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
-                new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Edit Records", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
+                new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Edit Rows", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 tblScript,
                 new MenuItem("-"),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Export", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
@@ -685,8 +685,8 @@ namespace SQLiteWorkshop
                     dbEditor = new DBEditorTab();
                     dbEditor.BuildTab(treeViewMain.SelectedNode);
                     break;
-                case "edit records":
-                    if (RecordEditInProgress(treeViewMain.SelectedNode)) return;
+                case "edit rows":
+                    if (RowEditInProgress(treeViewMain.SelectedNode)) return;
                     RecordEditorTab RecEditor = new RecordEditorTab();
                     RecEditor.BuildTab(treeViewMain.SelectedNode);
                     break;
@@ -1064,7 +1064,7 @@ namespace SQLiteWorkshop
         /// </summary>
         /// <param name="tablename">Table being edited.</param>
         /// <returns></returns>
-        protected bool RecordEditInProgress(TreeNode tn)
+        protected bool RowEditInProgress(TreeNode tn)
         {
             string tablename = tn.Text;
             foreach (TabPage tb in tabMain.TabPages)

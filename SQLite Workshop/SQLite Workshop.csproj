@@ -75,11 +75,11 @@
     <Compile Include="Classes\ImportWizTextPropertySettings.cs" />
     <Compile Include="Classes\DBMSAccessManager.cs" />
     <Compile Include="Classes\RecordEditorTab.cs" />
-    <Compile Include="Controls\RecordEditTabControl.cs">
+    <Compile Include="Controls\RowEditTabControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Controls\RecordEditTabControl.Designer.cs">
-      <DependentUpon>RecordEditTabControl.cs</DependentUpon>
+    <Compile Include="Controls\RowEditTabControl.Designer.cs">
+      <DependentUpon>RowEditTabControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\SqlFactory.cs" />
     <Compile Include="Classes\TableEditorTab.cs" />
@@ -176,8 +176,8 @@
     <EmbeddedResource Include="Controls\DBEditorTabControl.resx">
       <DependentUpon>DBEditorTabControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\RecordEditTabControl.resx">
-      <DependentUpon>RecordEditTabControl.cs</DependentUpon>
+    <EmbeddedResource Include="Controls\RowEditTabControl.resx">
+      <DependentUpon>RowEditTabControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\SqlTabControl.resx">
       <DependentUpon>SqlTabControl.cs</DependentUpon>

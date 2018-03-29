@@ -17,6 +17,7 @@ namespace SQLiteWorkshop
         string RowIDColName;
         int RowIdIndex;
         string PrimaryKeyName;
+        int PKIndex;
         bool tableHasRowID;
 
         string BaseSQL = string.Empty;
@@ -45,14 +46,15 @@ namespace SQLiteWorkshop
 
         protected void InitializePage()
         {
+            lblTable.Text = TableName;
             SQLiteErrorCode returnCode;
 
             tableHasRowID = DataAccess.CheckForRowID(DatabaseName, TableName, out RowIDColName, out PrimaryKeyName);
 
             BaseSQL = string.Format("Select Count(*) From \"{0}\"", TableName);
             RecordCount = Convert.ToInt32(DataAccess.ExecuteScalar(DatabaseName, BaseSQL, out returnCode));
-            BaseSQL = string.Format("Select {0}, * From \"{1}\"", RowIDColName, TableName);
-            RowIdIndex = 0;
+            BaseSQL = tableHasRowID ? string.Format("Select {0}, * From \"{1}\"", RowIDColName, TableName) : BaseSQL = string.Format("Select * From \"{0}\"", TableName);
+            RowIdIndex = -1;
             
             bs = new BindingSource();
             BindingList bl = new BindingList(RecordCount);
@@ -65,27 +67,30 @@ namespace SQLiteWorkshop
             cmd.CommandText = BaseSQL;
             SQLiteDataReader dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly);
 
-            int start = 100;
+            int start = 50;
             int lablen = 100;
             int height = 40;
 
             for (int i = 0; i < dr.FieldCount; i++)
             {
+                string colname = dr.GetName(i);
+                if (RowIdIndex < 0)  if (tableHasRowID) if (RowIDColName == colname) RowIdIndex = i;
                 if (i == RowIdIndex) continue;
+                if (colname == PrimaryKeyName) PKIndex = i;
 
                 Label lbl = new Label();
-                lbl.Text = string.Format("{0}:", dr.GetName(i));
+                lbl.Text = string.Format("{0}:", colname);
                 lbl.Top = start;
                 lbl.Left = 50;
+                panelBody.Controls.Add(lbl);
 
                 TextBox txt = new TextBox();
                 txt.Name = string.Format("txt{0}", i.ToString().PadLeft(4, '0'));
-                txt.Tag = dr.GetName(i);
-                panelBody.Controls.Add(lbl);
+                txt.Tag = colname;
                 txt.Top = start;
                 txt.Left = lbl.Left + lablen;
                 txt.Width = 300;
-                panelBody.Controls.Add(txt);
+                panelBody.Controls.Add(txt);                
                 start += height;
             }
             dr.Close();
@@ -119,12 +124,14 @@ namespace SQLiteWorkshop
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("Update \"{0}\" Set", TableName);
             int count = 0;
+            int i = 0;
             ArrayList parms = new ArrayList();
             toolStripLabel1.Text = string.Empty;
+            SQLiteErrorCode returnCode;
 
             DataRow dr = dt.Rows[0];
 
-            for (int i = 0; i < dr.ItemArray.Count(); i++)
+            for (i = 0; i < dr.ItemArray.Count(); i++)
             {
                 if (i == RowIdIndex) continue;
                 TextBox t = FindTextBox(string.Format("txt{0}", i.ToString().PadLeft(4, '0')));
@@ -136,7 +143,34 @@ namespace SQLiteWorkshop
                 }
             }
             if (count == 0) return true;
-            sb.AppendFormat(" Where {0} = {1}", RowIDColName, dr.ItemArray[RowIdIndex].ToString());
+            if (tableHasRowID)
+            {
+                sb.AppendFormat(" Where {0} = {1}", RowIDColName, dr.ItemArray[RowIdIndex].ToString());
+            }
+            else
+            if (!string.IsNullOrEmpty(PrimaryKeyName))
+            {
+                sb.AppendFormat(" Where {0} = {1}", PrimaryKeyName, dr.ItemArray[PKIndex].ToString());
+            }
+            else
+            {
+                StringBuilder sbWhere = new StringBuilder();
+                sbWhere.Append("Where ");
+                for (i = 0; i < dr.Table.Columns.Count - 1; i++)
+                {
+                    sbWhere.Append("\"").Append(dr.Table.Columns[i].ColumnName).AppendFormat("\" = \"{0}\"", dr[i].ToString());
+                    sbWhere.Append(" And ");
+                }
+                sbWhere.Append("\"").Append(dr.Table.Columns[dr.Table.Columns.Count - 1].ColumnName).AppendFormat("\" = \"{0}\"", dr[i].ToString());
+                var ucount = DataAccess.ExecuteScalar(DatabaseName, string.Format("Select Count(*) From \"{0}\" {1}", TableName, sbWhere.ToString()), out returnCode);
+                if (Convert.ToInt32(ucount) != 1)
+                {
+                    Common.ShowMsg(Common.ERR_MULTIUPDATE);
+                    return false;
+                }
+                sb.AppendFormat(" {0}", sbWhere.ToString());
+            }
+
 
             if (RecordUpdated())
             {
@@ -147,7 +181,7 @@ namespace SQLiteWorkshop
                     return false;
                 }
             }
-            int recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, sb.ToString(), parms, out SQLiteErrorCode returnCode);
+            int recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, sb.ToString(), parms, out returnCode);
             toolStripLabel1.Text = string.Format("{0} Record(s) updated.", recsupdated.ToString());
             return true;
         }
