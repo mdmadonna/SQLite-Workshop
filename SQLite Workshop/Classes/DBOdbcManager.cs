@@ -104,13 +104,21 @@ namespace SQLiteWorkshop
 
         internal override DBSchema GetSchema()
         {
-
+            DataTable dt;
             Dictionary<string, DBTable> Tables = new Dictionary<string, DBTable>();
 
             if (conn == null || conn.State != ConnectionState.Open) OpenDB();
 
-            DataTable dt = conn.GetSchema("Tables");
+            dt = conn.GetSchema("Tables");
             
+            foreach (DataRow dr in dt.Rows)
+            {
+                DBTable dbt = new DBTable() { Name = dr["TABLE_NAME"].ToString() };
+                Tables.Add(dbt.Name, dbt);
+            }
+
+            dt = conn.GetSchema("Views");
+
             foreach (DataRow dr in dt.Rows)
             {
                 DBTable dbt = new DBTable() { Name = dr["TABLE_NAME"].ToString() };

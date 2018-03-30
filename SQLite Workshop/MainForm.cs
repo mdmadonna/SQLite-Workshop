@@ -77,7 +77,7 @@ namespace SQLiteWorkshop
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Rebuild", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Restore", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem("-"));
-            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Refresh", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
+            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.F5, "Refresh", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Properties", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
 
 
@@ -284,6 +284,11 @@ namespace SQLiteWorkshop
                     ((SqlTabControl)c).SaveSql();
                 }
             }
+        }
+
+        private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (!string.IsNullOrEmpty(CurrentDB)) LoadDB(CurrentDB);
         }
 
         private void saveAstoolStripMenuItem_Click(object sender, EventArgs e)

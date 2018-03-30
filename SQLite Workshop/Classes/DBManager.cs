@@ -171,7 +171,7 @@ namespace SQLiteWorkshop
                 sbV.Append(colCount == 0 ? string.Empty : ",").Append("?");
                 sb.Append(GetColumnType(column.Value.SqlType, column.Value.Size, column.Value.NumericPrecision, column.Value.NumericScale, out ColumnType colType, out bool isText));
                 if (column.Value.IsAutoIncrement) sb.Append(" auto_increment");
-                sb.Append(column.Value.IsNullable ? " Null" : "Not Null");
+                sb.Append(column.Value.IsNullable ? " Null" : " Not Null");
                 if (column.Value.HasDefault)
                 {  sb.Append(" Default ").Append(column.Value.DefaultValue);  }
                 colCount++;
@@ -239,6 +239,7 @@ namespace SQLiteWorkshop
                     isText = false;
                     return "double";
                 case "int":
+                case "int identity":
                 case "system.int32":
                 case "dbtype_i4":
                     colType = ColumnType.Integer;
