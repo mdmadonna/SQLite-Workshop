@@ -86,8 +86,16 @@ namespace SQLiteWorkshop
             return openFile.FileName;
         }
 
+        /// <summary>
+        /// Build an empty Query tab.
+        /// </summary>
+        /// <param name="sqlType"></param>
+        internal void BuildTab(SQLType sqlType)
+        {
+            sTab.Text = "  New Query.sql          ";
+        }
 
-        internal void BuildTab(TreeNode TargetNode, SQLType sqlType)
+            internal void BuildTab(TreeNode TargetNode, SQLType sqlType)
         {
 
 
@@ -192,8 +200,6 @@ namespace SQLiteWorkshop
                 default:
                     break;
             }
-
-
         }
 
         protected void BuildTab(string dbName)

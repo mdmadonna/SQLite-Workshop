@@ -321,7 +321,7 @@ namespace SQLiteWorkshop
            
             int firstVisibleChar = txtSqlStatement.GetCharIndexFromPosition(new Point(0, 1));
             int lineIndex = txtSqlStatement.GetLineFromCharIndex(firstVisibleChar);
-            string firstVisibleLine = txtSqlStatement.Lines[lineIndex];
+            //string firstVisibleLine = txtSqlStatement.Lines[lineIndex];
             int iCursor = txtSqlStatement.SelectionStart;
 
             RichTextBox rtb = new RichTextBox();
@@ -340,8 +340,8 @@ namespace SQLiteWorkshop
             ignoreChange = true;
             txtSqlStatement.Rtf = rtb.Rtf;
             ignoreChange = false;
-
-            txtSqlStatement.SelectionStart = txtSqlStatement.Find(txtSqlStatement.Lines[lineIndex], RichTextBoxFinds.NoHighlight);
+            int sStart = txtSqlStatement.Find(txtSqlStatement.Lines[lineIndex], RichTextBoxFinds.NoHighlight);
+            txtSqlStatement.SelectionStart = sStart < 0 ? 0 : sStart;
             txtSqlStatement.ScrollToCaret();
 
             txtSqlStatement.SelectionStart = iCursor < 0 ? 0 : iCursor;

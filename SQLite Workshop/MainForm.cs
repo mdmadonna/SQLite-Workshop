@@ -486,7 +486,7 @@ namespace SQLiteWorkshop
         {
             if (string.IsNullOrEmpty(CurrentDB)) return;
             SqlTab st = new SqlTab();
-            st.BuildTab(CurrentDB, SQLType.SQLNewQuery);
+            st.BuildTab(SQLType.SQLNewQuery);
         }
         private void toolStripTbCreateTable_Click(object sender, EventArgs e)
         {
