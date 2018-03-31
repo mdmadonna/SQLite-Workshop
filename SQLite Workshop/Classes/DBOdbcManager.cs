@@ -117,6 +117,7 @@ namespace SQLiteWorkshop
                 Tables.Add(dbt.Name, dbt);
             }
 
+            /*  Hold off on views for the time being
             dt = conn.GetSchema("Views");
 
             foreach (DataRow dr in dt.Rows)
@@ -124,6 +125,7 @@ namespace SQLiteWorkshop
                 DBTable dbt = new DBTable() { Name = dr["TABLE_NAME"].ToString() };
                 Tables.Add(dbt.Name, dbt);
             }
+            */
 
             DBSchema schema = new DBSchema();
             schema.Tables = Tables;
