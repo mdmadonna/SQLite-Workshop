@@ -65,6 +65,7 @@
             this.toolStripDBNew = new System.Windows.Forms.ToolStripButton();
             this.toolStripDBOpenDropDown = new System.Windows.Forms.ToolStripDropDownButton();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripDBRefresh = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripDBEncrypt = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -88,6 +89,7 @@
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.templatesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.propertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.vacuumToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.integrityCheckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -107,7 +109,6 @@
             this.statusStripMain = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusMain = new System.Windows.Forms.ToolStripStatusLabel();
             this.spRight = new System.Windows.Forms.Splitter();
-            this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panelMain.SuspendLayout();
             this.panelTop.SuspendLayout();
             this.panelMenu.SuspendLayout();
@@ -490,6 +491,7 @@
             this.toolStripDBNew,
             this.toolStripDBOpenDropDown,
             this.toolStripSeparator2,
+            this.toolStripDBRefresh,
             this.toolStripSeparator3,
             this.toolStripDBEncrypt,
             this.toolStripSeparator1,
@@ -498,7 +500,7 @@
             this.toolStripDBProperties});
             this.toolStripDB.Location = new System.Drawing.Point(3, 0);
             this.toolStripDB.Name = "toolStripDB";
-            this.toolStripDB.Size = new System.Drawing.Size(174, 25);
+            this.toolStripDB.Size = new System.Drawing.Size(228, 25);
             this.toolStripDB.TabIndex = 1;
             this.toolStripDB.Text = "toolStrip1";
             // 
@@ -527,6 +529,17 @@
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
             this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripDBRefresh
+            // 
+            this.toolStripDBRefresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripDBRefresh.Image = global::SQLiteWorkshop.Properties.Resources.Refresh;
+            this.toolStripDBRefresh.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDBRefresh.Name = "toolStripDBRefresh";
+            this.toolStripDBRefresh.Size = new System.Drawing.Size(23, 22);
+            this.toolStripDBRefresh.Text = "toolStripDBRefresh";
+            this.toolStripDBRefresh.ToolTipText = "Refresh Database Tree";
+            this.toolStripDBRefresh.Click += new System.EventHandler(this.toolStripDBRefresh_Click);
             // 
             // toolStripSeparator3
             // 
@@ -712,16 +725,24 @@
             // templatesToolStripMenuItem
             // 
             this.templatesToolStripMenuItem.Name = "templatesToolStripMenuItem";
-            this.templatesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.templatesToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
             this.templatesToolStripMenuItem.Text = "Templates";
             this.templatesToolStripMenuItem.Click += new System.EventHandler(this.templatesToolStripMenuItem_Click);
             // 
             // propertiesToolStripMenuItem
             // 
             this.propertiesToolStripMenuItem.Name = "propertiesToolStripMenuItem";
-            this.propertiesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.propertiesToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
             this.propertiesToolStripMenuItem.Text = "Properties";
             this.propertiesToolStripMenuItem.Click += new System.EventHandler(this.propertiesToolStripMenuItem_Click);
+            // 
+            // refreshToolStripMenuItem
+            // 
+            this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
+            this.refreshToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.refreshToolStripMenuItem.Text = "Refresh";
+            this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
             // 
             // toolsToolStripMenuItem
             // 
@@ -738,33 +759,33 @@
             // vacuumToolStripMenuItem
             // 
             this.vacuumToolStripMenuItem.Name = "vacuumToolStripMenuItem";
-            this.vacuumToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.vacuumToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.vacuumToolStripMenuItem.Text = "Vacuum";
             this.vacuumToolStripMenuItem.Click += new System.EventHandler(this.toolStripDBCompress_Click);
             // 
             // integrityCheckToolStripMenuItem
             // 
             this.integrityCheckToolStripMenuItem.Name = "integrityCheckToolStripMenuItem";
-            this.integrityCheckToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.integrityCheckToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.integrityCheckToolStripMenuItem.Text = "Integrity Check";
             this.integrityCheckToolStripMenuItem.Click += new System.EventHandler(this.toolStripDBIntegrityCheck_Click);
             // 
             // encryptDatabaseToolStripMenuItem
             // 
             this.encryptDatabaseToolStripMenuItem.Name = "encryptDatabaseToolStripMenuItem";
-            this.encryptDatabaseToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.encryptDatabaseToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.encryptDatabaseToolStripMenuItem.Text = "Encrypt Database";
             this.encryptDatabaseToolStripMenuItem.Click += new System.EventHandler(this.toolStripDBEncrypt_Click);
             // 
             // toolStripSeparator9
             // 
             this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator9.Size = new System.Drawing.Size(162, 6);
             // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.optionsToolStripMenuItem.Text = "Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
@@ -780,14 +801,14 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // sQLiteHomePageToolStripMenuItem
             // 
             this.sQLiteHomePageToolStripMenuItem.Name = "sQLiteHomePageToolStripMenuItem";
-            this.sQLiteHomePageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sQLiteHomePageToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.sQLiteHomePageToolStripMenuItem.Text = "SQLite Home Page";
             // 
             // panelHeading
@@ -912,14 +933,6 @@
             this.spRight.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sp_MouseDown);
             this.spRight.MouseMove += new System.Windows.Forms.MouseEventHandler(this.spMouseMove);
             this.spRight.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sp_MouseUp);
-            // 
-            // refreshToolStripMenuItem
-            // 
-            this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
-            this.refreshToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.refreshToolStripMenuItem.Text = "Refresh";
-            this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -1050,6 +1063,7 @@
         private System.Windows.Forms.ToolStripMenuItem propertiesToolStripMenuItem;
         private System.Windows.Forms.Splitter spTemplate;
         private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
+        private System.Windows.Forms.ToolStripButton toolStripDBRefresh;
     }
 }
 

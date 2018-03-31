@@ -285,6 +285,21 @@
     <None Include="assets\MainSmall.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\UndoEdit.png" />
+    <None Include="assets\Add-New.png" />
+    <None Include="assets\Delete.png" />
+    <None Include="assets\First.png" />
+    <None Include="assets\Last.png" />
+    <None Include="assets\Next.png" />
+    <None Include="assets\Previous.png" />
+    <None Include="assets\Save.png" />
+    <None Include="assets\Reload.png" />
+    <None Include="assets\Undo.png" />
+    <None Include="assets\Reload-small.png" />
+    <None Include="assets\Undo-small.png" />
+    <Content Include="assets\Main.ico" />
+    <Content Include="assets\Main.png" />
+    <Content Include="assets\Refresh.png" />
     <Content Include="Templates\Query\Column Profile.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -312,8 +327,6 @@
     <None Include="assets\Explain Plan.png" />
     <None Include="assets\Explain.png" />
     <None Include="assets\Integrity.png" />
-    <None Include="assets\Data-Export.png" />
-    <None Include="assets\Data-Import.png" />
     <None Include="assets\Export.png" />
     <None Include="assets\Import.png" />
     <None Include="assets\Parse.png" />

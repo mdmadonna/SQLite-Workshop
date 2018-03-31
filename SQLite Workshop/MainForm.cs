@@ -369,6 +369,11 @@ namespace SQLiteWorkshop
             databaseToolStripMenuItem_Click(sender, e);
         }
 
+        private void toolStripDBRefresh_Click(object sender, EventArgs e)
+        {
+            refreshToolStripMenuItem_Click(sender, e);
+        }
+
         private void toolStripDBOpenDropDownItem_Click(object sender, EventArgs e)
         {
             LoadDB(((ToolStripMenuItem)sender).ToolTipText);

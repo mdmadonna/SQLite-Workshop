@@ -33,9 +33,6 @@ namespace SQLiteWorkshop
             BuildTab(sd.DBLocation, TargetNode.Text);
 
             sTab.Text = string.Format("   Edit - {1}          ", curtab, TargetNode.Text);
-
-            dbeTabControl.Execute();
-
         }
 
 
