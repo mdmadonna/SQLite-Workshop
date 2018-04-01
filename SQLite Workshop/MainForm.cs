@@ -50,6 +50,7 @@ namespace SQLiteWorkshop
         {
             InitializeComponent();
             cfg = new Config();
+            this.MaximumSize = Screen.FromRectangle(this.Bounds).WorkingArea.Size;
             InitializeFormGUI();
             InitializeForm();
         }
@@ -698,7 +699,9 @@ namespace SQLiteWorkshop
                 case "edit rows":
                     if (RowEditInProgress(treeViewMain.SelectedNode)) return;
                     RecordEditorTab RecEditor = new RecordEditorTab();
+                    this.Cursor = Cursors.WaitCursor;
                     RecEditor.BuildTab(treeViewMain.SelectedNode);
+                    this.Cursor = Cursors.Default;
                     break;
                 case "rename table":
                     ef = new ExecuteForm();

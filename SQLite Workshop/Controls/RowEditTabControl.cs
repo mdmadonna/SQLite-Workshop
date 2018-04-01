@@ -77,7 +77,7 @@ namespace SQLiteWorkshop
            
             RowIdIndex = -1;
             searchSQL = string.Format("{0} {1}", BaseSQL, searchWhereClause);
-
+            
             int iRowCount = Convert.ToInt32(DataAccess.ExecuteScalar(DatabaseName, searchSQL, out returnCode));
             if (iRowCount == -1 || returnCode != SQLiteErrorCode.Ok)
             {
@@ -480,8 +480,10 @@ namespace SQLiteWorkshop
         /// <param name="e"></param>
         private void toolStripButtonMoveFirst_Click(object sender, EventArgs e)
         {
+            this.Cursor = Cursors.WaitCursor;
             if (!UpdateRow()) return;
             LoadRecord(0);
+            this.Cursor = Cursors.Default;
         }
 
         /// <summary>
@@ -491,9 +493,11 @@ namespace SQLiteWorkshop
         /// <param name="e"></param>
         private void toolStripButtonMovePrevious_Click(object sender, EventArgs e)
         {
+            this.Cursor = Cursors.WaitCursor;
             if (!UpdateRow()) return;
             if (CurrentRow > 1) CurrentRow--;
             LoadRecord(CurrentRow);
+            this.Cursor = Cursors.Default;
         }
 
         /// <summary>
@@ -503,9 +507,11 @@ namespace SQLiteWorkshop
         /// <param name="e"></param>
         private void toolStripButtonMoveNext_Click(object sender, EventArgs e)
         {
+            this.Cursor = Cursors.WaitCursor;
             if (!UpdateRow()) return;
             if (CurrentRow < RowCount) CurrentRow++;
             LoadRecord(CurrentRow);
+            this.Cursor = Cursors.Default;
         }
 
         /// <summary>
@@ -515,8 +521,10 @@ namespace SQLiteWorkshop
         /// <param name="e"></param>
         private void toolStripButtonMoveLast_Click(object sender, EventArgs e)
         {
+            this.Cursor = Cursors.WaitCursor;
             if (!UpdateRow()) return;
             LoadRecord(RowCount);
+            this.Cursor = Cursors.Default;
         }
 
         /// <summary>

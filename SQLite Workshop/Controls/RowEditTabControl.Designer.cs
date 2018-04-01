@@ -117,7 +117,7 @@
             this.panelBody.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelBody.Location = new System.Drawing.Point(0, 63);
             this.panelBody.Name = "panelBody";
-            this.panelBody.Size = new System.Drawing.Size(837, 413);
+            this.panelBody.Size = new System.Drawing.Size(837, 344);
             this.panelBody.TabIndex = 0;
             // 
             // panelSeparator
@@ -147,9 +147,8 @@
             this.toolStripButtonCommit,
             this.toolStripSeparator4,
             this.toolStripLabelStatus});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 451);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 382);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.ShowItemToolTips = false;
             this.toolStrip1.Size = new System.Drawing.Size(837, 25);
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
@@ -297,7 +296,7 @@
             this.Controls.Add(this.panelBody);
             this.Controls.Add(this.panelTop);
             this.Name = "RecordEditTabControl";
-            this.Size = new System.Drawing.Size(837, 476);
+            this.Size = new System.Drawing.Size(837, 407);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             this.toolStrip1.ResumeLayout(false);
