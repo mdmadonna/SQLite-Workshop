@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportWiz));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelTop = new System.Windows.Forms.Panel();
@@ -110,15 +110,16 @@
             this.label7 = new System.Windows.Forms.Label();
             this.panelWizDB = new System.Windows.Forms.Panel();
             this.dgvTables = new System.Windows.Forms.DataGridView();
-            this.CheckBoxSelectedTable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
-            this.Source = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Destination = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Map = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panelWizDBMid = new System.Windows.Forms.Panel();
             this.label10 = new System.Windows.Forms.Label();
             this.panelWizDBTop = new System.Windows.Forms.Panel();
             this.label9 = new System.Windows.Forms.Label();
             this.lblDBName = new System.Windows.Forms.Label();
+            this.CheckBoxSelectedTable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
+            this.Source = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Destination = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Map = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Preview = new System.Windows.Forms.DataGridViewButtonColumn();
             this.statusStrip1.SuspendLayout();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
@@ -655,10 +656,9 @@
             this.panelWizText.BackColor = System.Drawing.SystemColors.Window;
             this.panelWizText.Controls.Add(this.tabText);
             this.panelWizText.Controls.Add(this.panelWizTextTop);
-            this.panelWizText.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelWizText.Location = new System.Drawing.Point(1, 29);
+            this.panelWizText.Location = new System.Drawing.Point(1, 148);
             this.panelWizText.Name = "panelWizText";
-            this.panelWizText.Size = new System.Drawing.Size(649, 301);
+            this.panelWizText.Size = new System.Drawing.Size(490, 182);
             this.panelWizText.TabIndex = 4;
             // 
             // tabText
@@ -667,10 +667,10 @@
             this.tabText.Controls.Add(this.tabTextColumns);
             this.tabText.Controls.Add(this.tabTextPreview);
             this.tabText.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.tabText.Location = new System.Drawing.Point(0, 52);
+            this.tabText.Location = new System.Drawing.Point(0, -67);
             this.tabText.Name = "tabText";
             this.tabText.SelectedIndex = 0;
-            this.tabText.Size = new System.Drawing.Size(649, 249);
+            this.tabText.Size = new System.Drawing.Size(490, 249);
             this.tabText.TabIndex = 9;
             this.tabText.SelectedIndexChanged += new System.EventHandler(this.tabText_SelectedIndexChanged);
             // 
@@ -685,7 +685,7 @@
             this.tabTextGeneral.Location = new System.Drawing.Point(4, 22);
             this.tabTextGeneral.Name = "tabTextGeneral";
             this.tabTextGeneral.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTextGeneral.Size = new System.Drawing.Size(641, 223);
+            this.tabTextGeneral.Size = new System.Drawing.Size(482, 223);
             this.tabTextGeneral.TabIndex = 0;
             this.tabTextGeneral.Text = "General";
             this.tabTextGeneral.UseVisualStyleBackColor = true;
@@ -897,8 +897,8 @@
             // 
             this.dataGridViewText.AllowUserToAddRows = false;
             this.dataGridViewText.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
             this.dataGridViewText.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGridViewText.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewText.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -932,7 +932,7 @@
             this.panelWizTextTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelWizTextTop.Location = new System.Drawing.Point(0, 0);
             this.panelWizTextTop.Name = "panelWizTextTop";
-            this.panelWizTextTop.Size = new System.Drawing.Size(649, 50);
+            this.panelWizTextTop.Size = new System.Drawing.Size(490, 50);
             this.panelWizTextTop.TabIndex = 10;
             // 
             // lblFileName
@@ -961,9 +961,10 @@
             this.panelWizDB.Controls.Add(this.dgvTables);
             this.panelWizDB.Controls.Add(this.panelWizDBMid);
             this.panelWizDB.Controls.Add(this.panelWizDBTop);
-            this.panelWizDB.Location = new System.Drawing.Point(405, 42);
+            this.panelWizDB.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelWizDB.Location = new System.Drawing.Point(1, 29);
             this.panelWizDB.Name = "panelWizDB";
-            this.panelWizDB.Size = new System.Drawing.Size(200, 100);
+            this.panelWizDB.Size = new System.Drawing.Size(649, 301);
             this.panelWizDB.TabIndex = 5;
             // 
             // dgvTables
@@ -976,14 +977,68 @@
             this.CheckBoxSelectedTable,
             this.Source,
             this.Destination,
-            this.Map});
+            this.Map,
+            this.Preview});
             this.dgvTables.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvTables.Location = new System.Drawing.Point(0, 72);
             this.dgvTables.Name = "dgvTables";
-            this.dgvTables.Size = new System.Drawing.Size(200, 28);
+            this.dgvTables.Size = new System.Drawing.Size(649, 229);
             this.dgvTables.TabIndex = 4;
+            this.dgvTables.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvTables_CellContentClick);
             this.dgvTables.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvTables_CellMouseUp);
             this.dgvTables.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvTables_CellValueChanged);
+            // 
+            // panelWizDBMid
+            // 
+            this.panelWizDBMid.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.panelWizDBMid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelWizDBMid.Controls.Add(this.label10);
+            this.panelWizDBMid.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelWizDBMid.Location = new System.Drawing.Point(0, 46);
+            this.panelWizDBMid.Name = "panelWizDBMid";
+            this.panelWizDBMid.Size = new System.Drawing.Size(649, 26);
+            this.panelWizDBMid.TabIndex = 5;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(23, 6);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(139, 13);
+            this.label10.TabIndex = 0;
+            this.label10.Text = "Select Tables to Import";
+            // 
+            // panelWizDBTop
+            // 
+            this.panelWizDBTop.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelWizDBTop.Controls.Add(this.label9);
+            this.panelWizDBTop.Controls.Add(this.lblDBName);
+            this.panelWizDBTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelWizDBTop.Location = new System.Drawing.Point(0, 0);
+            this.panelWizDBTop.Name = "panelWizDBTop";
+            this.panelWizDBTop.Size = new System.Drawing.Size(649, 46);
+            this.panelWizDBTop.TabIndex = 3;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.ForeColor = System.Drawing.Color.DimGray;
+            this.label9.Location = new System.Drawing.Point(23, 7);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(76, 16);
+            this.label9.TabIndex = 1;
+            this.label9.Text = "DB Import";
+            // 
+            // lblDBName
+            // 
+            this.lblDBName.AutoSize = true;
+            this.lblDBName.Location = new System.Drawing.Point(26, 27);
+            this.lblDBName.Name = "lblDBName";
+            this.lblDBName.Size = new System.Drawing.Size(60, 13);
+            this.lblDBName.TabIndex = 2;
+            this.lblDBName.Text = "lblDBName";
             // 
             // CheckBoxSelectedTable
             // 
@@ -1014,57 +1069,11 @@
             this.Map.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
             this.Map.Width = 50;
             // 
-            // panelWizDBMid
+            // Preview
             // 
-            this.panelWizDBMid.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.panelWizDBMid.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelWizDBMid.Controls.Add(this.label10);
-            this.panelWizDBMid.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelWizDBMid.Location = new System.Drawing.Point(0, 46);
-            this.panelWizDBMid.Name = "panelWizDBMid";
-            this.panelWizDBMid.Size = new System.Drawing.Size(200, 26);
-            this.panelWizDBMid.TabIndex = 5;
-            // 
-            // label10
-            // 
-            this.label10.AutoSize = true;
-            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label10.Location = new System.Drawing.Point(23, 6);
-            this.label10.Name = "label10";
-            this.label10.Size = new System.Drawing.Size(139, 13);
-            this.label10.TabIndex = 0;
-            this.label10.Text = "Select Tables to Import";
-            // 
-            // panelWizDBTop
-            // 
-            this.panelWizDBTop.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panelWizDBTop.Controls.Add(this.label9);
-            this.panelWizDBTop.Controls.Add(this.lblDBName);
-            this.panelWizDBTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelWizDBTop.Location = new System.Drawing.Point(0, 0);
-            this.panelWizDBTop.Name = "panelWizDBTop";
-            this.panelWizDBTop.Size = new System.Drawing.Size(200, 46);
-            this.panelWizDBTop.TabIndex = 3;
-            // 
-            // label9
-            // 
-            this.label9.AutoSize = true;
-            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label9.ForeColor = System.Drawing.Color.DimGray;
-            this.label9.Location = new System.Drawing.Point(23, 7);
-            this.label9.Name = "label9";
-            this.label9.Size = new System.Drawing.Size(76, 16);
-            this.label9.TabIndex = 1;
-            this.label9.Text = "DB Import";
-            // 
-            // lblDBName
-            // 
-            this.lblDBName.AutoSize = true;
-            this.lblDBName.Location = new System.Drawing.Point(26, 27);
-            this.lblDBName.Name = "lblDBName";
-            this.lblDBName.Size = new System.Drawing.Size(60, 13);
-            this.lblDBName.TabIndex = 2;
-            this.lblDBName.Text = "lblDBName";
+            this.Preview.HeaderText = "Preview";
+            this.Preview.Name = "Preview";
+            this.Preview.Width = 50;
             // 
             // ImportWiz
             // 
@@ -1072,9 +1081,9 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(50)))));
             this.ClientSize = new System.Drawing.Size(651, 392);
+            this.Controls.Add(this.panelWizDB);
             this.Controls.Add(this.panelWizText);
             this.Controls.Add(this.panelWizMain);
-            this.Controls.Add(this.panelWizDB);
             this.Controls.Add(this.panelBottom);
             this.Controls.Add(this.panelTop);
             this.Controls.Add(this.statusStrip1);
@@ -1188,10 +1197,6 @@
         private System.Windows.Forms.Panel panelWizDBTop;
         private System.Windows.Forms.Label label9;
         private System.Windows.Forms.Label lblDBName;
-        private System.Windows.Forms.DataGridViewCheckBoxColumn CheckBoxSelectedTable;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Source;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Destination;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Map;
         private System.Windows.Forms.Panel panelWizMainDB;
         private System.Windows.Forms.ComboBox comboBoxDatabaseList;
         private System.Windows.Forms.Label label14;
@@ -1220,5 +1225,10 @@
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.DataGridViewCheckBoxColumn CheckBoxSelectedTable;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Source;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Destination;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Map;
+        private System.Windows.Forms.DataGridViewButtonColumn Preview;
     }
 }

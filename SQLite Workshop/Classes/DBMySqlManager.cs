@@ -141,7 +141,7 @@ namespace SQLiteWorkshop
 
             IDbCommand cmd = (IDbCommand)assMySql.CreateInstance(MySqlCommandClass, true);
             cmd.Connection = conn;
-            cmd.CommandText = string.Format("Select * From {0}", TableName);
+            cmd.CommandText = string.Format("Select * From `{0}`", TableName);
             try
             {
                 sqldr = cmd.ExecuteReader(CommandBehavior.SingleRow);
@@ -243,7 +243,7 @@ namespace SQLiteWorkshop
                 OpenDB();
                 IDbCommand SqlCmd = (IDbCommand)assMySql.CreateInstance(MySqlCommandClass, true);
                 SqlCmd.Connection = conn;
-                SqlCmd.CommandText = string.Format("Select * FROM {0}", SourceTable);
+                SqlCmd.CommandText = string.Format("Select * FROM `{0}`", SourceTable);
                 IDataReader dr = SqlCmd.ExecuteReader();
                 while (dr.Read())
                 {

@@ -153,6 +153,12 @@
     <Compile Include="Forms\ExportWiz.Designer.cs">
       <DependentUpon>ExportWiz.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ShowImg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ShowImg.Designer.cs">
+      <DependentUpon>ShowImg.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Template.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -210,6 +216,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ExportWiz.resx">
       <DependentUpon>ExportWiz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ShowImg.resx">
+      <DependentUpon>ShowImg.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Template.resx">
       <DependentUpon>Template.cs</DependentUpon>

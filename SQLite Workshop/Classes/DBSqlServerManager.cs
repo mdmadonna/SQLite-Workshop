@@ -123,7 +123,7 @@ namespace SQLiteWorkshop
 
             SqlCommand cmd = new SqlCommand();
             cmd.Connection = conn;
-            cmd.CommandText = string.Format("Select Top(1) * From {0}", TableName);
+            cmd.CommandText = string.Format("Select Top(1) * From [{0}]", TableName);
             try
             {
                 sqldr = cmd.ExecuteReader(CommandBehavior.SingleRow);
@@ -225,7 +225,7 @@ namespace SQLiteWorkshop
                 OpenDB();
                 SqlCommand SqlCmd = new SqlCommand();
                 SqlCmd.Connection = conn;
-                SqlCmd.CommandText = string.Format("Select * FROM {0}", SourceTable);
+                SqlCmd.CommandText = string.Format("Select * FROM [{0}]", SourceTable);
                 SqlDataReader dr = SqlCmd.ExecuteReader();
                 while (dr.Read())
                 {

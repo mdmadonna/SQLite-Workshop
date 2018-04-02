@@ -138,7 +138,7 @@ namespace SQLiteWorkshop
             StringBuilder sbI = new StringBuilder();
             StringBuilder sbV = new StringBuilder();
 
-            sbI.Append(string.Format("Insert Into {0} (", TableName));
+            sbI.Append(string.Format("Insert Into \"{0}\" (", TableName));
             sbV.Append(" Values (");
 
             int colCount = 0;
@@ -159,7 +159,7 @@ namespace SQLiteWorkshop
 
             sb.Append(String.Format("Create Table If Not Exists \"{0}\"", TableName));
             sb.Append("(\r\n");
-            sbI.Append(string.Format("Insert Into {0} (", TableName));
+            sbI.Append(string.Format("Insert Into \"{0}\" (", TableName));
             sbV.Append(" Values (");
 
             int colCount = 0;

@@ -92,7 +92,7 @@ namespace SQLiteWorkshop
 
             OleDbCommand cmd = new OleDbCommand();
             cmd.Connection = conn;
-            cmd.CommandText = string.Format("Select * From {0}", TableName);
+            cmd.CommandText = string.Format("Select * From [{0}]", TableName);
             OleDbDataReader OleDbdr = cmd.ExecuteReader(CommandBehavior.SingleRow);
             OleDbdr.Read();
             DataTable ColumnList = OleDbdr.GetSchemaTable();
@@ -178,7 +178,7 @@ namespace SQLiteWorkshop
                 OpenDB();
                 OleDbCommand OleCmd = new OleDbCommand();
                 OleCmd.Connection = conn;
-                OleCmd.CommandText = string.Format("Select * FROM {0}", SourceTable);
+                OleCmd.CommandText = string.Format("Select * FROM [{0}]", SourceTable);
                 OleDbDataReader dr = OleCmd.ExecuteReader();
                 while (dr.Read())
                 {

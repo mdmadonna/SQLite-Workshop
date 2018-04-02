@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 namespace SQLiteWorkshop
 {
@@ -138,13 +140,53 @@ namespace SQLiteWorkshop
                 txt.Top = start;
                 txt.Left = lbl.Left + lablen;
                 txt.Width = 300;
-                panelBody.Controls.Add(txt);                
+                panelBody.Controls.Add(txt);
+                
+                if (dr.GetFieldType(i).Equals(typeof(byte[])))
+                {
+                    Button btn = new Button();
+                    btn.Name = string.Format("btn{0}", i.ToString().PadLeft(4, '0'));
+                    btn.Text = "Image";
+                    btn.Left = txt.Left + 320;
+                    btn.Top = txt.Top - 2;
+                    btn.Height = 24;
+                    btn.Width = 60;
+                    btn.BackColor = SystemColors.Control;
+                    btn.Tag = colname;
+                    btn.Click += button_clicked;
+                    panelBody.Controls.Add(btn);
+
+                }
                 start += height;
             }
             dr.Close();
             DataAccess.CloseDB(conn);
         }
 
+        protected void button_clicked(object sender, EventArgs e)
+        {
+            ShowImg si = new ShowImg();
+            string sql = string.Format("Select {0} From {1}", ((Button)sender).Tag, TableName);
+            bool b = BuildWhereClause(dt.Rows[0], out string WhereClause);
+            if (!b)
+            {
+                Common.ShowMsg("Unable to diaplay picture.");
+                return;
+            }
+            bool imgFail = false;
+            try
+            {
+                byte[] img = (byte[])DataAccess.ExecuteScalar(DatabaseName, string.Format("{0} {1}", sql, WhereClause), out SQLiteErrorCode returnCode);
+                imgFail = !si.setPicture(img);
+                if (!imgFail) si.Show();
+            }
+            catch { imgFail = true; }
+            if (imgFail)
+            {
+                Common.ShowMsg("Unable to diaplay picture.");
+                return;
+            }
+        }
         /// <summary>
         /// Load a record onto the window and enable/disable controls appropriately
         /// </summary>

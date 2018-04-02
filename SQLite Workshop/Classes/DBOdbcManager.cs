@@ -143,7 +143,7 @@ namespace SQLiteWorkshop
 
             OdbcCommand cmd = new OdbcCommand();
             cmd.Connection = conn;
-            cmd.CommandText = string.Format("Select * From {0}", TableName);
+            cmd.CommandText = string.Format("Select * From [{0}]", TableName);
             try
             {
                 sqldr = cmd.ExecuteReader(CommandBehavior.SingleRow);
@@ -244,7 +244,7 @@ namespace SQLiteWorkshop
                 OpenDB();
                 OdbcCommand SqlCmd = new OdbcCommand();
                 SqlCmd.Connection = conn;
-                SqlCmd.CommandText = string.Format("Select * FROM {0}", SourceTable);
+                SqlCmd.CommandText = string.Format("Select * FROM [{0}]", SourceTable);
                 OdbcDataReader dr = SqlCmd.ExecuteReader();
                 while (dr.Read())
                 {

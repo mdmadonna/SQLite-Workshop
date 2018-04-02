@@ -529,16 +529,20 @@ namespace SQLiteWorkshop
             DataGridViewTextBoxCell dgvST = new DataGridViewTextBoxCell() { Value = "Source Table" };
             DataGridViewTextBoxCell dgvDT = new DataGridViewTextBoxCell() { Value = "Destination Table" };
             DataGridViewTextBoxCell dgvMT = new DataGridViewTextBoxCell() { Value = "Map" };
-            dgvrow.Cells.AddRange(new DataGridViewCell[] { dgvCB, dgvST, dgvDT, dgvMT });
+            DataGridViewTextBoxCell dgvPT = new DataGridViewTextBoxCell() { Value = "Preview" };
+            dgvrow.Cells.AddRange(new DataGridViewCell[] { dgvCB, dgvST, dgvDT, dgvMT, dgvPT });
+
             dgvrow.Cells[1].ReadOnly = true;
             dgvrow.Cells[2].ReadOnly = true;
             dgvrow.Cells[3].ReadOnly = true;
+            dgvrow.Cells[4].ReadOnly = true;
             dgvTables.Rows.Add(dgvrow);
             dgvTables[0, 0].Style = dgHeaderStyle;
             dgvTables[1, 0].Style = dgHeaderStyle;
             dgvTables[2, 0].Style = dgHeaderStyle;
             dgvTables[3, 0].Style = dgHeaderStyle;
-            
+            dgvTables[4, 0].Style = dgHeaderStyle;
+
 
             schema = db.GetSchema();
             foreach (var table in schema.Tables)
@@ -551,7 +555,9 @@ namespace SQLiteWorkshop
                 dgvComboDest.FlatStyle = FlatStyle.Standard;
                 DataGridViewButtonCell dgvButton = new DataGridViewButtonCell() { Value = "Map" };
                 dgvButton.FlatStyle = FlatStyle.Standard;
-                dgvr.Cells.AddRange(new DataGridViewCell[] { dgvCheckBox, dgvSourceText, dgvComboDest, dgvButton });
+                DataGridViewButtonCell dgvButtonPreview = new DataGridViewButtonCell() { Value = "Preview" };
+                dgvButtonPreview.FlatStyle = FlatStyle.Standard;
+                dgvr.Cells.AddRange(new DataGridViewCell[] { dgvCheckBox, dgvSourceText, dgvComboDest, dgvButton, dgvButtonPreview });
                 dgvr.Cells[1].ReadOnly = true;
                 dgvr.Cells[2].ReadOnly = false;
                 PopulateTables(ref dgvComboDest, table.Value.Name);
@@ -612,6 +618,39 @@ namespace SQLiteWorkshop
                 dgvTables.EndEdit();
             }
         }
+
+        private void dgvTables_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var dgv = (DataGridView)sender;
+
+            if (dgv.Rows[e.RowIndex].Cells[e.ColumnIndex] is DataGridViewButtonCell && e.RowIndex >= 0)
+            {
+                string buttonText = ((DataGridViewButtonCell)dgv.Rows[e.RowIndex].Cells[e.ColumnIndex]).Value.ToString().ToLower();
+                switch (buttonText)
+                {
+                    case "map":
+                        dgvTables_Map();
+                        break;
+                    case "preview":
+                        dgvTables_Preview();
+                        break;
+                    default:
+                    break;
+                }
+            }
+        }
+
+        private void dgvTables_Map()
+        {
+            Common.ShowMsg("This feature is not yet implemented");
+        }
+
+
+        private void dgvTables_Preview()
+        {
+            Common.ShowMsg("This feature is not yet implemented");
+        }
+
 
         #region SqlServer
         private void radioSqlServerAuth_CheckedChanged(object sender, EventArgs e)
@@ -1208,8 +1247,9 @@ namespace SQLiteWorkshop
 
 
 
+
         #endregion
 
-       
+
     }
 }
