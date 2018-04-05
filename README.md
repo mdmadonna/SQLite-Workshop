@@ -1,7 +1,7 @@
 # SQLite-Workshop
 Database Manager for SQLite
 
-This is still a work in progress and not yet ready for Beta.    See <a href="https://github.com/mdmadonna/SQLite-Workshop/issues">Issues</a> for current status. 
+See <a href="https://github.com/mdmadonna/SQLite-Workshop/issues">Issues</a> for current status. I am interested in feedback :-).
 
 SQLite Workshop has a wide range of features and capabilities including:
 
