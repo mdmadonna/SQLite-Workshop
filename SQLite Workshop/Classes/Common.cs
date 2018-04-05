@@ -56,6 +56,7 @@ namespace SQLiteWorkshop
     {
         #region Constants
         internal const string APPNAME                   = "SQLite Workshop";
+        internal const string StatsTable                = "SQL_Workshop_Stats";
 
         internal const int MAX_SQL_FILESIZE             = 1048576;
 

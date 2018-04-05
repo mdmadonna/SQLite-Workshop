@@ -64,10 +64,14 @@
     <Compile Include="AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
+    <Compile Include="Classes\Analyzer.cs" />
     <Compile Include="Classes\ColumnPropertySettings.cs" />
     <Compile Include="Classes\Common.cs" />
     <Compile Include="Classes\DBManager.cs" />
     <Compile Include="Classes\DBMySqlManager.cs" />
+    <Compile Include="Classes\DBPropertySettings.cs" />
+    <Compile Include="Classes\DBProperties.cs" />
+    <Compile Include="Classes\DBRuntimePropertySettings.cs" />
     <Compile Include="Classes\DBSQLiteManager.cs" />
     <Compile Include="Classes\DBSqlServerManager.cs" />
     <Compile Include="Classes\DBTextManager.cs" />
@@ -75,6 +79,9 @@
     <Compile Include="Classes\ImportWizTextPropertySettings.cs" />
     <Compile Include="Classes\DBMSAccessManager.cs" />
     <Compile Include="Classes\RecordEditorTab.cs" />
+    <Compile Include="Classes\SQPrinter.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\RowEditTabControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -117,11 +124,11 @@
     <Compile Include="Forms\GetPassword.Designer.cs">
       <DependentUpon>GetPassword.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\DBProperties.cs">
+    <Compile Include="Forms\DBAnalyze.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\DBProperties.Designer.cs">
-      <DependentUpon>DBProperties.cs</DependentUpon>
+    <Compile Include="Forms\DBAnalyze.Designer.cs">
+      <DependentUpon>DBAnalyze.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\ImportWiz.cs">
       <SubType>Form</SubType>
@@ -159,6 +166,18 @@
     <Compile Include="Forms\ShowImg.Designer.cs">
       <DependentUpon>ShowImg.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\ShowMsg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\ShowMsg.Designer.cs">
+      <DependentUpon>ShowMsg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\WaitDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\WaitDialog.Designer.cs">
+      <DependentUpon>WaitDialog.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\Template.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -192,8 +211,8 @@
     <EmbeddedResource Include="Controls\TableEditorTabControl.resx">
       <DependentUpon>TableEditorTabControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\DBProperties.resx">
-      <DependentUpon>DBProperties.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\DBAnalyze.resx">
+      <DependentUpon>DBAnalyze.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ExecuteForm.resx">
       <DependentUpon>ExecuteForm.cs</DependentUpon>
@@ -219,6 +238,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ShowImg.resx">
       <DependentUpon>ShowImg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\ShowMsg.resx">
+      <DependentUpon>ShowMsg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\WaitDialog.resx">
+      <DependentUpon>WaitDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\Template.resx">
       <DependentUpon>Template.cs</DependentUpon>
@@ -309,6 +334,9 @@
     <Content Include="assets\Main.ico" />
     <Content Include="assets\Main.png" />
     <Content Include="assets\Refresh.png" />
+    <Content Include="Definitions.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="dll\SQLite 1.0.108.0\Mixed\System.Data.SQLite.dll" />
     <Content Include="Templates\Query\Column Profile.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

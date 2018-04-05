@@ -35,13 +35,29 @@
             this.spBottom = new System.Windows.Forms.Splitter();
             this.panelMain = new System.Windows.Forms.Panel();
             this.spTemplate = new System.Windows.Forms.Splitter();
-            this.tabMain = new System.Windows.Forms.TabControl();
+            this.panelRight = new System.Windows.Forms.Panel();
+            this.panelProperties = new System.Windows.Forms.Panel();
+            this.tabProperties = new System.Windows.Forms.TabControl();
+            this.tabPageDB = new System.Windows.Forms.TabPage();
+            this.propertyGridDBProperties = new System.Windows.Forms.PropertyGrid();
+            this.tabPageRuntime = new System.Windows.Forms.TabPage();
+            this.propertyGridDBRuntime = new System.Windows.Forms.PropertyGrid();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.label2 = new System.Windows.Forms.Label();
+            this.spProp = new System.Windows.Forms.Splitter();
+            this.panelTemplates = new System.Windows.Forms.Panel();
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
             this.treeTemplates = new System.Windows.Forms.TreeView();
             this.imageListTreeView = new System.Windows.Forms.ImageList(this.components);
+            this.tabMain = new System.Windows.Forms.TabControl();
             this.vSplitter = new System.Windows.Forms.Splitter();
             this.treeViewMain = new System.Windows.Forms.TreeView();
             this.panelTop = new System.Windows.Forms.Panel();
             this.panelMenu = new System.Windows.Forms.Panel();
+            this.toolStripImpExp = new System.Windows.Forms.ToolStrip();
+            this.toolStripToolImport = new System.Windows.Forms.ToolStripButton();
+            this.toolStripToolExport = new System.Windows.Forms.ToolStripButton();
             this.toolStripTb = new System.Windows.Forms.ToolStrip();
             this.toolStripTbCreateTable = new System.Windows.Forms.ToolStripButton();
             this.toolStripTbCreateView = new System.Windows.Forms.ToolStripButton();
@@ -49,9 +65,6 @@
             this.toolStripTbCreateTrigger = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripTbNewQryWin = new System.Windows.Forms.ToolStripButton();
-            this.toolStripImpExp = new System.Windows.Forms.ToolStrip();
-            this.toolStripToolImport = new System.Windows.Forms.ToolStripButton();
-            this.toolStripToolExport = new System.Windows.Forms.ToolStripButton();
             this.toolStripOps = new System.Windows.Forms.ToolStrip();
             this.toolStripOpsExecute = new System.Windows.Forms.ToolStripButton();
             this.toolStripOpsCancel = new System.Windows.Forms.ToolStripButton();
@@ -71,7 +84,7 @@
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripDBCompress = new System.Windows.Forms.ToolStripButton();
             this.toolStripDBIntegrityCheck = new System.Windows.Forms.ToolStripButton();
-            this.toolStripDBProperties = new System.Windows.Forms.ToolStripButton();
+            this.toolStripDBAnalyze = new System.Windows.Forms.ToolStripButton();
             this.menuStripMain = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -110,10 +123,18 @@
             this.toolStripStatusMain = new System.Windows.Forms.ToolStripStatusLabel();
             this.spRight = new System.Windows.Forms.Splitter();
             this.panelMain.SuspendLayout();
+            this.panelRight.SuspendLayout();
+            this.panelProperties.SuspendLayout();
+            this.tabProperties.SuspendLayout();
+            this.tabPageDB.SuspendLayout();
+            this.tabPageRuntime.SuspendLayout();
+            this.panel2.SuspendLayout();
+            this.panelTemplates.SuspendLayout();
+            this.panel1.SuspendLayout();
             this.panelTop.SuspendLayout();
             this.panelMenu.SuspendLayout();
-            this.toolStripTb.SuspendLayout();
             this.toolStripImpExp.SuspendLayout();
+            this.toolStripTb.SuspendLayout();
             this.toolStripOps.SuspendLayout();
             this.toolStripContainer1.TopToolStripPanel.SuspendLayout();
             this.toolStripContainer1.SuspendLayout();
@@ -173,8 +194,8 @@
             // 
             this.panelMain.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(30)))));
             this.panelMain.Controls.Add(this.spTemplate);
+            this.panelMain.Controls.Add(this.panelRight);
             this.panelMain.Controls.Add(this.tabMain);
-            this.panelMain.Controls.Add(this.treeTemplates);
             this.panelMain.Controls.Add(this.vSplitter);
             this.panelMain.Controls.Add(this.treeViewMain);
             this.panelMain.Controls.Add(this.panelTop);
@@ -188,35 +209,156 @@
             // spTemplate
             // 
             this.spTemplate.Dock = System.Windows.Forms.DockStyle.Right;
-            this.spTemplate.Location = new System.Drawing.Point(723, 80);
+            this.spTemplate.Location = new System.Drawing.Point(644, 80);
             this.spTemplate.Name = "spTemplate";
             this.spTemplate.Size = new System.Drawing.Size(3, 296);
             this.spTemplate.TabIndex = 6;
             this.spTemplate.TabStop = false;
             // 
-            // tabMain
+            // panelRight
             // 
-            this.tabMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabMain.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-            this.tabMain.Location = new System.Drawing.Point(124, 80);
-            this.tabMain.Name = "tabMain";
-            this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(602, 296);
-            this.tabMain.TabIndex = 4;
-            this.tabMain.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.tabMain_DrawItem);
-            this.tabMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseDown);
-            this.tabMain.MouseEnter += new System.EventHandler(this.tabMain_MouseEnter);
-            this.tabMain.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseMove);
+            this.panelRight.BackColor = System.Drawing.SystemColors.Window;
+            this.panelRight.Controls.Add(this.panelProperties);
+            this.panelRight.Controls.Add(this.spProp);
+            this.panelRight.Controls.Add(this.panelTemplates);
+            this.panelRight.Dock = System.Windows.Forms.DockStyle.Right;
+            this.panelRight.Location = new System.Drawing.Point(647, 80);
+            this.panelRight.Name = "panelRight";
+            this.panelRight.Size = new System.Drawing.Size(200, 296);
+            this.panelRight.TabIndex = 11;
+            // 
+            // panelProperties
+            // 
+            this.panelProperties.Controls.Add(this.tabProperties);
+            this.panelProperties.Controls.Add(this.panel2);
+            this.panelProperties.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.panelProperties.Location = new System.Drawing.Point(0, 103);
+            this.panelProperties.Name = "panelProperties";
+            this.panelProperties.Size = new System.Drawing.Size(200, 193);
+            this.panelProperties.TabIndex = 1;
+            // 
+            // tabProperties
+            // 
+            this.tabProperties.Controls.Add(this.tabPageDB);
+            this.tabProperties.Controls.Add(this.tabPageRuntime);
+            this.tabProperties.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabProperties.Location = new System.Drawing.Point(0, 17);
+            this.tabProperties.Name = "tabProperties";
+            this.tabProperties.SelectedIndex = 0;
+            this.tabProperties.Size = new System.Drawing.Size(200, 176);
+            this.tabProperties.TabIndex = 1;
+            // 
+            // tabPageDB
+            // 
+            this.tabPageDB.Controls.Add(this.propertyGridDBProperties);
+            this.tabPageDB.Location = new System.Drawing.Point(4, 22);
+            this.tabPageDB.Name = "tabPageDB";
+            this.tabPageDB.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageDB.Size = new System.Drawing.Size(192, 150);
+            this.tabPageDB.TabIndex = 0;
+            this.tabPageDB.Text = "DB";
+            this.tabPageDB.UseVisualStyleBackColor = true;
+            // 
+            // propertyGridDBProperties
+            // 
+            this.propertyGridDBProperties.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGridDBProperties.Location = new System.Drawing.Point(3, 3);
+            this.propertyGridDBProperties.Name = "propertyGridDBProperties";
+            this.propertyGridDBProperties.PropertySort = System.Windows.Forms.PropertySort.NoSort;
+            this.propertyGridDBProperties.Size = new System.Drawing.Size(186, 144);
+            this.propertyGridDBProperties.TabIndex = 0;
+            // 
+            // tabPageRuntime
+            // 
+            this.tabPageRuntime.Controls.Add(this.propertyGridDBRuntime);
+            this.tabPageRuntime.Location = new System.Drawing.Point(4, 22);
+            this.tabPageRuntime.Name = "tabPageRuntime";
+            this.tabPageRuntime.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageRuntime.Size = new System.Drawing.Size(192, 150);
+            this.tabPageRuntime.TabIndex = 1;
+            this.tabPageRuntime.Text = "Runtime";
+            this.tabPageRuntime.UseVisualStyleBackColor = true;
+            // 
+            // propertyGridDBRuntime
+            // 
+            this.propertyGridDBRuntime.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGridDBRuntime.Location = new System.Drawing.Point(3, 3);
+            this.propertyGridDBRuntime.Name = "propertyGridDBRuntime";
+            this.propertyGridDBRuntime.PropertySort = System.Windows.Forms.PropertySort.NoSort;
+            this.propertyGridDBRuntime.Size = new System.Drawing.Size(186, 144);
+            this.propertyGridDBRuntime.TabIndex = 0;
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.label2);
+            this.panel2.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel2.Location = new System.Drawing.Point(0, 0);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(200, 17);
+            this.panel2.TabIndex = 7;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(7, 1);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(47, 12);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Properties";
+            // 
+            // spProp
+            // 
+            this.spProp.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(50)))));
+            this.spProp.Dock = System.Windows.Forms.DockStyle.Top;
+            this.spProp.Location = new System.Drawing.Point(0, 100);
+            this.spProp.Name = "spProp";
+            this.spProp.Size = new System.Drawing.Size(200, 3);
+            this.spProp.TabIndex = 2;
+            this.spProp.TabStop = false;
+            // 
+            // panelTemplates
+            // 
+            this.panelTemplates.Controls.Add(this.panel1);
+            this.panelTemplates.Controls.Add(this.treeTemplates);
+            this.panelTemplates.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panelTemplates.Location = new System.Drawing.Point(0, 0);
+            this.panelTemplates.Name = "panelTemplates";
+            this.panelTemplates.Size = new System.Drawing.Size(200, 100);
+            this.panelTemplates.TabIndex = 0;
+            // 
+            // panel1
+            // 
+            this.panel1.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.label1);
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panel1.Location = new System.Drawing.Point(0, 0);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(200, 17);
+            this.panel1.TabIndex = 6;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(7, 1);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(48, 12);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Templates";
             // 
             // treeTemplates
             // 
-            this.treeTemplates.Dock = System.Windows.Forms.DockStyle.Right;
+            this.treeTemplates.Dock = System.Windows.Forms.DockStyle.Fill;
             this.treeTemplates.ImageIndex = 0;
             this.treeTemplates.ImageList = this.imageListTreeView;
-            this.treeTemplates.Location = new System.Drawing.Point(726, 80);
+            this.treeTemplates.Location = new System.Drawing.Point(0, 0);
             this.treeTemplates.Name = "treeTemplates";
             this.treeTemplates.SelectedImageIndex = 0;
-            this.treeTemplates.Size = new System.Drawing.Size(121, 296);
+            this.treeTemplates.Size = new System.Drawing.Size(200, 100);
             this.treeTemplates.TabIndex = 5;
             this.treeTemplates.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeTemplates_AfterSelect);
             // 
@@ -233,6 +375,20 @@
             this.imageListTreeView.Images.SetKeyName(6, "view.png");
             this.imageListTreeView.Images.SetKeyName(7, "Key.png");
             this.imageListTreeView.Images.SetKeyName(8, "Trigger.png");
+            // 
+            // tabMain
+            // 
+            this.tabMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabMain.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+            this.tabMain.Location = new System.Drawing.Point(124, 80);
+            this.tabMain.Name = "tabMain";
+            this.tabMain.SelectedIndex = 0;
+            this.tabMain.Size = new System.Drawing.Size(723, 296);
+            this.tabMain.TabIndex = 4;
+            this.tabMain.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.tabMain_DrawItem);
+            this.tabMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseDown);
+            this.tabMain.MouseEnter += new System.EventHandler(this.tabMain_MouseEnter);
+            this.tabMain.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseMove);
             // 
             // vSplitter
             // 
@@ -268,8 +424,8 @@
             // 
             // panelMenu
             // 
-            this.panelMenu.Controls.Add(this.toolStripTb);
             this.panelMenu.Controls.Add(this.toolStripImpExp);
+            this.panelMenu.Controls.Add(this.toolStripTb);
             this.panelMenu.Controls.Add(this.toolStripOps);
             this.panelMenu.Controls.Add(this.toolStripContainer1);
             this.panelMenu.Controls.Add(this.menuStripMain);
@@ -278,6 +434,40 @@
             this.panelMenu.Name = "panelMenu";
             this.panelMenu.Size = new System.Drawing.Size(847, 52);
             this.panelMenu.TabIndex = 1;
+            // 
+            // toolStripImpExp
+            // 
+            this.toolStripImpExp.BackColor = System.Drawing.SystemColors.InactiveCaption;
+            this.toolStripImpExp.Dock = System.Windows.Forms.DockStyle.None;
+            this.toolStripImpExp.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStripToolImport,
+            this.toolStripToolExport});
+            this.toolStripImpExp.Location = new System.Drawing.Point(696, 23);
+            this.toolStripImpExp.Name = "toolStripImpExp";
+            this.toolStripImpExp.Size = new System.Drawing.Size(58, 25);
+            this.toolStripImpExp.TabIndex = 3;
+            // 
+            // toolStripToolImport
+            // 
+            this.toolStripToolImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripToolImport.Image = global::SQLiteWorkshop.Properties.Resources.Import;
+            this.toolStripToolImport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripToolImport.Name = "toolStripToolImport";
+            this.toolStripToolImport.Size = new System.Drawing.Size(23, 22);
+            this.toolStripToolImport.Text = "Import";
+            this.toolStripToolImport.ToolTipText = "Import Data Into the Current Database";
+            this.toolStripToolImport.Click += new System.EventHandler(this.toolStripToolImport_Click);
+            // 
+            // toolStripToolExport
+            // 
+            this.toolStripToolExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripToolExport.Image = global::SQLiteWorkshop.Properties.Resources.Export;
+            this.toolStripToolExport.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripToolExport.Name = "toolStripToolExport";
+            this.toolStripToolExport.Size = new System.Drawing.Size(23, 22);
+            this.toolStripToolExport.Text = "Export";
+            this.toolStripToolExport.ToolTipText = "Export Data From the Current Database";
+            this.toolStripToolExport.Click += new System.EventHandler(this.toolStripToolExport_Click);
             // 
             // toolStripTb
             // 
@@ -290,7 +480,7 @@
             this.toolStripTbCreateTrigger,
             this.toolStripSeparator4,
             this.toolStripTbNewQryWin});
-            this.toolStripTb.Location = new System.Drawing.Point(412, 23);
+            this.toolStripTb.Location = new System.Drawing.Point(431, 23);
             this.toolStripTb.Name = "toolStripTb";
             this.toolStripTb.Size = new System.Drawing.Size(196, 25);
             this.toolStripTb.TabIndex = 2;
@@ -354,40 +544,6 @@
             this.toolStripTbNewQryWin.ToolTipText = "Open an Empty Query Tab\r\n";
             this.toolStripTbNewQryWin.Click += new System.EventHandler(this.toolStripTbNewQryWin_Click);
             // 
-            // toolStripImpExp
-            // 
-            this.toolStripImpExp.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.toolStripImpExp.Dock = System.Windows.Forms.DockStyle.None;
-            this.toolStripImpExp.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripToolImport,
-            this.toolStripToolExport});
-            this.toolStripImpExp.Location = new System.Drawing.Point(610, 23);
-            this.toolStripImpExp.Name = "toolStripImpExp";
-            this.toolStripImpExp.Size = new System.Drawing.Size(58, 25);
-            this.toolStripImpExp.TabIndex = 3;
-            // 
-            // toolStripToolImport
-            // 
-            this.toolStripToolImport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripToolImport.Image = global::SQLiteWorkshop.Properties.Resources.Import;
-            this.toolStripToolImport.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripToolImport.Name = "toolStripToolImport";
-            this.toolStripToolImport.Size = new System.Drawing.Size(23, 22);
-            this.toolStripToolImport.Text = "Import";
-            this.toolStripToolImport.ToolTipText = "Import Data Into the Current Database";
-            this.toolStripToolImport.Click += new System.EventHandler(this.toolStripToolImport_Click);
-            // 
-            // toolStripToolExport
-            // 
-            this.toolStripToolExport.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripToolExport.Image = global::SQLiteWorkshop.Properties.Resources.Export;
-            this.toolStripToolExport.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripToolExport.Name = "toolStripToolExport";
-            this.toolStripToolExport.Size = new System.Drawing.Size(23, 22);
-            this.toolStripToolExport.Text = "Export";
-            this.toolStripToolExport.ToolTipText = "Export Data From the Current Database";
-            this.toolStripToolExport.Click += new System.EventHandler(this.toolStripToolExport_Click);
-            // 
             // toolStripOps
             // 
             this.toolStripOps.BackColor = System.Drawing.SystemColors.InactiveCaption;
@@ -400,7 +556,7 @@
             this.toolStripOpsExplainQueryPlan,
             this.toolStripSeparator6,
             this.toolStripOpsParse});
-            this.toolStripOps.Location = new System.Drawing.Point(191, 23);
+            this.toolStripOps.Location = new System.Drawing.Point(225, 23);
             this.toolStripOps.Name = "toolStripOps";
             this.toolStripOps.Size = new System.Drawing.Size(183, 25);
             this.toolStripOps.TabIndex = 2;
@@ -497,10 +653,10 @@
             this.toolStripSeparator1,
             this.toolStripDBCompress,
             this.toolStripDBIntegrityCheck,
-            this.toolStripDBProperties});
+            this.toolStripDBAnalyze});
             this.toolStripDB.Location = new System.Drawing.Point(3, 0);
             this.toolStripDB.Name = "toolStripDB";
-            this.toolStripDB.Size = new System.Drawing.Size(197, 25);
+            this.toolStripDB.Size = new System.Drawing.Size(228, 25);
             this.toolStripDB.TabIndex = 1;
             this.toolStripDB.Text = "toolStrip1";
             // 
@@ -582,16 +738,16 @@
             this.toolStripDBIntegrityCheck.ToolTipText = "Check Database for Corruption";
             this.toolStripDBIntegrityCheck.Click += new System.EventHandler(this.toolStripDBIntegrityCheck_Click);
             // 
-            // toolStripDBProperties
+            // toolStripDBAnalyze
             // 
-            this.toolStripDBProperties.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.toolStripDBProperties.Image = global::SQLiteWorkshop.Properties.Resources.Properties;
-            this.toolStripDBProperties.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDBProperties.Name = "toolStripDBProperties";
-            this.toolStripDBProperties.Size = new System.Drawing.Size(23, 22);
-            this.toolStripDBProperties.Text = "Properties";
-            this.toolStripDBProperties.ToolTipText = "Show Database Properties";
-            this.toolStripDBProperties.Click += new System.EventHandler(this.toolStripDBProperties_Click);
+            this.toolStripDBAnalyze.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripDBAnalyze.Image = global::SQLiteWorkshop.Properties.Resources.Properties;
+            this.toolStripDBAnalyze.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDBAnalyze.Name = "toolStripDBAnalyze";
+            this.toolStripDBAnalyze.Size = new System.Drawing.Size(23, 22);
+            this.toolStripDBAnalyze.Text = "Properties";
+            this.toolStripDBAnalyze.ToolTipText = "Analyze Database";
+            this.toolStripDBAnalyze.Click += new System.EventHandler(this.toolStripDBAnalyze_Click);
             // 
             // menuStripMain
             // 
@@ -725,14 +881,14 @@
             // templatesToolStripMenuItem
             // 
             this.templatesToolStripMenuItem.Name = "templatesToolStripMenuItem";
-            this.templatesToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.templatesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.templatesToolStripMenuItem.Text = "Templates";
             this.templatesToolStripMenuItem.Click += new System.EventHandler(this.templatesToolStripMenuItem_Click);
             // 
             // propertiesToolStripMenuItem
             // 
             this.propertiesToolStripMenuItem.Name = "propertiesToolStripMenuItem";
-            this.propertiesToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.propertiesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.propertiesToolStripMenuItem.Text = "Properties";
             this.propertiesToolStripMenuItem.Click += new System.EventHandler(this.propertiesToolStripMenuItem_Click);
             // 
@@ -740,7 +896,7 @@
             // 
             this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
             this.refreshToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.refreshToolStripMenuItem.Text = "Refresh";
             this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
             // 
@@ -943,8 +1099,8 @@
             this.Controls.Add(this.panelMain);
             this.Controls.Add(this.spBottom);
             this.Controls.Add(this.spTop);
-            this.Controls.Add(this.spRight);
             this.Controls.Add(this.spLeft);
+            this.Controls.Add(this.spRight);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStripMain;
@@ -953,13 +1109,23 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.panelMain.ResumeLayout(false);
             this.panelMain.PerformLayout();
+            this.panelRight.ResumeLayout(false);
+            this.panelProperties.ResumeLayout(false);
+            this.tabProperties.ResumeLayout(false);
+            this.tabPageDB.ResumeLayout(false);
+            this.tabPageRuntime.ResumeLayout(false);
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
+            this.panelTemplates.ResumeLayout(false);
+            this.panel1.ResumeLayout(false);
+            this.panel1.PerformLayout();
             this.panelTop.ResumeLayout(false);
             this.panelMenu.ResumeLayout(false);
             this.panelMenu.PerformLayout();
-            this.toolStripTb.ResumeLayout(false);
-            this.toolStripTb.PerformLayout();
             this.toolStripImpExp.ResumeLayout(false);
             this.toolStripImpExp.PerformLayout();
+            this.toolStripTb.ResumeLayout(false);
+            this.toolStripTb.PerformLayout();
             this.toolStripOps.ResumeLayout(false);
             this.toolStripOps.PerformLayout();
             this.toolStripContainer1.TopToolStripPanel.ResumeLayout(false);
@@ -1048,7 +1214,7 @@
         private System.Windows.Forms.ToolStrip toolStripImpExp;
         private System.Windows.Forms.ToolStripButton toolStripToolImport;
         private System.Windows.Forms.ToolStripButton toolStripToolExport;
-        private System.Windows.Forms.ToolStripButton toolStripDBProperties;
+        private System.Windows.Forms.ToolStripButton toolStripDBAnalyze;
         private System.Windows.Forms.ToolStripMenuItem newQuerytoolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem savetoolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAstoolStripMenuItem;
@@ -1064,6 +1230,19 @@
         private System.Windows.Forms.Splitter spTemplate;
         private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton toolStripDBRefresh;
+        private System.Windows.Forms.Panel panelRight;
+        private System.Windows.Forms.Panel panelProperties;
+        private System.Windows.Forms.PropertyGrid propertyGridDBProperties;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Splitter spProp;
+        private System.Windows.Forms.Panel panelTemplates;
+        private System.Windows.Forms.Panel panel1;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TabControl tabProperties;
+        private System.Windows.Forms.TabPage tabPageDB;
+        private System.Windows.Forms.TabPage tabPageRuntime;
+        private System.Windows.Forms.PropertyGrid propertyGridDBRuntime;
     }
 }
 

@@ -25,7 +25,10 @@ namespace SQLiteWorkshop
         internal const string CFG_DFLTSQLDIR        = "DEFAULTSQLDIR";              //Default Directory for SQL Files
         internal const string CFG_REGISTEREDDBS     = "REGISTEREDDBS";              //Registered Databases
         internal const string CFG_TEMPLATESVISIBLE  = "TEMPLATESVISIBLE";           //Template tree visible
-        internal const string CFG_TSPLITP           = "TSPLITP";                    //Template splitter position
+        internal const string CFG_PROPSVISIBLE      = "PROPSVISIBLE";               //Properties visible
+        internal const string CFG_TSPLITP           = "TSPLITP";                    //Template *Right Panel) splitter position
+        internal const string CFG_PSPLITP           = "TPPLITP";                    //Property splitter position
+        internal const string CFG_ANALYZEWARN       = "ANALYZEWARN";                //Analyzer warning message
 
 
         //Configuration File

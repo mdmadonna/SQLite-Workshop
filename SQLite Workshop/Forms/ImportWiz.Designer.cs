@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportWiz));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelTop = new System.Windows.Forms.Panel();
@@ -110,16 +110,16 @@
             this.label7 = new System.Windows.Forms.Label();
             this.panelWizDB = new System.Windows.Forms.Panel();
             this.dgvTables = new System.Windows.Forms.DataGridView();
-            this.panelWizDBMid = new System.Windows.Forms.Panel();
-            this.label10 = new System.Windows.Forms.Label();
-            this.panelWizDBTop = new System.Windows.Forms.Panel();
-            this.label9 = new System.Windows.Forms.Label();
-            this.lblDBName = new System.Windows.Forms.Label();
             this.CheckBoxSelectedTable = new System.Windows.Forms.DataGridViewCheckBoxColumn();
             this.Source = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Destination = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Map = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Preview = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.panelWizDBMid = new System.Windows.Forms.Panel();
+            this.label10 = new System.Windows.Forms.Label();
+            this.panelWizDBTop = new System.Windows.Forms.Panel();
+            this.label9 = new System.Windows.Forms.Label();
+            this.lblDBName = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
@@ -837,7 +837,7 @@
             this.tabTextColumns.Location = new System.Drawing.Point(4, 22);
             this.tabTextColumns.Name = "tabTextColumns";
             this.tabTextColumns.Padding = new System.Windows.Forms.Padding(3);
-            this.tabTextColumns.Size = new System.Drawing.Size(641, 223);
+            this.tabTextColumns.Size = new System.Drawing.Size(482, 223);
             this.tabTextColumns.TabIndex = 1;
             this.tabTextColumns.Text = "Columns";
             this.tabTextColumns.UseVisualStyleBackColor = true;
@@ -848,7 +848,7 @@
             this.propertyGridColumns.Location = new System.Drawing.Point(206, 3);
             this.propertyGridColumns.Name = "propertyGridColumns";
             this.propertyGridColumns.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.propertyGridColumns.Size = new System.Drawing.Size(432, 217);
+            this.propertyGridColumns.Size = new System.Drawing.Size(273, 217);
             this.propertyGridColumns.TabIndex = 2;
             this.propertyGridColumns.PropertyValueChanged += new System.Windows.Forms.PropertyValueChangedEventHandler(this.propertyGridColumns_PropertyValueChanged);
             // 
@@ -888,7 +888,7 @@
             this.tabTextPreview.Controls.Add(this.panelWizTextTab);
             this.tabTextPreview.Location = new System.Drawing.Point(4, 22);
             this.tabTextPreview.Name = "tabTextPreview";
-            this.tabTextPreview.Size = new System.Drawing.Size(641, 223);
+            this.tabTextPreview.Size = new System.Drawing.Size(482, 223);
             this.tabTextPreview.TabIndex = 2;
             this.tabTextPreview.Text = "Preview";
             this.tabTextPreview.UseVisualStyleBackColor = true;
@@ -897,14 +897,14 @@
             // 
             this.dataGridViewText.AllowUserToAddRows = false;
             this.dataGridViewText.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridViewText.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGridViewText.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewText.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewText.Location = new System.Drawing.Point(0, 31);
             this.dataGridViewText.Name = "dataGridViewText";
-            this.dataGridViewText.Size = new System.Drawing.Size(641, 192);
+            this.dataGridViewText.Size = new System.Drawing.Size(482, 192);
             this.dataGridViewText.TabIndex = 10;
             // 
             // panelWizTextTab
@@ -913,7 +913,7 @@
             this.panelWizTextTab.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelWizTextTab.Location = new System.Drawing.Point(0, 0);
             this.panelWizTextTab.Name = "panelWizTextTab";
-            this.panelWizTextTab.Size = new System.Drawing.Size(641, 31);
+            this.panelWizTextTab.Size = new System.Drawing.Size(482, 31);
             this.panelWizTextTab.TabIndex = 11;
             // 
             // lblRowCount
@@ -988,6 +988,41 @@
             this.dgvTables.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvTables_CellMouseUp);
             this.dgvTables.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvTables_CellValueChanged);
             // 
+            // CheckBoxSelectedTable
+            // 
+            this.CheckBoxSelectedTable.HeaderText = "Check";
+            this.CheckBoxSelectedTable.Name = "CheckBoxSelectedTable";
+            this.CheckBoxSelectedTable.Width = 20;
+            // 
+            // Source
+            // 
+            this.Source.HeaderText = "Source";
+            this.Source.Name = "Source";
+            this.Source.ReadOnly = true;
+            this.Source.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Source.Width = 220;
+            // 
+            // Destination
+            // 
+            this.Destination.HeaderText = "Dest";
+            this.Destination.Name = "Destination";
+            this.Destination.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Destination.Width = 220;
+            // 
+            // Map
+            // 
+            this.Map.HeaderText = "Map";
+            this.Map.Name = "Map";
+            this.Map.ReadOnly = true;
+            this.Map.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
+            this.Map.Width = 50;
+            // 
+            // Preview
+            // 
+            this.Preview.HeaderText = "Preview";
+            this.Preview.Name = "Preview";
+            this.Preview.Width = 50;
+            // 
             // panelWizDBMid
             // 
             this.panelWizDBMid.BackColor = System.Drawing.SystemColors.InactiveCaption;
@@ -1039,41 +1074,6 @@
             this.lblDBName.Size = new System.Drawing.Size(60, 13);
             this.lblDBName.TabIndex = 2;
             this.lblDBName.Text = "lblDBName";
-            // 
-            // CheckBoxSelectedTable
-            // 
-            this.CheckBoxSelectedTable.HeaderText = "Check";
-            this.CheckBoxSelectedTable.Name = "CheckBoxSelectedTable";
-            this.CheckBoxSelectedTable.Width = 20;
-            // 
-            // Source
-            // 
-            this.Source.HeaderText = "Source";
-            this.Source.Name = "Source";
-            this.Source.ReadOnly = true;
-            this.Source.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Source.Width = 220;
-            // 
-            // Destination
-            // 
-            this.Destination.HeaderText = "Dest";
-            this.Destination.Name = "Destination";
-            this.Destination.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Destination.Width = 220;
-            // 
-            // Map
-            // 
-            this.Map.HeaderText = "Map";
-            this.Map.Name = "Map";
-            this.Map.ReadOnly = true;
-            this.Map.SortMode = System.Windows.Forms.DataGridViewColumnSortMode.NotSortable;
-            this.Map.Width = 50;
-            // 
-            // Preview
-            // 
-            this.Preview.HeaderText = "Preview";
-            this.Preview.Name = "Preview";
-            this.Preview.Width = 50;
             // 
             // ImportWiz
             // 

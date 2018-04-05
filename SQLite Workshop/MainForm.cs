@@ -57,7 +57,6 @@ namespace SQLiteWorkshop
 
         internal void InitializeForm()
         {
-
             mInstance = this;
             this.DoubleBuffered = true;
             this.SetStyle(ControlStyles.ResizeRedraw, true);
@@ -72,6 +71,8 @@ namespace SQLiteWorkshop
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Optimize Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Compress Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Encrypt Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
+            dbContextMenu.MenuItems.Add(new MenuItem("-"));
+            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Analyze Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem("-"));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Register", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null) { Name = "Register" });
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Attach", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
@@ -204,12 +205,17 @@ namespace SQLiteWorkshop
             if (Int32.TryParse(cfg.appsetting(Config.CFG_FWIDTH), out parm)) this.Width = parm;
             if (Int32.TryParse(cfg.appsetting(Config.CFG_VSPLITP), out parm)) vSplitter.SplitPosition = parm;
             if (Int32.TryParse(cfg.appsetting(Config.CFG_TSPLITP), out parm)) spTemplate.SplitPosition = Math.Max(parm, 100);
+            if (Int32.TryParse(cfg.appsetting(Config.CFG_PSPLITP), out parm)) spProp.SplitPosition = parm;
 
-            // Setting the Visible
+            // Setting the Right Panel Visibility
             bool b = true;
-            if (bool.TryParse(cfg.appsetting(Config.CFG_TEMPLATESVISIBLE), out b)) treeTemplates.Visible = b;
-            templatesToolStripMenuItem.Checked = b;
-            spTemplate.Visible = b;
+            templatesToolStripMenuItem.Checked = bool.TryParse(cfg.appsetting(Config.CFG_TEMPLATESVISIBLE), out b) ? true : b;
+            b = true;
+            propertiesToolStripMenuItem.Checked = bool.TryParse(cfg.appsetting(Config.CFG_PROPSVISIBLE), out b) ? true : b;
+            SetRightPanelStatus();
+
+            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_TSPLITP), out parm)) spTemplate.SplitPosition = parm;
+            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_PSPLITP), out parm)) spTemplate.SplitPosition = parm;
 
             string RecentDBList = cfg.appsetting(Config.CFG_RECENTDB);
             if (!string.IsNullOrEmpty(RecentDBList))
@@ -239,8 +245,11 @@ namespace SQLiteWorkshop
             cfg.SetSetting(Config.CFG_FHEIGHT, this.Height.ToString());
             cfg.SetSetting(Config.CFG_FWIDTH, this.Width.ToString());
             cfg.SetSetting(Config.CFG_VSPLITP, vSplitter.SplitPosition.ToString());
-            cfg.SetSetting(Config.CFG_TEMPLATESVISIBLE, treeTemplates.Visible.ToString());
+            cfg.SetSetting(Config.CFG_TEMPLATESVISIBLE, panelTemplates.Visible.ToString());
+            cfg.SetSetting(Config.CFG_PROPSVISIBLE, panelProperties.Visible.ToString());
+
             if (spTemplate.Visible) cfg.SetSetting(Config.CFG_TSPLITP, spTemplate.SplitPosition.ToString());
+            if (spProp.Visible) cfg.SetSetting(Config.CFG_PSPLITP, spProp.SplitPosition.ToString());
         }
 
         #endregion
@@ -343,16 +352,23 @@ namespace SQLiteWorkshop
 
         private void templatesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            treeTemplates.Visible = !treeTemplates.Visible;
-            templatesToolStripMenuItem.Checked = treeTemplates.Visible;
-            spTemplate.Visible = treeTemplates.Visible;
-            cfg.SetSetting(Config.CFG_TEMPLATESVISIBLE, treeTemplates.Visible.ToString());
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_TSPLITP), out int parm)) spTemplate.SplitPosition = parm;
+            templatesToolStripMenuItem.Checked = !panelTemplates.Visible;
+            SetRightPanelStatus();
         }
 
         private void propertiesToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            toolStripDBProperties_Click(sender, e);
+            propertiesToolStripMenuItem.Checked = !propertiesToolStripMenuItem.Checked;
+            SetRightPanelStatus();
+            if (string.IsNullOrEmpty(CurrentDB)) return;
+            if (propertiesToolStripMenuItem.Checked)
+            {
+                DBProperties p = new DBProperties();
+                propertyGridDBProperties.SelectedObject = p.dbprops;
+                propertyGridDBProperties.Refresh();
+                propertyGridDBRuntime.SelectedObject = p.dbRT;
+                propertyGridDBRuntime.Refresh();
+            }
         }
 
         #endregion
@@ -410,12 +426,10 @@ namespace SQLiteWorkshop
             st.BuildTab(CurrentDB, SQLType.SQLIntegrityCheck);
         }
 
-        private void toolStripDBProperties_Click(object sender, EventArgs e)
+        private void toolStripDBAnalyze_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
-            DBProperties p = new DBProperties();
-            p.DatabaseLocation = CurrentDB;
-            p.Show();
+            DBAnalyze analyze = new DBAnalyze(CurrentDB);
+            analyze.ShowDialog();
         }
         #endregion
 
@@ -602,6 +616,9 @@ namespace SQLiteWorkshop
                 case "encrypt database":
                     toolStripDBEncrypt_Click(sender, e);
                     break;
+                case "analyze database":
+                    toolStripDBAnalyze_Click(sender, e);
+                    break;
                 case "create":
                     newToolStripMenuItem_Click(sender, e);
                     break;
@@ -609,7 +626,7 @@ namespace SQLiteWorkshop
                     Common.ShowMsg(Common.NOTIMPLEMENTED);
                     break;
                 case "properties":
-                    toolStripDBProperties_Click(sender, e);
+                    propertiesToolStripMenuItem_Click(sender, e);
                     break;
                 case "refresh":
                     LoadDB(CurrentDB);
@@ -1326,6 +1343,13 @@ namespace SQLiteWorkshop
             tablesNode.Expand();
             topNode.Expand();
             treeViewMain.Nodes.Add(topNode);
+
+            DBProperties p = new DBProperties();
+            propertyGridDBProperties.SelectedObject = p.dbprops;
+            propertyGridDBProperties.Refresh();
+            propertyGridDBRuntime.SelectedObject = p.dbRT;
+            propertyGridDBRuntime.Refresh();
+
         }
 
         internal void WriteStatusStripMessage(string message)
@@ -1397,6 +1421,23 @@ namespace SQLiteWorkshop
             InitToolStripRegisteredDBDropDown(RegisteredDBs);
         }
 
+        internal void SetRightPanelStatus()
+        {
+            if (templatesToolStripMenuItem.Checked || propertiesToolStripMenuItem.Checked)
+            {
+                panelRight.Visible = true;
+                spTemplate.Visible = true;
+                panelProperties.Visible = propertiesToolStripMenuItem.Checked;
+                panelTemplates.Visible = templatesToolStripMenuItem.Checked;
+                spProp.Visible = templatesToolStripMenuItem.Checked && propertiesToolStripMenuItem.Checked;
+                panelTemplates.Dock = propertiesToolStripMenuItem.Checked ? DockStyle.Top : DockStyle.Fill;
+            }
+            else
+            {
+                panelRight.Visible = false;
+                spTemplate.Visible = false;
+            }
+        }
         #endregion
 
         #region Form Sizing and Control
