@@ -146,7 +146,7 @@ namespace SQLiteWorkshop
                 {
                     Button btn = new Button();
                     btn.Name = string.Format("btn{0}", i.ToString().PadLeft(4, '0'));
-                    btn.Text = "Image";
+                    btn.Text = "View";
                     btn.Left = txt.Left + 320;
                     btn.Top = txt.Top - 2;
                     btn.Height = 24;
@@ -165,25 +165,9 @@ namespace SQLiteWorkshop
 
         protected void button_clicked(object sender, EventArgs e)
         {
-            ShowImg si = new ShowImg();
-            string sql = string.Format("Select {0} From {1}", ((Button)sender).Tag, TableName);
-            bool b = BuildWhereClause(dt.Rows[0], out string WhereClause);
-            if (!b)
+            if (!ShowData(((Button)sender).Tag.ToString()))
             {
-                Common.ShowMsg("Unable to diaplay picture.");
-                return;
-            }
-            bool imgFail = false;
-            try
-            {
-                byte[] img = (byte[])DataAccess.ExecuteScalar(DatabaseName, string.Format("{0} {1}", sql, WhereClause), out SQLiteErrorCode returnCode);
-                imgFail = !si.setPicture(img);
-                if (!imgFail) si.Show();
-            }
-            catch { imgFail = true; }
-            if (imgFail)
-            {
-                Common.ShowMsg("Unable to diaplay picture.");
+                Common.ShowMsg("Unable to display data.");
                 return;
             }
         }
@@ -248,6 +232,97 @@ namespace SQLiteWorkshop
             toolStripLabelTotalRecords.Text = string.Format("of {0}", RowCount.ToString());
         }
 
+        private bool ShowData(string columnName)
+        {
+
+            byte[] data;
+
+            string sql = string.Format("Select {0} From {1}", columnName, TableName);
+            bool bld = BuildWhereClause(dt.Rows[0], out string WhereClause);
+            if (!bld) return false;
+
+            try
+            {
+                data = (byte[])DataAccess.ExecuteScalar(DatabaseName, string.Format("{0} {1}", sql, WhereClause), out SQLiteErrorCode returnCode);
+            }
+            catch { return false; }
+
+            ShowImg si = new ShowImg();
+
+            // Not terribly exact but will do for now.
+            Boolean isAscii = data.All(b => b >= 8 && b <= 127);
+            if (isAscii)
+            {
+                string str = System.Text.Encoding.Default.GetString(data);
+                si.setText(str);
+                si.Show();
+                return true;
+            }
+
+            //Let's try to display it as a picture
+            try
+            {
+                if (si.setPicture(data))
+                {
+                    si.Show();
+                    return true;
+                }
+            }
+            catch { }
+
+            //Binary is last resort
+            StringBuilder t = FormatBinary(data);
+            if (t == null) return false;
+
+            si.setBinary(t.ToString());
+            si.Show();
+            return true;
+        }
+
+        protected StringBuilder FormatBinary(byte[] data)
+        {
+            try
+            {
+                string binstr = string.Join("", data.Select(b => Convert.ToString(b, 16).PadLeft(2, '0').ToUpper()));
+                int m = binstr.Length % 64;
+                StringBuilder sb = new StringBuilder();
+                sb.Append(binstr);
+                if (m > 0) sb.Append(new string(' ', 64 - m));
+
+                int i = 0;
+                StringBuilder t = new StringBuilder();
+                StringBuilder ch = new StringBuilder();
+                while (i < sb.Length)
+                {
+                    for (int j = 0; j < 2; j++)
+                    {
+                        t.AppendFormat("{0}  ", i.ToString("X8"));
+                        for (int k = 0; k < 4; k++)
+                        {
+                            string chunk = sb.ToString(i + (j * 32) + (k * 8), 8);
+                            t.AppendFormat("{0} ", chunk);
+                            for (int l = 0; l < 4; l++)
+                            {
+                                String hs = chunk.Substring(l, 2);
+                                if (!string.IsNullOrWhiteSpace(hs))
+                                {
+                                    uint ui = Convert.ToUInt16(hs, 16);
+                                    ch.Append(ui >= 32 && ui <= 127 ? Convert.ToChar(ui).ToString() : ".");
+                                }
+                            }
+                            ch.Append(" ");
+                        }
+                        t.Append("   ");
+                    }
+                    t.AppendFormat("   {0}\r\n", ch.ToString());
+                    ch.Clear();
+                    i += 64;
+                }
+                return t;
+            }
+            catch { return null; }
+
+        }
         #region Row Update Routines
 
         #region Update a row

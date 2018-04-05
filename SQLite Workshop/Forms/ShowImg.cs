@@ -23,14 +23,21 @@ namespace SQLiteWorkshop
 
         private void ShowImg_Load(object sender, EventArgs e)
         {
-            lblFormHeading.Text = "Picture Viewer";
-
             // Establish ToolTips for various controls.
             toolTip = new ToolTip();
             toolTip.SetToolTip(pbMin, "Minimize");
             toolTip.SetToolTip(pbMax, "Maximize");
             toolTip.SetToolTip(pbClose, "Close");
+            this.MaximumSize = Screen.FromRectangle(this.Bounds).WorkingArea.Size;
+            this.DoubleBuffered = true;
+            this.SetStyle(ControlStyles.ResizeRedraw, true);
         }
+
+        private void pictureBox1_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
 
         internal bool setPicture(byte[] img)
         {
@@ -40,12 +47,43 @@ namespace SQLiteWorkshop
                 Image pic = Image.FromStream(ms);
                 int height = pic.Height;
                 int width = pic.Width;
-                this.MaximumSize = Screen.FromRectangle(this.Bounds).WorkingArea.Size;
                 this.Width = width;
                 this.Height = height + panelTop.Height;
                 pictureBox1.Image = pic;
+                pictureBox1.Visible = true;
+                richTextBoxData.Visible = false;
             }
             catch { return false; }
+            lblFormHeading.Text = "Picture Viewer";
+            return true;
+        }
+
+        internal bool setText(string text)
+        {
+            try
+            {
+                richTextBoxData.Text = text;
+                pictureBox1.Visible = false;
+                richTextBoxData.Visible = true;
+                richTextBoxData.WordWrap = true;
+            }
+            catch { return false; }
+            lblFormHeading.Text = "Text Viewer";
+            return true;
+        }
+
+        internal bool setBinary(string text)
+        {
+            try
+            {
+                richTextBoxData.Text = text;
+                pictureBox1.Visible = false;
+                richTextBoxData.Visible = true;
+                richTextBoxData.WordWrap = false;
+                this.Width = 1000;
+            }
+            catch { return false; }
+            lblFormHeading.Text = "Binary Viewer";
             return true;
         }
 
@@ -105,6 +143,60 @@ namespace SQLiteWorkshop
         }
         #endregion
 
+        #region Form Sizing and Control
+
+        bool grabbed = false;
+        int minWidth = 500;
+        int minHeight = 200;
+
+        private void sp_MouseDown(object sender, MouseEventArgs e)
+        {
+            grabbed = true;
+        }
+
+        private void sp_MouseUp(object sender, MouseEventArgs e)
+        {
+            grabbed = false;
+        }
+
+        private void spMouseMove(object sender, MouseEventArgs e)
+        {
+            if (!grabbed) return;
+            int x = MousePosition.X;
+            int y = MousePosition.Y;
+
+            int newsize;
+
+            switch (((Splitter)sender).Name)
+            {
+
+                case "spLeft":
+                    newsize = this.Width + (this.Left - x);
+                    if (newsize < minWidth) break;
+                    this.Left = x;
+                    this.Width = newsize;
+                    break;
+                case "spRight":
+                    newsize = x - this.Left;
+                    if (newsize < minWidth) break;
+                    this.Width = newsize;
+                    break;
+                case "spTop":
+                    newsize = this.Height + (this.Top - y);
+                    if (newsize < minHeight) break;
+                    this.Top = y;
+                    this.Height = newsize;
+                    break;
+                case "spBottom":
+                    newsize = y - this.Top;
+                    if (newsize < minHeight) break;
+                    this.Height = newsize;
+                    break;
+                default:
+                    break;
+            }
+        }
+
         #region Form Dragging Event Handler
 
         public const int WM_NCLBUTTONDOWN = 0xA1;
@@ -130,10 +222,8 @@ namespace SQLiteWorkshop
 
         #endregion
 
-        private void pictureBox1_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
+        #endregion
+
 
         private void toolStripButtonIncrease_Click(object sender, EventArgs e)
         {
