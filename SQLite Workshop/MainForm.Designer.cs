@@ -193,9 +193,9 @@
             // panelMain
             // 
             this.panelMain.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(30)))));
+            this.panelMain.Controls.Add(this.tabMain);
             this.panelMain.Controls.Add(this.spTemplate);
             this.panelMain.Controls.Add(this.panelRight);
-            this.panelMain.Controls.Add(this.tabMain);
             this.panelMain.Controls.Add(this.vSplitter);
             this.panelMain.Controls.Add(this.treeViewMain);
             this.panelMain.Controls.Add(this.panelTop);
@@ -383,7 +383,7 @@
             this.tabMain.Location = new System.Drawing.Point(124, 80);
             this.tabMain.Name = "tabMain";
             this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(723, 296);
+            this.tabMain.Size = new System.Drawing.Size(520, 296);
             this.tabMain.TabIndex = 4;
             this.tabMain.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.tabMain_DrawItem);
             this.tabMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseDown);
@@ -656,7 +656,7 @@
             this.toolStripDBAnalyze});
             this.toolStripDB.Location = new System.Drawing.Point(3, 0);
             this.toolStripDB.Name = "toolStripDB";
-            this.toolStripDB.Size = new System.Drawing.Size(228, 25);
+            this.toolStripDB.Size = new System.Drawing.Size(197, 25);
             this.toolStripDB.TabIndex = 1;
             this.toolStripDB.Text = "toolStrip1";
             // 
@@ -777,7 +777,7 @@
             this.toolStripSeparator7,
             this.closeToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(122, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // newToolStripMenuItem
@@ -881,14 +881,14 @@
             // templatesToolStripMenuItem
             // 
             this.templatesToolStripMenuItem.Name = "templatesToolStripMenuItem";
-            this.templatesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.templatesToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
             this.templatesToolStripMenuItem.Text = "Templates";
             this.templatesToolStripMenuItem.Click += new System.EventHandler(this.templatesToolStripMenuItem_Click);
             // 
             // propertiesToolStripMenuItem
             // 
             this.propertiesToolStripMenuItem.Name = "propertiesToolStripMenuItem";
-            this.propertiesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.propertiesToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
             this.propertiesToolStripMenuItem.Text = "Properties";
             this.propertiesToolStripMenuItem.Click += new System.EventHandler(this.propertiesToolStripMenuItem_Click);
             // 
@@ -896,7 +896,7 @@
             // 
             this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
             this.refreshToolStripMenuItem.ShortcutKeys = System.Windows.Forms.Keys.F5;
-            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(132, 22);
             this.refreshToolStripMenuItem.Text = "Refresh";
             this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
             // 

@@ -144,6 +144,7 @@ namespace SQLiteWorkshop
                 
                 if (dr.GetFieldType(i).Equals(typeof(byte[])))
                 {
+                    txt.ReadOnly = true;
                     Button btn = new Button();
                     btn.Name = string.Format("btn{0}", i.ToString().PadLeft(4, '0'));
                     btn.Text = "View";

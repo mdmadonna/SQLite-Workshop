@@ -64,40 +64,56 @@ namespace SQLiteWorkshop
             BindFunction(conn, new isinternal());
             conn.Progress += ProgressReport;
 
-            foreach (DataRow dr in dt.Rows)
+            try
             {
-                e.CurrentObject = dr["name"].ToString();
-                e.LoadComplete = false;
-                LoadStatsReport(this, e);
-                string select = CreateSelectStmt(dr["name"].ToString(), dr["tbl_name"].ToString());
-                cmd.CommandText = select;
-                cmd.Parameters.Clear();
-                cmd.Parameters.AddWithValue("is_index", dr["type"].ToString() == "index" ? true : false);
-                cmd.ExecuteNonQuery();
-                int gap_cnt = 0;
-                long prevpage = 0;
-                sql = string.Format("SELECT pageno, pagetype FROM dbstat WHERE name = \"{0}\" ORDER BY pageno", dr["name"].ToString());
-                cmd.CommandText = sql;
-                SQLiteDataReader pdr = cmd.ExecuteReader();
-                while (pdr.Read())
+                foreach (DataRow dr in dt.Rows)
                 {
-                    if (prevpage > 0 && pdr["pagetype"].ToString() == "leaf" && (long)pdr["pageno"] != prevpage + 1) gap_cnt++;
-                    prevpage = (long)pdr["pageno"];
-                }
-                pdr.Close();
-                sql = string.Format("Update {0} Set gap_cnt = {1} Where name = \"{2}\"", Common.StatsTable, gap_cnt.ToString(), dr["name"].ToString());
-                cmd.CommandText = sql;
-                cmd.ExecuteNonQuery();
-                e.LoadComplete = true;
-                LoadStatsReport(this, e);
-                if (Cancel)
-                {
-                    rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, string.Format("Delete From {0}", Common.StatsTable), out returnCode);
-                    break;
+                    e.CurrentObject = dr["name"].ToString();
+                    e.LoadComplete = false;
+                    LoadStatsReport(this, e);
+                    string select = CreateSelectStmt(dr["name"].ToString(), dr["tbl_name"].ToString());
+                    cmd.CommandText = select;
+                    cmd.Parameters.Clear();
+                    cmd.Parameters.AddWithValue("is_index", dr["type"].ToString() == "index" ? true : false);
+                    cmd.ExecuteNonQuery();
+                    int gap_cnt = 0;
+                    long prevpage = 0;
+                    sql = string.Format("SELECT pageno, pagetype FROM dbstat WHERE name = \"{0}\" ORDER BY pageno", dr["name"].ToString());
+                    cmd.CommandText = sql;
+                    SQLiteDataReader pdr = cmd.ExecuteReader();
+                    while (pdr.Read())
+                    {
+                        if (prevpage > 0 && pdr["pagetype"].ToString() == "leaf" && (long)pdr["pageno"] != prevpage + 1) gap_cnt++;
+                        prevpage = (long)pdr["pageno"];
+                    }
+                    pdr.Close();
+                    sql = string.Format("Update {0} Set gap_cnt = {1} Where name = \"{2}\"", Common.StatsTable, gap_cnt.ToString(), dr["name"].ToString());
+                    cmd.CommandText = sql;
+                    cmd.ExecuteNonQuery();
+                    e.LoadComplete = true;
+                    LoadStatsReport(this, e);
+                    if (Cancel)
+                    {
+                        rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, string.Format("Delete From {0}", Common.StatsTable), out returnCode);
+                        break;
+                    }
                 }
             }
-            conn.Progress -= ProgressReport;
-            DataAccess.CloseDB(conn);
+            catch (Exception ex)
+            {
+                if (returnCode == SQLiteErrorCode.Interrupt)
+                {
+                    rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, string.Format("Delete From {0}", Common.StatsTable), out returnCode);
+                    return false;
+                }
+                Common.ShowMsg(string.Format(Common.ERR_SQL, ex.Message, returnCode));
+                return false;
+            }
+            finally
+            {
+                conn.Progress -= ProgressReport;
+                DataAccess.CloseDB(conn);
+            }
 
             return true;
         }

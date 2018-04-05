@@ -29,6 +29,7 @@ namespace SQLiteWorkshop
         SQLEncrypt,
         SQLIntegrityCheck,
         SQLBackup,
+        SQLOptimize,
         SQLClone,
         SQLGenIndex,
         SQLGenAllIndexes,
@@ -65,6 +66,7 @@ namespace SQLiteWorkshop
         internal const string ERR_FILEENTRY             = "Please enter a file name.";
 
         internal const string OK_BACKUP                 = "Backup Ok: Database {0} copied to {1}.";
+        internal const string OK_OPTIMIZE               = "Optmize Ok: Database {0} has been optimized.";
         internal const string OK_CLONE                  = "Clone Ok: Database {0} cloned to {1}.";
         internal const string OK_DBCREATED              = "Create Ok: Database {0} created.";
         internal const string OK_DELINDEX               = "Delete Ok: Index {0} deleted.";

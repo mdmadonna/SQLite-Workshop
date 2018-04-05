@@ -33,6 +33,7 @@ namespace SQLiteWorkshop
         const string TITLE_COMPRESS             = "Compress Database";
         const string TITLE_ENCRYPT              = "Encrypt Database";
         const string TITLE_BACKUP               = "Backup Database";
+        const string TITLE_OPTIMIZE             = "Optimize Database";
         const string TITLE_CLONE                = "Clone Database";
         const string TITLE_DELETEINDEX          = "Delete Index";
         const string TITLE_DELETEINDEXES        = "Delete All Indexes";
@@ -49,6 +50,7 @@ namespace SQLiteWorkshop
         const string COMPRESSWARNING        = "WARNING!!  This action will compress (vacuum) Database {0} to reorganize and recover unused space. Depending on the size of the database, this may take a long time.";
         const string ENCRYPTWARNING         = "WARNING!!  This action will Encrypt Database {0}. Encryption may not be supported on all platforms or by all interfaces - use it at your own risk. Enter blanks to remove encryption.";
         const string BACKUPWARNING          = "WARNING!!  This action will Backup {0}. Depending on the size of your database, this may take some time.";
+        const string OPTIMIZEWARNING        = "WARNING!!  This action will attempt to optimize {0}. This process generally runs quickly.";
         const string CLONEWARNING           = "WARNING!!  This action will Clone {0}. The cloned database will contain all data structures found in this database but no data will be copied.";
         const string DELALLINDEXWARNING     = "WARNING!!  This action will Delete all indexes on table {0}. ";
         const string DELINDEXWARNING        = "WARNING!!  This action will Delete index {0}.";
@@ -123,6 +125,10 @@ namespace SQLiteWorkshop
                 case SQLType.SQLBackup:
                     lblFormHeading.Text = TITLE_BACKUP;
                     BackupDB();
+                    break;
+                case SQLType.SQLOptimize:
+                    lblFormHeading.Text = TITLE_OPTIMIZE;
+                    OptimizeDB();
                     break;
                 case SQLType.SQLClone:
                     lblFormHeading.Text = TITLE_CLONE;
@@ -347,6 +353,23 @@ namespace SQLiteWorkshop
             else { return false; }
             
             return true;
+        }
+        #endregion
+
+        #region Optimize Database
+        private void OptimizeDB()
+        {
+            if (!bActionApproved)
+            {
+                DisplayWarning(string.Format(OPTIMIZEWARNING, DatabaseLocation));
+                return;
+            }
+
+            string SqlStatement = "Pragma optimize";
+            string SuccessMessage = string.Format(Common.OK_OPTIMIZE, DatabaseLocation);
+            string ErrorMessage = Common.ERR_SQL;
+            ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
+            return;
         }
         #endregion
 

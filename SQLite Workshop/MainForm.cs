@@ -603,6 +603,13 @@ namespace SQLiteWorkshop
                     ef.DatabaseLocation = CurrentDB;
                     ef.ShowDialog();
                     break;
+                case "optimize database":
+                    ef = new ExecuteForm();
+                    ef.execType = SQLType.SQLOptimize;
+                    ef.TargetNode = null;
+                    ef.DatabaseLocation = CurrentDB;
+                    ef.ShowDialog();
+                    break;
                 case "clone database":
                     ef = new ExecuteForm();
                     ef.execType = SQLType.SQLClone;
