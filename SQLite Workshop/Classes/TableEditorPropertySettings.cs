@@ -74,7 +74,7 @@ namespace SQLiteWorkshop
             set { collatingSequence = value; }
         }
 
-        [DescriptionAttribute("A Check Constraint for this column.  The value must be surrounded by quotes (i.e. The action to take when a Foreign Key is deleted.")]
+        [DescriptionAttribute("A Check Constraint for this column.  The value must be surrounded by quotes (i.e. The action to take when a Foreign Key is deleted.)")]
         public string CheckConstraint
         {
             get { return checkConstraint; }

@@ -674,8 +674,11 @@ namespace SQLiteWorkshop
 
         private void btnShowSQL_Click(object sender, EventArgs e)
         {
-            if (!ValidateInput()) return;
-
+            if (!ValidateInput())
+            {
+                MessageBox.Show(errorMsg, Common.APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
             ShowSQL sSQL = new ShowSQL();
             sSQL.SQL = BuildCreateSQL();
             sSQL.ShowDialog();
