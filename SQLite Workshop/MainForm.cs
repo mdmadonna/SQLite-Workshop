@@ -596,6 +596,7 @@ namespace SQLiteWorkshop
             switch (((MenuItem)sender).Text.ToLower())
             {
                 case "new database":
+                    newToolStripMenuItem_Click(sender, e);
                     break;
                 case "backup database":
                     ef = new ExecuteForm();

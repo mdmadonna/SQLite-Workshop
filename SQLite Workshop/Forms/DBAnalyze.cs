@@ -97,6 +97,18 @@ namespace SQLiteWorkshop
             {
                 if (!ShowWarning()) { this.Close(); return false; }
             }
+
+            string sql = "Select Count(*) From sqlite_master Where type = \"table\"";
+            long tablecount = (long)DataAccess.ExecuteScalar(DatabaseLocation, sql, out returnCode);
+
+            if (tablecount == 0)
+            {
+                Common.ShowMsg("This database does not contain any tables.\r\nAnalysis terminated.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.Close();
+                return false;
+            }
+
+
             wd = new WaitDialog();
             analyzer = new Analyzer(DatabaseLocation);
             analyzer.LoadStatsReport += StatsReport;
@@ -138,6 +150,13 @@ namespace SQLiteWorkshop
                 dtTableList = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
                 sql = string.Format("Select Distinct tblname, name From {0}", Common.StatsTable);
                 dtObjectList = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
+
+                if (dtTableList.Rows.Count == 0)
+                {
+                    Common.ShowMsg("This database does not contain any tables.\r\nAnalysis terminated.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.Close();
+                    return;
+                }
 
                 PrintUtilization();
                 PrintTablePageCounts();
@@ -192,8 +211,12 @@ namespace SQLiteWorkshop
             FileInfo fi = new FileInfo(DatabaseLocation);
             long fileSize = fi.Exists ? fi.Length : 0;
             DataTable dt = FetchSummaryData();
-            long inusePages = Convert.ToInt64(dt.Rows[0]["leaf_pages"]) + Convert.ToInt64(dt.Rows[0]["int_pages"]) + Convert.ToInt64(dt.Rows[0]["ovfl_pages"]);
-            long payload = Convert.ToInt64(dt.Rows[0]["payload"]);
+            long leaf_pages = string.IsNullOrEmpty(dt.Rows[0]["leaf_pages"].ToString()) ? 0 : Convert.ToInt64(dt.Rows[0]["leaf_pages"]);
+            long int_pages = string.IsNullOrEmpty(dt.Rows[0]["int_pages"].ToString()) ? 0 : Convert.ToInt64(dt.Rows[0]["int_pages"]);
+            long ovfl_pages = string.IsNullOrEmpty(dt.Rows[0]["ovfl_pages"].ToString()) ? 0 : Convert.ToInt64(dt.Rows[0]["ovfl_pages"]);
+            long payload = string.IsNullOrEmpty(dt.Rows[0]["payload"].ToString()) ? 0 : Convert.ToInt64(dt.Rows[0]["payload"]);
+
+            long inusePages = leaf_pages + int_pages + ovfl_pages;
 
             richTextBoxReport.AppendText(string.Format("*** Disk-Space Utilization Report For {0}\r\n", DatabaseLocation));
             richTextBoxReport.AppendText(string.Format("*** Statistics as of {0}\r\n\r\n", reportDate));
@@ -299,20 +322,20 @@ namespace SQLiteWorkshop
         protected void PrintDetails(string Caption, DataTable dt, ReportType type = ReportType.consolidated)
         {
             DataRow dr = dt.Rows[0];
-            long numEntries = Convert.ToInt64(dr["nentry"]);
-            long numLeafEntries = Convert.ToInt64(dr["nleaf"]);
-            long payload = Convert.ToInt64(dr["payload"]);
-            long ovfl_payload = Convert.ToInt64(dr["ovfl_payload"]);
-            long mx_payload = Convert.ToInt64(dr["mx_payload"]);
-            long ovfl_cnt = Convert.ToInt64(dr["ovfl_cnt"]);
-            long leaf_pages = Convert.ToInt64(dr["leaf_pages"]);
-            long int_pages = Convert.ToInt64(dr["int_pages"]);
-            long ovfl_pages = Convert.ToInt64(dr["ovfl_pages"]);
-            long leaf_unused = Convert.ToInt64(dr["leaf_unused"]);
-            long int_unused = Convert.ToInt64(dr["int_unused"]);
-            long ovfl_unused = Convert.ToInt64(dr["ovfl_unused"]);
-            long gap_cnt = Convert.ToInt64(dr["gap_cnt"]);
-            long compressed_size = Convert.ToInt64(dr["compressed_size"]);
+            long numEntries = string.IsNullOrEmpty(dr["nentry"].ToString()) ? 0 : Convert.ToInt64(dr["nentry"]);
+            long numLeafEntries = string.IsNullOrEmpty(dr["nleaf"].ToString()) ? 0 : Convert.ToInt64(dr["nleaf"]);
+            long payload = string.IsNullOrEmpty(dr["payload"].ToString()) ? 0 : Convert.ToInt64(dr["payload"]);
+            long ovfl_payload = string.IsNullOrEmpty(dr["ovfl_payload"].ToString()) ? 0 : Convert.ToInt64(dr["ovfl_payload"]);
+            long mx_payload = string.IsNullOrEmpty(dr["mx_payload"].ToString()) ? 0 : Convert.ToInt64(dr["mx_payload"]);
+            long ovfl_cnt = string.IsNullOrEmpty(dr["ovfl_cnt"].ToString()) ? 0 : Convert.ToInt64(dr["ovfl_cnt"]);
+            long leaf_pages = string.IsNullOrEmpty(dr["leaf_pages"].ToString()) ? 0 : Convert.ToInt64(dr["leaf_pages"]);
+            long int_pages = string.IsNullOrEmpty(dr["int_pages"].ToString()) ? 0 : Convert.ToInt64(dr["int_pages"]);
+            long ovfl_pages = string.IsNullOrEmpty(dr["ovfl_pages"].ToString()) ? 0 : Convert.ToInt64(dr["ovfl_pages"]);
+            long leaf_unused = string.IsNullOrEmpty(dr["leaf_unused"].ToString()) ? 0 : Convert.ToInt64(dr["leaf_unused"]);
+            long int_unused = string.IsNullOrEmpty(dr["int_unused"].ToString()) ? 0 : Convert.ToInt64(dr["int_unused"]);
+            long ovfl_unused = string.IsNullOrEmpty(dr["ovfl_unused"].ToString()) ? 0 : Convert.ToInt64(dr["ovfl_unused"]);
+            long gap_cnt = string.IsNullOrEmpty(dr["gap_cnt"].ToString()) ? 0 : Convert.ToInt64(dr["gap_cnt"]);
+            long compressed_size = string.IsNullOrEmpty(dr["compressed_size"].ToString()) ? 0 : Convert.ToInt64(dr["compressed_size"]);
 
             long totPages = leaf_pages + int_pages + ovfl_pages;
             long storage = totPages * pageSize;

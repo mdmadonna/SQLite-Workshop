@@ -677,17 +677,17 @@ namespace SQLiteWorkshop
         {
             int RecordCount = 0;
             returnCode = SQLiteErrorCode.Ok;
-            SQLiteTransaction tran;
-            tran = cmd.Connection.BeginTransaction();
+            //SQLiteTransaction tran;
+            //tran = cmd.Connection.BeginTransaction();
 
             try
             {
                 RecordCount = cmd.ExecuteNonQuery();
-                tran.Commit();
+                //tran.Commit();
             }
             catch (Exception ex)
             {
-                tran.Rollback();
+                //tran.Rollback();
                 LastError = ex.Message;
                 returnCode = cmd.Connection.ExtendedResultCode();
                 return -1;
