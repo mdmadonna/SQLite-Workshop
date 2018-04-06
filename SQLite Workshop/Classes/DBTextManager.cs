@@ -13,7 +13,6 @@ namespace SQLiteWorkshop
     {
         
         internal string FileName { get; set; }
-        internal string LastError { get; set; }
         internal bool FirstRowHasHeadings { get; set; }
         internal char Delimiter { get; set; }
         internal string TextQualifier { get; set; }
@@ -241,6 +240,16 @@ namespace SQLiteWorkshop
                 return tmpFields;
             }
             return fields;
+        }
+
+        /// <summary>
+        /// Should never be called
+        /// </summary>
+        /// <param name="TableName"></param>
+        /// <returns></returns>
+        internal override DataTable PreviewData(string TableName)
+        {
+            throw new NotImplementedException();
         }
     }
 }

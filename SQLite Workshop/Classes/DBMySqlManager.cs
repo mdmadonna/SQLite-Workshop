@@ -18,8 +18,7 @@ namespace SQLiteWorkshop
         internal string DatabaseName { get; set; }
         internal string DatabaseUserName { get; set; }
         internal string DatabasePassword { get; set; }
-        internal bool UseWindowsAuthentication { get; set; }
-        internal string LastError { get; set; }
+
 
         string MySqlLibrary = "MySql.Data.dll";
         string MySqlConnectionClass = "MySql.Data.MySqlClient.MySqlConnection";
@@ -275,5 +274,17 @@ namespace SQLiteWorkshop
             }
             return true;
         }
+
+        internal override DataTable PreviewData(string TableName)
+        {
+            OpenDB();
+            IDbCommand cmd = (IDbCommand)assMySql.CreateInstance(MySqlCommandClass, true);
+            cmd.Connection = conn;
+            cmd.CommandText = string.Format("Select * FROM `{0}` Limit 100", TableName);
+            DataTable dt = LoadPreviewData(cmd);
+            CloseDB();
+            return dt;
+        }
+
     }
 }

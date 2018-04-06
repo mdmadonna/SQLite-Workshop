@@ -19,7 +19,6 @@ namespace SQLiteWorkshop
         internal string DatabaseUserName { get; set; }
         internal string DatabasePassword { get; set; }
         internal bool UseWindowsAuthentication { get; set; }
-        internal string LastError { get; set; }
 
         internal DBSqlServerManager(string DBName) : base(DBName)
         {
@@ -256,6 +255,16 @@ namespace SQLiteWorkshop
                 DataAccess.CloseDB(SQConn);
             }
             return true;
+        }
+        internal override DataTable PreviewData(string TableName)
+        {
+            OpenDB();
+            SqlCommand cmd = new SqlCommand();
+            cmd.Connection = conn;
+            cmd.CommandText = string.Format("Select Top 100 * FROM [{0}]", TableName);
+            DataTable dt = LoadPreviewData(cmd);
+            CloseDB();
+            return dt;
         }
     }
 }

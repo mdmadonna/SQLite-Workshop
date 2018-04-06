@@ -629,10 +629,10 @@ namespace SQLiteWorkshop
                 switch (buttonText)
                 {
                     case "map":
-                        dgvTables_Map();
+                        dgvTables_Map(dgv.Rows[e.RowIndex].Cells[1].Value.ToString());
                         break;
                     case "preview":
-                        dgvTables_Preview();
+                        dgvTables_Preview(dgv.Rows[e.RowIndex].Cells[1].Value.ToString());
                         break;
                     default:
                     break;
@@ -640,15 +640,25 @@ namespace SQLiteWorkshop
             }
         }
 
-        private void dgvTables_Map()
+        private void dgvTables_Map(string tableName)
         {
             Common.ShowMsg("This feature is not yet implemented");
         }
 
 
-        private void dgvTables_Preview()
+        private void dgvTables_Preview(string tableName)
         {
-            Common.ShowMsg("This feature is not yet implemented");
+            this.Cursor = Cursors.WaitCursor;
+            DataTable dt = db.PreviewData(tableName);
+            if (dt == null)
+            {
+                Common.ShowMsg(string.Format("Cannot read Table {0}\r\nError: {1}", tableName, db.LastError));
+                return;
+            }
+            Preview p = new Preview();
+            p.setPreview(tableName, dt);
+            this.Cursor = Cursors.Default;
+            p.Show();
         }
 
 
@@ -964,7 +974,6 @@ namespace SQLiteWorkshop
                 default:
                     Common.ShowMsg("Not yet implemented");
                     break;
-
             }
         }
         private void Import_SQLite()

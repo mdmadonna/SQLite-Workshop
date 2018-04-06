@@ -13,15 +13,15 @@ using System.Windows.Forms;
 
 namespace SQLiteWorkshop
 {
-    public partial class ShowImg : Form
+    public partial class Preview : Form
     {
         ToolTip toolTip;
-        public ShowImg()
+        public Preview()
         {
             InitializeComponent();
         }
 
-        private void ShowImg_Load(object sender, EventArgs e)
+        private void Preview_Load(object sender, EventArgs e)
         {
             // Establish ToolTips for various controls.
             toolTip = new ToolTip();
@@ -31,60 +31,14 @@ namespace SQLiteWorkshop
             this.MaximumSize = Screen.FromRectangle(this.Bounds).WorkingArea.Size;
             this.DoubleBuffered = true;
             this.SetStyle(ControlStyles.ResizeRedraw, true);
+            lblFormHeading.Text = "Import Preview";
         }
 
-        private void pictureBox1_Click(object sender, EventArgs e)
+        internal void setPreview(string table, DataTable dt)
         {
-            this.Close();
-        }
-
-
-        internal bool setPicture(byte[] img)
-        {
-            try
-            {
-                var ms = new MemoryStream(img);
-                Image pic = Image.FromStream(ms);
-                int height = pic.Height;
-                int width = pic.Width;
-                this.Width = width;
-                this.Height = height + panelTop.Height;
-                pictureBox1.Image = pic;
-                pictureBox1.Visible = true;
-                richTextBoxData.Visible = false;
-            }
-            catch { return false; }
-            lblFormHeading.Text = "Picture Viewer";
-            return true;
-        }
-
-        internal bool setText(string text)
-        {
-            try
-            {
-                richTextBoxData.Text = text;
-                pictureBox1.Visible = false;
-                richTextBoxData.Visible = true;
-                richTextBoxData.WordWrap = true;
-            }
-            catch { return false; }
-            lblFormHeading.Text = "Text Viewer";
-            return true;
-        }
-
-        internal bool setBinary(string text)
-        {
-            try
-            {
-                richTextBoxData.Text = text;
-                pictureBox1.Visible = false;
-                richTextBoxData.Visible = true;
-                richTextBoxData.WordWrap = false;
-                this.Width = 1000;
-            }
-            catch { return false; }
-            lblFormHeading.Text = "Binary Viewer";
-            return true;
+            lblTable.Text = string.Format("Table: {0}", table);
+            dgPreview.DataSource = dt;
+            dgPreview.Refresh();
         }
 
         private void btnClose_Click(object sender, EventArgs e)

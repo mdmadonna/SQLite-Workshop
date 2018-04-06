@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
@@ -98,6 +99,12 @@ namespace SQLiteWorkshop
             eventHandler(this, e);
         }
 
+        protected const int MAX_ERRORS = 10;
+        internal ArrayList FormatErrors { get; set; }
+        internal string LastError { get; set; }
+
+        protected int FormatErrorCount;
+
         internal DBManager(string ConnectionString)
         { }
 
@@ -107,7 +114,56 @@ namespace SQLiteWorkshop
 
         abstract internal Dictionary<string, DBColumn> GetColumns(string TableName);
 
+        abstract internal DataTable PreviewData(string TableName);
+
         abstract internal bool Import(string SourceTable, string DestTable, Dictionary<string, DBColumn> columns = null);
+
+        protected DataTable LoadPreviewData(IDbCommand cmd)
+        {
+            DataTable dt = new DataTable();
+            int recordcount = 0;
+            FormatErrorCount = 0;
+
+            IDataReader dr;
+            try
+            {
+                dr = cmd.ExecuteReader();
+            }
+            catch (Exception ex)
+            {
+                LastError = ex.Message;
+                return null;
+            }
+
+            for (int i = 0; i < dr.FieldCount; i++) { dt.Columns.Add(dr.GetName(i), typeof(string)); }
+
+            try
+            {
+                while (dr.Read())
+                {
+                    recordcount++;
+                    DataRow dRow = dt.NewRow();
+                    for (int i = 0; i < dr.FieldCount; i++)
+                    {
+                        try { dRow[i] = dr[i] == null ? string.Empty : dr[i].ToString(); }
+                        catch (Exception ex)
+                        {
+                            FormatErrorCount++;
+                            if ((FormatErrorCount <= MAX_ERRORS)) FormatErrors.Add(string.Format("Format Error on Record {0} Column {1}: {2}", recordcount, dr.GetName(i), ex.Message));
+                        }
+                    }
+                    dt.Rows.Add(dRow);
+                    if (recordcount >= 100) break;
+                }
+                dr.Close();
+            }
+            catch (Exception ex)
+            {
+                LastError = ex.Message;
+                return null;
+            }
+            return dt;
+        }
 
         protected string BuildCreateSql(string TableName, Dictionary<string, DBColumn> columns)
         {

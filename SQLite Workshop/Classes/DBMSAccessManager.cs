@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
@@ -18,7 +19,6 @@ namespace SQLiteWorkshop
         OleDbConnection conn;
 
         internal string DatabaseName { get; set; }
-        internal string LastError { get; set; }
 
         internal DBMSAccessManager(string DBName) : base(DBName)
         {
@@ -211,5 +211,15 @@ namespace SQLiteWorkshop
             return true;
         }
 
+        internal override DataTable PreviewData(string TableName)
+        {
+            OpenDB();
+            OleDbCommand OleCmd = new OleDbCommand();
+            OleCmd.Connection = conn;
+            OleCmd.CommandText = string.Format("Select Top 100 * FROM [{0}]", TableName);
+            DataTable dt = LoadPreviewData(OleCmd);
+            CloseDB();
+            return dt;
+        }
     }
 }

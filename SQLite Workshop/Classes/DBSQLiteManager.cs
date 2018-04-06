@@ -12,7 +12,6 @@ namespace SQLiteWorkshop
     {
 
         internal string DatabaseName { get; set; }
-        internal string LastError { get; set; }
 
         internal DBSQLiteManager(string DBName) : base(DBName)
         {
@@ -83,7 +82,7 @@ namespace SQLiteWorkshop
                 return false;
             }
 
-            cmd.CommandText = string.Format("CREATE TABLE {0} AS SELECT * FROM Import.{1}", DestTable, SourceTable);
+            cmd.CommandText = string.Format("CREATE TABLE {0} AS SELECT * FROM Import.\"{1}\"", DestTable, SourceTable);
             int count = DataAccess.ExecuteNonQuery(cmd, out returnCode);
             if (count < 0 || returnCode != SQLiteErrorCode.Ok)
             {
@@ -92,7 +91,7 @@ namespace SQLiteWorkshop
                 return false;
             }
 
-            cmd.CommandText = string.Format("Insert into {0} Select * From Import.{1}", DestTable,  SourceTable);
+            cmd.CommandText = string.Format("Insert into {0} Select * From Import.\"{1}\"", DestTable,  SourceTable);
             count = DataAccess.ExecuteNonQuery(cmd, out returnCode);
             if (count < 0 || returnCode != SQLiteErrorCode.Ok)
             {
@@ -102,11 +101,25 @@ namespace SQLiteWorkshop
             }
 
             DataAccess.DetachDatabase(cmd, "Import", out returnCode);
-            //cmd.CommandText = string.Format("Select Count(*) From {0}", DestTable);
-            //long recCount = Convert.ToInt64(DataAccess.ExecuteScalar(MainForm.mInstance.CurrentDB, string.Format("Select Count(*) From {0}", DestTable), out returnCode));
             FireStatusEvent(ImportStatus.Complete, count);
             return true;
         }
+
+        internal override DataTable PreviewData(string TableName)
+        {
+            SQLiteErrorCode returnCode;
+            SQLiteCommand cmd = DataAccess.AttachDatabase(MainForm.mInstance.CurrentDB, DatabaseName, "Import", out returnCode);
+            if (returnCode != SQLiteErrorCode.Ok)
+            {
+                Common.ShowMsg(String.Format("Could not attach {0}\r\n{1}", DatabaseName, DataAccess.LastError));
+                return null;
+            }
+            cmd.CommandText = string.Format("Select * FROM Import.\"{0}\" Limit 100", TableName);
+            DataTable dt = LoadPreviewData(cmd);
+            DataAccess.DetachDatabase(cmd, "Import", out returnCode);
+            return dt;
+        }
+
 
     }
 }

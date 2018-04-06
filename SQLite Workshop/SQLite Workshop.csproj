@@ -136,6 +136,12 @@
     <Compile Include="Forms\ImportWiz.Designer.cs">
       <DependentUpon>ImportWiz.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\Preview.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\Preview.Designer.cs">
+      <DependentUpon>Preview.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ShowSQL.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -229,6 +235,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ImportWiz.resx">
       <DependentUpon>ImportWiz.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\Preview.resx">
+      <DependentUpon>Preview.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\ShowSQL.resx">
       <DependentUpon>ShowSQL.cs</DependentUpon>
