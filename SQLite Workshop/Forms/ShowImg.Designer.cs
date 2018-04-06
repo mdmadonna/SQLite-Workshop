@@ -41,7 +41,7 @@
             this.panelBody = new System.Windows.Forms.Panel();
             this.richTextBoxData = new System.Windows.Forms.RichTextBox();
             this.spLeft = new System.Windows.Forms.Splitter();
-            this.splitterTop = new System.Windows.Forms.Splitter();
+            this.spTop = new System.Windows.Forms.Splitter();
             this.spRight = new System.Windows.Forms.Splitter();
             this.spBottom = new System.Windows.Forms.Splitter();
             this.panelTop.SuspendLayout();
@@ -61,7 +61,7 @@
             this.panelTop.Controls.Add(this.pbIcon);
             this.panelTop.Controls.Add(this.panelControls);
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.panelTop.Location = new System.Drawing.Point(1, 1);
+            this.panelTop.Location = new System.Drawing.Point(1, 2);
             this.panelTop.Name = "panelTop";
             this.panelTop.Size = new System.Drawing.Size(350, 28);
             this.panelTop.TabIndex = 1;
@@ -152,7 +152,7 @@
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox1.Location = new System.Drawing.Point(0, 0);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(350, 290);
+            this.pictureBox1.Size = new System.Drawing.Size(350, 289);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 3;
             this.pictureBox1.TabStop = false;
@@ -165,9 +165,9 @@
             this.panelBody.Controls.Add(this.richTextBoxData);
             this.panelBody.Controls.Add(this.pictureBox1);
             this.panelBody.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelBody.Location = new System.Drawing.Point(1, 29);
+            this.panelBody.Location = new System.Drawing.Point(1, 30);
             this.panelBody.Name = "panelBody";
-            this.panelBody.Size = new System.Drawing.Size(350, 290);
+            this.panelBody.Size = new System.Drawing.Size(350, 289);
             this.panelBody.TabIndex = 4;
             // 
             // richTextBoxData
@@ -177,7 +177,7 @@
             this.richTextBoxData.Location = new System.Drawing.Point(0, 0);
             this.richTextBoxData.Name = "richTextBoxData";
             this.richTextBoxData.ReadOnly = true;
-            this.richTextBoxData.Size = new System.Drawing.Size(350, 290);
+            this.richTextBoxData.Size = new System.Drawing.Size(350, 289);
             this.richTextBoxData.TabIndex = 5;
             this.richTextBoxData.Text = "";
             this.richTextBoxData.Visible = false;
@@ -185,26 +185,26 @@
             // 
             // spLeft
             // 
-            this.spLeft.Location = new System.Drawing.Point(1, 29);
+            this.spLeft.Location = new System.Drawing.Point(1, 30);
             this.spLeft.Name = "spLeft";
-            this.spLeft.Size = new System.Drawing.Size(1, 290);
+            this.spLeft.Size = new System.Drawing.Size(1, 289);
             this.spLeft.TabIndex = 7;
             this.spLeft.TabStop = false;
             this.spLeft.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sp_MouseDown);
             this.spLeft.MouseMove += new System.Windows.Forms.MouseEventHandler(this.spMouseMove);
             this.spLeft.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sp_MouseUp);
             // 
-            // splitterTop
+            // spTop
             // 
-            this.splitterTop.Dock = System.Windows.Forms.DockStyle.Top;
-            this.splitterTop.Location = new System.Drawing.Point(2, 29);
-            this.splitterTop.Name = "splitterTop";
-            this.splitterTop.Size = new System.Drawing.Size(349, 1);
-            this.splitterTop.TabIndex = 10;
-            this.splitterTop.TabStop = false;
-            this.splitterTop.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sp_MouseDown);
-            this.splitterTop.MouseMove += new System.Windows.Forms.MouseEventHandler(this.spMouseMove);
-            this.splitterTop.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sp_MouseUp);
+            this.spTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.spTop.Location = new System.Drawing.Point(1, 1);
+            this.spTop.Name = "spTop";
+            this.spTop.Size = new System.Drawing.Size(350, 1);
+            this.spTop.TabIndex = 10;
+            this.spTop.TabStop = false;
+            this.spTop.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sp_MouseDown);
+            this.spTop.MouseMove += new System.Windows.Forms.MouseEventHandler(this.spMouseMove);
+            this.spTop.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sp_MouseUp);
             // 
             // spRight
             // 
@@ -238,10 +238,10 @@
             this.ClientSize = new System.Drawing.Size(352, 320);
             this.Controls.Add(this.spBottom);
             this.Controls.Add(this.spRight);
-            this.Controls.Add(this.splitterTop);
             this.Controls.Add(this.spLeft);
             this.Controls.Add(this.panelBody);
             this.Controls.Add(this.panelTop);
+            this.Controls.Add(this.spTop);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ShowImg";
@@ -274,7 +274,7 @@
         private System.Windows.Forms.Panel panelBody;
         private System.Windows.Forms.RichTextBox richTextBoxData;
         private System.Windows.Forms.Splitter spLeft;
-        private System.Windows.Forms.Splitter splitterTop;
+        private System.Windows.Forms.Splitter spTop;
         private System.Windows.Forms.Splitter spRight;
         private System.Windows.Forms.Splitter spBottom;
     }

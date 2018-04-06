@@ -311,7 +311,7 @@ namespace SQLiteWorkshop
             if (!ValidateBackup()) return;
 
             string SqlStatement = txtInfo.Text;
-            string SuccessMessage = string.Format(Common.OK_ENCRYPT, DatabaseLocation);
+            string SuccessMessage = string.Format(Common.OK_BACKUP, DatabaseLocation, txtInfo.Text);
             string ErrorMessage = Common.ERR_BACKUPFAILED;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
@@ -367,7 +367,7 @@ namespace SQLiteWorkshop
 
             string SqlStatement = "Pragma optimize";
             string SuccessMessage = string.Format(Common.OK_OPTIMIZE, DatabaseLocation);
-            string ErrorMessage = Common.ERR_SQL;
+            string ErrorMessage = string.Format(Common.OK_OPTIMIZE, DatabaseLocation);      //always succeeds
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
         }
@@ -650,6 +650,9 @@ namespace SQLiteWorkshop
             txtMessage.SelectionLength = 0;
 
             Cursor = Cursors.WaitCursor;
+            MainForm.mInstance.Cursor = Cursors.WaitCursor;
+            toolStripExecutionStatus.ToolTipText = "Working...";
+            Application.DoEvents();
             switch (execType)
             {
                 case SQLType.SQLBackup:
@@ -664,6 +667,7 @@ namespace SQLiteWorkshop
                     break;
             }
             Cursor = Cursors.Default;
+            MainForm.mInstance.Cursor = Cursors.Default;
             if (!result || returnCode != SQLiteErrorCode.Ok)
             {
                 //Common.ShowMsg(string.Format(ErrorMessage, DataAccess.LastError, returnCode.ToString()));

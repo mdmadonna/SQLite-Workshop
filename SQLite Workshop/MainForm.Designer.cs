@@ -34,6 +34,7 @@
             this.spTop = new System.Windows.Forms.Splitter();
             this.spBottom = new System.Windows.Forms.Splitter();
             this.panelMain = new System.Windows.Forms.Panel();
+            this.tabMain = new System.Windows.Forms.TabControl();
             this.spTemplate = new System.Windows.Forms.Splitter();
             this.panelRight = new System.Windows.Forms.Panel();
             this.panelProperties = new System.Windows.Forms.Panel();
@@ -50,7 +51,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.treeTemplates = new System.Windows.Forms.TreeView();
             this.imageListTreeView = new System.Windows.Forms.ImageList(this.components);
-            this.tabMain = new System.Windows.Forms.TabControl();
             this.vSplitter = new System.Windows.Forms.Splitter();
             this.treeViewMain = new System.Windows.Forms.TreeView();
             this.panelTop = new System.Windows.Forms.Panel();
@@ -206,6 +206,20 @@
             this.panelMain.Size = new System.Drawing.Size(847, 398);
             this.panelMain.TabIndex = 4;
             // 
+            // tabMain
+            // 
+            this.tabMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tabMain.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
+            this.tabMain.Location = new System.Drawing.Point(124, 80);
+            this.tabMain.Name = "tabMain";
+            this.tabMain.SelectedIndex = 0;
+            this.tabMain.Size = new System.Drawing.Size(520, 296);
+            this.tabMain.TabIndex = 4;
+            this.tabMain.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.tabMain_DrawItem);
+            this.tabMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseDown);
+            this.tabMain.MouseEnter += new System.EventHandler(this.tabMain_MouseEnter);
+            this.tabMain.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseMove);
+            // 
             // spTemplate
             // 
             this.spTemplate.Dock = System.Windows.Forms.DockStyle.Right;
@@ -261,6 +275,7 @@
             // 
             // propertyGridDBProperties
             // 
+            this.propertyGridDBProperties.DisabledItemForeColor = System.Drawing.SystemColors.ControlText;
             this.propertyGridDBProperties.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGridDBProperties.Location = new System.Drawing.Point(3, 3);
             this.propertyGridDBProperties.Name = "propertyGridDBProperties";
@@ -281,6 +296,7 @@
             // 
             // propertyGridDBRuntime
             // 
+            this.propertyGridDBRuntime.DisabledItemForeColor = System.Drawing.SystemColors.ControlText;
             this.propertyGridDBRuntime.Dock = System.Windows.Forms.DockStyle.Fill;
             this.propertyGridDBRuntime.Location = new System.Drawing.Point(3, 3);
             this.propertyGridDBRuntime.Name = "propertyGridDBRuntime";
@@ -375,20 +391,6 @@
             this.imageListTreeView.Images.SetKeyName(6, "view.png");
             this.imageListTreeView.Images.SetKeyName(7, "Key.png");
             this.imageListTreeView.Images.SetKeyName(8, "Trigger.png");
-            // 
-            // tabMain
-            // 
-            this.tabMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tabMain.DrawMode = System.Windows.Forms.TabDrawMode.OwnerDrawFixed;
-            this.tabMain.Location = new System.Drawing.Point(124, 80);
-            this.tabMain.Name = "tabMain";
-            this.tabMain.SelectedIndex = 0;
-            this.tabMain.Size = new System.Drawing.Size(520, 296);
-            this.tabMain.TabIndex = 4;
-            this.tabMain.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.tabMain_DrawItem);
-            this.tabMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseDown);
-            this.tabMain.MouseEnter += new System.EventHandler(this.tabMain_MouseEnter);
-            this.tabMain.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseMove);
             // 
             // vSplitter
             // 
@@ -777,7 +779,7 @@
             this.toolStripSeparator7,
             this.closeToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(122, 20);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // newToolStripMenuItem

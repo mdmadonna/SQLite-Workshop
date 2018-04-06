@@ -693,7 +693,6 @@ namespace SQLiteWorkshop
                 return -1;
             }
             return RecordCount;
-
         }
 
         internal static object ExecuteScalar(string DBLocation, string SqlStatement, out SQLiteErrorCode returnCode)
@@ -758,7 +757,7 @@ namespace SQLiteWorkshop
         /// <returns>True if successful, False if the open fails</returns>
         internal static bool OpenDB(string DBLocation, ref SQLiteConnection Conn, ref SQLiteCommand Cmd, out SQLiteErrorCode returnCode, bool IsNew = false, string password = null)
         {
-
+            LastError = string.Empty;
             Conn = new SQLiteConnection();
             Conn.ConnectionString = string.Format("Data Source={0};Version=3;New={1}", DBLocation, IsNew ? "True" : "False");
             if (password != null) Conn.ConnectionString += string.Format(";Password={0}", password);

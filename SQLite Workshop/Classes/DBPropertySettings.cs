@@ -11,6 +11,7 @@ namespace SQLiteWorkshop
     class DBPropertySettings
     {
         internal string[] FKList { get; set; }
+        internal string[] FKCheckList { get; set; }
 
         [DisplayName("Database File Name"),
         ReadOnly(true),
@@ -79,8 +80,8 @@ namespace SQLiteWorkshop
         public string DbForeignKeyCheck { get; set; }
 
         /// <summary>
-        /// Declared internal for the time being.  I may in the future build a list
-        /// of all foreign keys in the database and place it here.
+        /// Marked internal to keep it off the properties grid.  This is not appropriate here
+        /// and will be deleted at a later date.
         /// </summary>
         [DisplayName("Foreign Key List"),
         ReadOnly(true),
@@ -121,6 +122,11 @@ namespace SQLiteWorkshop
 
         public class FKListConverter : StringConverter
         {
+            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
             public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
             {
                 return true;
@@ -131,6 +137,26 @@ namespace SQLiteWorkshop
                 DBPropertySettings db = context.Instance as DBPropertySettings;
                 Array.Sort(db.FKList);
                 return new StandardValuesCollection(db.FKList);
+            }
+
+        }
+
+        public class FKCheckListConverter : StringConverter
+        {
+            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
+            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
+            public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+            {
+                DBPropertySettings db = context.Instance as DBPropertySettings;
+                return new StandardValuesCollection(db.FKCheckList);
             }
 
         }

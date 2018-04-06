@@ -103,6 +103,7 @@ namespace SQLiteWorkshop
         internal const string ERR_SQLWIDE               = "SQL Executed with errors.\r\n\r\n{0} errors encountered.\r\nSQL Error Code: {1}.\r\n\r\nThe last {2} error(s) are:\r\n\r\n{3}";
         internal const string ERR_SQLERR                = "SQL Executed with errors.";
         internal const string ERR_VACUUMFAIL            = "Compress failed: {0}\r\nSQL Error Code: {1}.";
+        internal const string ERR_GENERAL               = "Error: {0}.";
         #endregion
 
         #endregion

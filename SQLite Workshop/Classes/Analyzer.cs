@@ -44,28 +44,37 @@ namespace SQLiteWorkshop
 
         internal void Start()
         {
-            BuildStats();
+            try
+            {
+                BuildStats();
+            }
+            catch (Exception ex)
+            {
+                Common.ShowMsg(string.Format(Common.ERR_GENERAL, ex.Message));
+            }
         }
         private bool BuildStats()
         {
-            SQLiteErrorCode returnCode;
+            SQLiteErrorCode returnCode = SQLiteErrorCode.Ok;
             string sql = CreateSQL();
             LoadStatsEventArgs e = new LoadStatsEventArgs();
-
-            int rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, sql, out returnCode);
-            rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, string.Format("Delete From {0}", Common.StatsTable), out returnCode);
-
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
+            int rc;
 
-            DataAccess.OpenDB(MainForm.mInstance.CurrentDB, ref conn, ref cmd, out returnCode, false);
-            BindFunction(conn, new isleaf());
-            BindFunction(conn, new isoverflow());
-            BindFunction(conn, new isinternal());
-            conn.Progress += ProgressReport;
-
-            try
+                        try
             {
+                rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, sql, out returnCode);
+                rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, string.Format("Delete From {0}", Common.StatsTable), out returnCode);
+
+                
+                DataAccess.OpenDB(MainForm.mInstance.CurrentDB, ref conn, ref cmd, out returnCode, false);
+                BindFunction(conn, new isleaf());
+                BindFunction(conn, new isoverflow());
+                BindFunction(conn, new isinternal());
+                conn.Progress += ProgressReport;
+
+          
                 foreach (DataRow dr in dt.Rows)
                 {
                     e.CurrentObject = dr["name"].ToString();

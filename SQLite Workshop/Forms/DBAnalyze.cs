@@ -16,6 +16,13 @@ namespace SQLiteWorkshop
     public partial class DBAnalyze : Form
     {
 
+        protected enum ReportType
+        {
+            consolidated,
+            table,
+            index
+        }
+
         internal string DatabaseLocation { get; set; }
         internal string TableName { get; set; }
 
@@ -122,23 +129,30 @@ namespace SQLiteWorkshop
 
         protected void AnalyzeDB()
         {
+            try
+            {
+                if (!StatsFileExists()) if (!LoadStats()) return;
+                richTextBoxReport.Text = string.Empty;
 
-            if (!StatsFileExists()) if (!LoadStats()) return;
-            richTextBoxReport.Text = string.Empty;
+                string sql = string.Format("Select Distinct tblname From {0}", Common.StatsTable);
+                dtTableList = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
+                sql = string.Format("Select Distinct tblname, name From {0}", Common.StatsTable);
+                dtObjectList = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
 
-            string sql = string.Format("Select Distinct tblname From {0}", Common.StatsTable);
-            dtTableList = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
-            sql = string.Format("Select Distinct tblname, name From {0}", Common.StatsTable);
-            dtObjectList = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
-
-            PrintUtilization();
-            PrintTablePageCounts();
-            PrintObjectPageCounts();
-            PrintAllObjectsSummary();
-            PrintAllTablesSummary();
-            PrintAllIndexesSummary();
-            PrintTableDetails();
-            PrintDefinitions();
+                PrintUtilization();
+                PrintTablePageCounts();
+                PrintObjectPageCounts();
+                PrintAllObjectsSummary();
+                PrintAllTablesSummary();
+                PrintAllIndexesSummary();
+                PrintTableDetails();
+                PrintDefinitions();
+            }
+            catch (Exception ex)
+            {
+                Common.ShowMsg(string.Format(Common.ERR_GENERAL, ex.Message));
+                return;
+            }
 
         }
 
@@ -164,6 +178,12 @@ namespace SQLiteWorkshop
             sinTotalPages = Convert.ToSingle(totalPages);
             sql = "Pragma freelist_count";
             freelistCount = (long)DataAccess.ExecuteScalar(DatabaseLocation, sql, out returnCode);
+            sql = "Pragma auto_vacuum";
+            long AutoVacuum = (long)DataAccess.ExecuteScalar(DatabaseLocation, sql, out returnCode);
+            long AutoVacOverhead;
+            AutoVacOverhead = (totalPages == 1 || AutoVacuum == 0) ? 0 : (long)Math.Ceiling((totalPages - 1) / ((Single)(pageSize / 5) + 1));
+
+
 
             sql = string.Format("Select min(sdate) from \"{0}\"", Common.StatsTable);
             var obj = DataAccess.ExecuteScalar(DatabaseLocation, sql, out returnCode);
@@ -179,11 +199,11 @@ namespace SQLiteWorkshop
             richTextBoxReport.AppendText(string.Format("*** Statistics as of {0}\r\n\r\n", reportDate));
             richTextBoxReport.AppendText(BL("Page size in bytes", pageSize));
             richTextBoxReport.AppendText(BL("Pages in the whole file(measured)", totalPages));
-            richTextBoxReport.AppendText(BL("Pages in the whole file(calculated)", 0));
+            richTextBoxReport.AppendText(BL("Pages in the whole file(calculated)", totalPages));
             richTextBoxReport.AppendText(BL("Pages that store data", inusePages, inusePages / sinTotalPages));
             richTextBoxReport.AppendText(BL("Pages on the freelist(per header)", freelistCount, freelistCount / sinTotalPages));
-            richTextBoxReport.AppendText(BL("Pages on the freelist(calculated)", 0, 0));
-            richTextBoxReport.AppendText(BL("Pages of auto-vacuum overhead", 0, 0));
+            richTextBoxReport.AppendText(BL("Pages on the freelist(calculated)", freelistCount, freelistCount / sinTotalPages));
+            richTextBoxReport.AppendText(BL("Pages of auto-vacuum overhead", AutoVacOverhead, AutoVacOverhead / sinTotalPages ));
             richTextBoxReport.AppendText(BL("Number of tables in the database", tableCount));
             richTextBoxReport.AppendText(BL("Number of indices", indexCount));
             richTextBoxReport.AppendText(BL("Number of defined indices", indexCount - autoIndexCount));
@@ -276,7 +296,7 @@ namespace SQLiteWorkshop
             catch { }
         }
 
-        protected void PrintDetails(string Caption, DataTable dt)
+        protected void PrintDetails(string Caption, DataTable dt, ReportType type = ReportType.consolidated)
         {
             DataRow dr = dt.Rows[0];
             long numEntries = Convert.ToInt64(dr["nentry"]);
@@ -309,7 +329,8 @@ namespace SQLiteWorkshop
             richTextBoxReport.AppendText(BL("Bytes of payload", payload, payload / Convert.ToSingle(storage)));
             richTextBoxReport.AppendText(BLSingle("Average payload per entry", payload / Convert.ToSingle(numEntries)));
             richTextBoxReport.AppendText(BLSingle("Average unused bytes per entry", totUnused / Convert.ToSingle(numLeafEntries)));
-            richTextBoxReport.AppendText(BLSingle("Average fanout", fanout));
+            //need to fix fanout formula
+            //richTextBoxReport.AppendText(BLSingle("Average fanout", fanout));
             richTextBoxReport.AppendText(BL("Maximum payload per entry", mx_payload));
             richTextBoxReport.AppendText(BL("Entries that use overflow", ovfl_cnt, ovfl_cnt / Convert.ToSingle(numEntries)));
             richTextBoxReport.AppendText(BL("Index pages used", int_pages));

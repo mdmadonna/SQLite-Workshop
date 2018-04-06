@@ -9,6 +9,10 @@ namespace SQLiteWorkshop
 {
     class DBRuntimePropertySettings
     {
+        internal string[] CompileOptionsList { get; set; }
+        internal string[] FunctionList { get; set; }
+        internal string[] ModuleList { get; set; }
+        internal string[] PragmaList { get; set; }
 
         [DisplayName("Application ID"),
         ReadOnly(true),
@@ -50,7 +54,7 @@ namespace SQLiteWorkshop
         [DisplayName("Case Sensitive LIKE"),
         ReadOnly(true),
         CategoryAttribute("Runtime Properties"),
-        DescriptionAttribute("When enabled (value = 1), SQLite will ignore case.")]
+        DescriptionAttribute("When enabled, SQLite will ignore case when using the LIKE operator.")]
         public string DbCaseSensitiveLike { get; set; }
 
         [DisplayName("Cell Size Check"),
@@ -72,7 +76,8 @@ namespace SQLiteWorkshop
         public string DbCollationList { get; set; }
 
         [DisplayName("Compile Options"),
-        ReadOnly(true),
+        TypeConverter(typeof(CompileListConverter)),
+        ReadOnly(false),
         CategoryAttribute("Runtime Properties"),
         DescriptionAttribute("The names of compile-time options used when building SQLite.")]
         public string DbCompileOptions { get; set; }
@@ -108,6 +113,7 @@ namespace SQLiteWorkshop
         public string DbFullfsync { get; set; }
 
         [DisplayName("Function List"),
+        TypeConverter(typeof(FunctionListConverter)),
         ReadOnly(true),
         CategoryAttribute("Runtime Properties"),
         DescriptionAttribute("A list of SQL functions known to the database connection.  This is only available if SQLite is built using the -DSQLITE_INTROSPECTION_PRAGMAS compile-time option")]
@@ -156,12 +162,14 @@ namespace SQLiteWorkshop
         public string DbMemoryMapSize { get; set; }
 
         [DisplayName("Module List"),
+        TypeConverter(typeof(ModuleListConverter)),
         ReadOnly(true),
         CategoryAttribute("Runtime Properties"),
         DescriptionAttribute("A list of virtual table modules registered with the database connection. This is only available if SQLite is built using the -DSQLITE_INTROSPECTION_PRAGMAS compile-time option.")]
         public string DbModuleList { get; set; }
 
         [DisplayName("Pragma List"),
+        TypeConverter(typeof(PragmaListConverter)),
         ReadOnly(true),
         CategoryAttribute("Runtime Properties"),
         DescriptionAttribute("A list of PRAGMA commands known to the database connection. This is only available if SQLite is built using the -DSQLITE_INTROSPECTION_PRAGMAS compile-time option.")]
@@ -225,8 +233,81 @@ namespace SQLiteWorkshop
         [DisplayName("Writable Schema"),
         ReadOnly(true),
         CategoryAttribute("Runtime Properties"),
-        DescriptionAttribute("When enabled (value = 1) the SQLITE_MASTER tables can be modified using standard SQL. (Extremely HIGH RISK.)")]
+        DescriptionAttribute("When enabled the SQLITE_MASTER tables can be modified using standard SQL. (Extremely HIGH RISK.)")]
         public string DbWritableSchema { get; set; }
 
+        public class CompileListConverter : StringConverter
+        {
+            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
+            public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+            {
+                DBRuntimePropertySettings db = context.Instance as DBRuntimePropertySettings;
+                Array.Sort(db.CompileOptionsList);
+                return new StandardValuesCollection(db.CompileOptionsList);
+            }
+        }
+
+        public class FunctionListConverter : StringConverter
+        {
+            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
+            public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+            {
+                DBRuntimePropertySettings db = context.Instance as DBRuntimePropertySettings;
+                Array.Sort(db.FunctionList);
+                return new StandardValuesCollection(db.FunctionList);
+            }
+        }
+        public class ModuleListConverter : StringConverter
+        {
+            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
+            public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+            {
+                DBRuntimePropertySettings db = context.Instance as DBRuntimePropertySettings;
+                Array.Sort(db.ModuleList);
+                return new StandardValuesCollection(db.ModuleList);
+            }
+        }
+        public class PragmaListConverter : StringConverter
+        {
+            public override bool GetStandardValuesExclusive(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+            public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
+            {
+                return true;
+            }
+
+            public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
+            {
+                DBRuntimePropertySettings db = context.Instance as DBRuntimePropertySettings;
+                Array.Sort(db.PragmaList);
+                return new StandardValuesCollection(db.PragmaList);
+            }
+        }
     }
 }

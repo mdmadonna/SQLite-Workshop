@@ -70,7 +70,7 @@ namespace SQLiteWorkshop
         public bool Unique
         {
             get { return unique; }
-            set { exclude = unique; }
+            set { unique = value; }
         }
 
         [DisplayName("Allow Null Values"),
@@ -79,7 +79,7 @@ namespace SQLiteWorkshop
         public bool AllowNulls
         {
             get { return allownulls; }
-            set { exclude = allownulls; }
+            set { allownulls = value; }
         }
 
         public void SetReadOnly(string property, bool value)
