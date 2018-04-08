@@ -260,7 +260,6 @@ namespace SQLiteWorkshop
                 CloseDB();
                 sqlT.Commit();
                 DataAccess.CloseDB(SQConn);
-                FireStatusEvent(ImportStatus.Complete, recCount);
             }
             catch (Exception ex)
             {
@@ -272,6 +271,7 @@ namespace SQLiteWorkshop
             {
                 DataAccess.CloseDB(SQConn);
             }
+            try { FireStatusEvent(ImportStatus.Complete, recCount); } catch { }
             return true;
         }
 

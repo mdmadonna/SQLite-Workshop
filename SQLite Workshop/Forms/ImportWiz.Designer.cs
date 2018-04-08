@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportWiz));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelTop = new System.Windows.Forms.Panel();
@@ -644,7 +644,8 @@
             "MS Access Database",
             "SQL Server",
             "ODBC",
-            "MySQL"});
+            "MySQL",
+            "SQL"});
             this.cmbSourceDB.Location = new System.Drawing.Point(124, 66);
             this.cmbSourceDB.Name = "cmbSourceDB";
             this.cmbSourceDB.Size = new System.Drawing.Size(195, 21);
@@ -898,8 +899,8 @@
             // 
             this.dataGridViewText.AllowUserToAddRows = false;
             this.dataGridViewText.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
             this.dataGridViewText.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGridViewText.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewText.Dock = System.Windows.Forms.DockStyle.Fill;

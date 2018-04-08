@@ -74,6 +74,7 @@
     <Compile Include="Classes\DBRuntimePropertySettings.cs" />
     <Compile Include="Classes\DBSQLiteManager.cs" />
     <Compile Include="Classes\DBSqlServerManager.cs" />
+    <Compile Include="Classes\DBSqlManager.cs" />
     <Compile Include="Classes\DBTextManager.cs" />
     <Compile Include="Classes\DBOdbcManager.cs" />
     <Compile Include="Classes\ImportWizTextPropertySettings.cs" />

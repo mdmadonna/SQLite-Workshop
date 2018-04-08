@@ -205,7 +205,7 @@ namespace SQLiteWorkshop
             {
                 DisplayWarning(string.Format(RENAMEWARNING, TargetNode.Text, DatabaseLocation));
                 txtInfo.Visible = true;
-                lblTxtInfo.Text = "New Table Name:";
+                lblTxtInfo.Text = "New Name:";
                 txtInfo.Focus();
                 return;
             }

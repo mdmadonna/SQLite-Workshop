@@ -33,7 +33,8 @@ namespace SQLiteWorkshop
             MySql,
             Text,
             Excel,
-            ODBC
+            ODBC,
+            SQL
         }
 
         public ImportWiz()
@@ -180,6 +181,10 @@ namespace SQLiteWorkshop
                     cmbDestinationTable.Text = Path.GetFileNameWithoutExtension(txtFileName.Text);
                     InitializeTextColumns();
                     break;
+                case ImportSource.SQL:
+                    if (!ValidateTextPanel()) return;
+                    ImportFromSQL();
+                    break;
                 case ImportSource.SQLite:
                     if (!ValidateTextPanel()) return;
                     ImportFromDB();
@@ -205,6 +210,16 @@ namespace SQLiteWorkshop
                     break;
             }
         }
+
+        #region Import from SQL
+        protected void ImportFromSQL()
+        {
+            db = new DBSqlManager(txtFileName.Text);
+            db.StatusReport += StatusReport;
+            db.Import(txtFileName.Text, null, null);
+            db.StatusReport -= StatusReport;
+        }
+        #endregion
 
         /// <summary>
         /// Routines to manage import from a database.
@@ -1120,6 +1135,16 @@ namespace SQLiteWorkshop
                     panelWizMainODBC.Visible = false;
                     break;
 
+                case "SQL":
+                    SourceType = ImportSource.SQL;
+                    panelWizMainText.Visible = true;
+                    panelWizMainDB.Visible = false;
+                    panelWizMainODBC.Visible = false;
+                    panelWizMainMySql.Visible = false;
+                    lblPassword.Visible = false;
+                    txtPassword.Visible = false;
+                    break;
+
                 default:
                     break;
             }
@@ -1222,6 +1247,12 @@ namespace SQLiteWorkshop
                     Title = "Open Excel Spreadsheet";
                     Extension = "xslx";
                     Filter = "All files (*.*)|*.*|Database Files (*.xls;*.xlsx)|*.xls;*.xlsx";
+                    break;
+
+                case ImportSource.SQL:
+                    Title = "Open SQL File";
+                    Extension = "sql";
+                    Filter = "All files (*.*)|*.*|SQL Files (*.sql)|*.sql";
                     break;
 
                 default:

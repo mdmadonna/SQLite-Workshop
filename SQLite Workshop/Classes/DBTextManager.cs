@@ -150,13 +150,11 @@ namespace SQLiteWorkshop
                 }
                 sr.Close();
                 sqlT.Commit();
-                FireStatusEvent(ImportStatus.Complete, recCount);
             }
             catch (Exception ex)
             {
                 sqlT.Rollback();
                 try { if (sr != null) sr.Close(); } catch { }
-                rtnCode = DataAccess.ExecuteNonQuery(SQCmd, out returnCode);
                 Common.ShowMsg(string.Format(Common.ERR_SQL, ex.Message, SQLiteErrorCode.Ok));
                 return false;
             }
@@ -164,6 +162,7 @@ namespace SQLiteWorkshop
             {
                 DataAccess.CloseDB(SQConn);
             }
+            try { FireStatusEvent(ImportStatus.Complete, recCount); } catch { }
             return true;
         }
 

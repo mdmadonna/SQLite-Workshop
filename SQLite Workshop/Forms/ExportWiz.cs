@@ -71,12 +71,19 @@ namespace SQLiteWorkshop
 
         private void radioSQL_CheckedChanged(object sender, EventArgs e)
         {
+            checkBoxHeadings.Text = "Include Column Names in INSERT Statement";
             listBoxTables.SelectionMode = SelectionMode.MultiExtended;
+            if (!string.IsNullOrWhiteSpace(txtFileDestination.Text)) txtFileDestination.Text = Path.ChangeExtension(txtFileDestination.Text, "sql");
         }
 
         private void radioComma_CheckedChanged(object sender, EventArgs e)
         {
+            checkBoxHeadings.Text = "Include Headings in First Line";
             listBoxTables.SelectionMode = SelectionMode.One;
+            if (listBoxTables.SelectedIndex >= 0)
+            { txtFileDestination.Text = string.Format("{0}.csv", listBoxTables.SelectedItem); }
+            else
+            { txtFileDestination.Text = string.Empty; }
         }
 
         private void listBoxTables_SelectedIndexChanged(object sender, EventArgs e)
@@ -112,7 +119,7 @@ namespace SQLiteWorkshop
             }
             else
             {
-                txtFileDestination.Text = "SQLWorkshop.sql";
+                if (string.IsNullOrWhiteSpace(txtFileDestination.Text)) txtFileDestination.Text = "SQLWorkshop.sql";
             }
             saveFile.FileName = txtFileDestination.Text;
 
@@ -266,7 +273,7 @@ namespace SQLiteWorkshop
                     if (!CreateSQL.EndsWith(";")) CreateSQL += ";";
                     sw.WriteLine(CreateSQL);
 
-                    cmd.CommandText = string.Format("Select * From \"{0}\"", listBoxTables.SelectedItem.ToString());
+                    cmd.CommandText = string.Format("Select * From \"{0}\"", table);
                     SQLiteDataReader dr = cmd.ExecuteReader();
                     long recs = 0;
                     while (dr.Read())
@@ -316,7 +323,7 @@ namespace SQLiteWorkshop
                 case "system.byte[]":
                     return FormatBytes((byte[])item);
                 case "system.string":
-                    return string.Format("\"{0}\"", item.ToString());
+                    return string.Format("\"{0}\"", item.ToString().Replace("\"", "\"\""));
                 default:
                     return item.ToString();
 
