@@ -46,6 +46,12 @@ namespace SQLiteWorkshop
             e.Graphics.DrawString(rowIdx, this.Font, SystemBrushes.ControlText, headerBounds, centerFormat);
         }
 
+        private void dgMain_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            dgMain.BeginEdit(true);
+        }
+
         DataTable dt;
 
         internal bool Execute()

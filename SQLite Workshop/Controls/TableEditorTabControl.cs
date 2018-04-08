@@ -658,6 +658,12 @@ namespace SQLiteWorkshop
             dgr.Cells["ColCheck"].Value = tableSettings.CheckConstraint;
         }
 
+        private void dgvTableDef_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+            dgvTableDef.BeginEdit(true);
+        }
+
         private void propertyGridTable_Leave(object sender, EventArgs e)
         {
             int currentRow = dgvTableDef.SelectedRows[0].Index;
@@ -683,7 +689,5 @@ namespace SQLiteWorkshop
             sSQL.SQL = BuildCreateSQL();
             sSQL.ShowDialog();
         }
-
-
     }
 }

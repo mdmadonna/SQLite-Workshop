@@ -816,6 +816,7 @@
             this.checkBoxFirstRowContainsHeadings.TabIndex = 5;
             this.checkBoxFirstRowContainsHeadings.Text = "First Row Contains Column Names";
             this.checkBoxFirstRowContainsHeadings.UseVisualStyleBackColor = true;
+            this.checkBoxFirstRowContainsHeadings.CheckedChanged += new System.EventHandler(this.checkBoxFirstRowContainsHeadings_CheckedChanged);
             // 
             // comboBoxTextQualifier
             // 

@@ -117,10 +117,12 @@ namespace SQLiteWorkshop
                 SQCmd.CommandText = InsertSQL;
 
                 bool[] bInclude = new bool[columns.Count];
+                string[] fldName = new string[columns.Count];
                 i = 0;
                 foreach (var col in columns)
                 {
                     bInclude[i] = col.Value.IncludeInImport;
+                    fldName[i] = col.Key;
                     i++;
                 }
 
@@ -134,7 +136,13 @@ namespace SQLiteWorkshop
                     SQCmd.Parameters.Clear();
                     for (i = 0; i < fields.Length; i++)
                     {
-                        if (bInclude[i]) SQCmd.Parameters.AddWithValue(String.Empty, fields[i]);
+                        if (bInclude[i])
+                        {
+                            if (columns[fldName[i]].Type != "blob")
+                            { SQCmd.Parameters.AddWithValue(String.Empty, fields[i]); }
+                            else
+                            { SQCmd.Parameters.Add(String.Empty, DbType.Binary).Value = FormatData(fields[i]); }
+                        }
                     }
                     SQCmd.ExecuteNonQuery();
                     recCount++;
@@ -157,6 +165,19 @@ namespace SQLiteWorkshop
                 DataAccess.CloseDB(SQConn);
             }
             return true;
+        }
+
+        internal object FormatData(string data)
+        {
+            string s = (data.StartsWith("x'")) ? data.Substring(3, data.Length - 3) : data;
+            if (s.Length % 2 != 0) return null;
+
+            byte[] b1 = new byte[s.Length / 2];
+            for (int i = 0; i < s.Length / 2; i++)
+            {
+                b1[i] = Convert.ToByte(s.Substring(i * 2, 2), 16);
+            }
+            return b1;
         }
 
         internal string[] SplitLine(string line, int count, char delimiter, string textQualifier)

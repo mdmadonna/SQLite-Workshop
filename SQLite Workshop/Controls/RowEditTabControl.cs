@@ -297,14 +297,14 @@ namespace SQLiteWorkshop
                 {
                     for (int j = 0; j < 2; j++)
                     {
-                        t.AppendFormat("{0}  ", i.ToString("X8"));
+                        t.AppendFormat("{0}  ", ((i / 2) + (j * 16)).ToString("X8"));
                         for (int k = 0; k < 4; k++)
                         {
                             string chunk = sb.ToString(i + (j * 32) + (k * 8), 8);
                             t.AppendFormat("{0} ", chunk);
                             for (int l = 0; l < 4; l++)
                             {
-                                String hs = chunk.Substring(l, 2);
+                                String hs = chunk.Substring(l, 2).Trim();
                                 if (!string.IsNullOrWhiteSpace(hs))
                                 {
                                     uint ui = Convert.ToUInt16(hs, 16);

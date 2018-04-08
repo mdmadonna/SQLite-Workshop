@@ -316,15 +316,42 @@ namespace SQLiteWorkshop
         protected void InitializeTextColumns()
         {
             UpdateTextManager();
+            if (ColumnSettings != null) return;
+
+            if (!InitTextListBox()) return; ;
+            PopulatePropertyGrid();
+        }
+
+        protected bool InitTextListBox()
+        {
             listBoxColumns.Items.Clear();
             textColumns = db.GetColumns(txtFileName.Text);
-            if (textColumns.Count == 0) return;
+            if (textColumns.Count == 0) return false;
 
             foreach (var textColumn in textColumns)
             {
                 listBoxColumns.Items.Add(textColumn.Key);
             }
-            PopulatePropertyGrid();
+            return true;
+        }
+
+        /// <summary>
+        /// If the checkbox changes after initialization, we need to reload the listbox
+        /// and change the names in the propertygrid settings objects
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void checkBoxFirstRowContainsHeadings_CheckedChanged(object sender, EventArgs e)
+        {
+            if (ColumnSettings == null) return;
+            int idx = listBoxColumns.SelectedIndex;
+            UpdateTextManager();
+            if (!InitTextListBox()) return;
+            if (idx < listBoxColumns.Items.Count) listBoxColumns.SelectedIndex = idx;
+            for (int i = 0; i < listBoxColumns.Items.Count; i++)
+            {
+                ColumnSettings[string.Format("col{0}", i.ToString().PadLeft(3, '0'))].Name = listBoxColumns.Items[i].ToString();
+            }
         }
 
         /// <summary>
@@ -370,16 +397,17 @@ namespace SQLiteWorkshop
             for (int i = 0; i < listBoxColumns.Items.Count; i++)
             {
                 ImportWizTextPropertySettings ips = new ImportWizTextPropertySettings();
+                string key = string.Format("col{0}", i.ToString().PadLeft(3, '0'));
                 ips.Name = listBoxColumns.Items[i].ToString();
                 ips.ColumnWidth = 255;
                 ips.Type = "varchar";
                 ips.Exclude = false;
-                ColumnSettings.Add(ips.Name, ips);
+                ColumnSettings.Add(key, ips);
             }
 
             if (column == null) column = listBoxColumns.Items[0].ToString();
             listBoxColumns.SelectedIndex = 0;
-            propertyGridColumns.SelectedObject = ColumnSettings[column];
+            propertyGridColumns.SelectedObject = ColumnSettings[string.Format("col{0}", listBoxColumns.SelectedIndex.ToString().PadLeft(3, '0'))];
         }
 
         /// <summary>
@@ -491,9 +519,10 @@ namespace SQLiteWorkshop
         private void listBoxColumns_SelectedIndexChanged(object sender, EventArgs e)
         {
             int iKey = listBoxColumns.SelectedIndex == -1 ? 0 : listBoxColumns.SelectedIndex;
-            propertyGridColumns.SelectedObject = ColumnSettings[string.Format("Column {0}", iKey.ToString())];
+            propertyGridColumns.SelectedObject = ColumnSettings[string.Format("col{0}", iKey.ToString().PadLeft(3,'0'))];
             propertyGridColumns.Refresh();
         }
+
 
         #endregion
 
@@ -1249,6 +1278,7 @@ namespace SQLiteWorkshop
                 SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
             }
         }
+
 
 
 

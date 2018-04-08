@@ -82,6 +82,7 @@
             this.dgMain.RowHeadersWidth = 60;
             this.dgMain.Size = new System.Drawing.Size(591, 418);
             this.dgMain.TabIndex = 0;
+            this.dgMain.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgMain_CellContentClick);
             this.dgMain.RowPostPaint += new System.Windows.Forms.DataGridViewRowPostPaintEventHandler(this.dgMain_RowPostPaint);
             // 
             // bindingNavigator

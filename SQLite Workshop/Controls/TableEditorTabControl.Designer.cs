@@ -114,6 +114,7 @@
             this.dgvTableDef.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvTableDef.Size = new System.Drawing.Size(789, 386);
             this.dgvTableDef.TabIndex = 0;
+            this.dgvTableDef.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvTableDef_CellClick);
             this.dgvTableDef.CellEndEdit += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvTableDef_CellEndEdit);
             this.dgvTableDef.CellValidating += new System.Windows.Forms.DataGridViewCellValidatingEventHandler(this.dgvTableDef_CellValidating);
             this.dgvTableDef.EditingControlShowing += new System.Windows.Forms.DataGridViewEditingControlShowingEventHandler(this.dgvTableDef_EditingControlShowing);

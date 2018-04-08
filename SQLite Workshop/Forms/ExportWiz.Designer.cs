@@ -46,6 +46,9 @@
             this.checkBoxHeadings = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.listBoxTables = new System.Windows.Forms.ListBox();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.radioComma = new System.Windows.Forms.RadioButton();
+            this.radioSQL = new System.Windows.Forms.RadioButton();
             this.statusStrip1.SuspendLayout();
             this.panelTop.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
@@ -53,6 +56,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.pbClose)).BeginInit();
             this.panelBottom.SuspendLayout();
             this.panel1.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -165,6 +169,7 @@
             // panel1
             // 
             this.panel1.BackColor = System.Drawing.SystemColors.Window;
+            this.panel1.Controls.Add(this.panel2);
             this.panel1.Controls.Add(this.btnFindFile);
             this.panel1.Controls.Add(this.txtFileDestination);
             this.panel1.Controls.Add(this.label2);
@@ -179,7 +184,7 @@
             // 
             // btnFindFile
             // 
-            this.btnFindFile.Location = new System.Drawing.Point(540, 143);
+            this.btnFindFile.Location = new System.Drawing.Point(539, 200);
             this.btnFindFile.Name = "btnFindFile";
             this.btnFindFile.Size = new System.Drawing.Size(29, 23);
             this.btnFindFile.TabIndex = 5;
@@ -189,7 +194,7 @@
             // 
             // txtFileDestination
             // 
-            this.txtFileDestination.Location = new System.Drawing.Point(231, 145);
+            this.txtFileDestination.Location = new System.Drawing.Point(230, 202);
             this.txtFileDestination.Name = "txtFileDestination";
             this.txtFileDestination.Size = new System.Drawing.Size(297, 20);
             this.txtFileDestination.TabIndex = 4;
@@ -197,7 +202,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(228, 114);
+            this.label2.Location = new System.Drawing.Point(227, 171);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(108, 13);
             this.label2.TabIndex = 3;
@@ -208,7 +213,7 @@
             this.checkBoxHeadings.AutoSize = true;
             this.checkBoxHeadings.Checked = true;
             this.checkBoxHeadings.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxHeadings.Location = new System.Drawing.Point(228, 62);
+            this.checkBoxHeadings.Location = new System.Drawing.Point(227, 119);
             this.checkBoxHeadings.Name = "checkBoxHeadings";
             this.checkBoxHeadings.Size = new System.Drawing.Size(165, 17);
             this.checkBoxHeadings.TabIndex = 2;
@@ -233,6 +238,40 @@
             this.listBoxTables.Sorted = true;
             this.listBoxTables.TabIndex = 0;
             this.listBoxTables.SelectedIndexChanged += new System.EventHandler(this.listBoxTables_SelectedIndexChanged);
+            // 
+            // panel2
+            // 
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.radioSQL);
+            this.panel2.Controls.Add(this.radioComma);
+            this.panel2.Location = new System.Drawing.Point(230, 62);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(297, 30);
+            this.panel2.TabIndex = 6;
+            // 
+            // radioComma
+            // 
+            this.radioComma.AutoSize = true;
+            this.radioComma.Checked = true;
+            this.radioComma.Location = new System.Drawing.Point(16, 4);
+            this.radioComma.Name = "radioComma";
+            this.radioComma.Size = new System.Drawing.Size(106, 17);
+            this.radioComma.TabIndex = 0;
+            this.radioComma.TabStop = true;
+            this.radioComma.Text = "Comma Delimited";
+            this.radioComma.UseVisualStyleBackColor = true;
+            this.radioComma.CheckedChanged += new System.EventHandler(this.radioComma_CheckedChanged);
+            // 
+            // radioSQL
+            // 
+            this.radioSQL.AutoSize = true;
+            this.radioSQL.Location = new System.Drawing.Point(174, 4);
+            this.radioSQL.Name = "radioSQL";
+            this.radioSQL.Size = new System.Drawing.Size(46, 17);
+            this.radioSQL.TabIndex = 1;
+            this.radioSQL.Text = "SQL";
+            this.radioSQL.UseVisualStyleBackColor = true;
+            this.radioSQL.CheckedChanged += new System.EventHandler(this.radioSQL_CheckedChanged);
             // 
             // ExportWiz
             // 
@@ -260,6 +299,8 @@
             this.panelBottom.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -284,5 +325,8 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ListBox listBoxTables;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.RadioButton radioSQL;
+        private System.Windows.Forms.RadioButton radioComma;
     }
 }

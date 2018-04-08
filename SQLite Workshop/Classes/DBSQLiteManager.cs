@@ -82,16 +82,16 @@ namespace SQLiteWorkshop
                 return false;
             }
 
-            cmd.CommandText = string.Format("CREATE TABLE {0} AS SELECT * FROM Import.\"{1}\"", DestTable, SourceTable);
+            cmd.CommandText = string.Format("CREATE TABLE If Not Exists \"{0}\" AS SELECT * FROM Import.\"{1}\"", DestTable, SourceTable);
             int count = DataAccess.ExecuteNonQuery(cmd, out returnCode);
-            if (count < 0 || returnCode != SQLiteErrorCode.Ok)
+            if ( returnCode != SQLiteErrorCode.Ok)
             {
                 Common.ShowMsg(String.Format("Could not create table {0}\r\n{1}", DestTable, DataAccess.LastError));
                 DataAccess.DetachDatabase(cmd, "Import", out returnCode);
                 return false;
             }
 
-            cmd.CommandText = string.Format("Insert into {0} Select * From Import.\"{1}\"", DestTable,  SourceTable);
+            cmd.CommandText = string.Format("Insert into \"{0}\" Select * From Import.\"{1}\"", DestTable,  SourceTable);
             count = DataAccess.ExecuteNonQuery(cmd, out returnCode);
             if (count < 0 || returnCode != SQLiteErrorCode.Ok)
             {

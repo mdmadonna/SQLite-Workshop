@@ -69,18 +69,33 @@ namespace SQLiteWorkshop
             this.Close();
         }
 
+        private void radioSQL_CheckedChanged(object sender, EventArgs e)
+        {
+            listBoxTables.SelectionMode = SelectionMode.MultiExtended;
+        }
+
+        private void radioComma_CheckedChanged(object sender, EventArgs e)
+        {
+            listBoxTables.SelectionMode = SelectionMode.One;
+        }
+
         private void listBoxTables_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (listBoxTables.SelectedIndex < 0) return;
             string path = string.IsNullOrEmpty(txtFileDestination.Text) ? string.Empty : Path.GetDirectoryName(txtFileDestination.Text);
-            txtFileDestination.Text = string.IsNullOrEmpty(path) ? string.Format("{0}.csv", listBoxTables.Items[listBoxTables.SelectedIndex].ToString()) : string.Format("{0}\\{1}.csv", path, listBoxTables.Items[listBoxTables.SelectedIndex].ToString());
+            if (radioComma.Checked)
+            {
+                txtFileDestination.Text = string.IsNullOrEmpty(path) ? string.Format("{0}.csv", listBoxTables.Items[listBoxTables.SelectedIndex].ToString()) : string.Format("{0}\\{1}.csv", path, listBoxTables.Items[listBoxTables.SelectedIndex].ToString());
+                return;
+            }
+            txtFileDestination.Text = string.IsNullOrEmpty(path) ? "SQWorkshop.sql" : string.Format("{0}\\SQWorkshop.csv", path);
         }
 
         protected void GetFile()
         {
             SaveFileDialog saveFile = new SaveFileDialog();
             saveFile.Title = "Select Destination File";
-            saveFile.Filter = "All files (*.*)|*.*|Comma-delimited FIles (*.csv)|*.csv";
+            saveFile.Filter = radioComma.Checked ? "All files (*.*)|*.*|Comma-delimited FIles (*.csv)|*.csv" : "All files (*.*)|*.*|Sql FIles (*.sql)|*.sql";
             saveFile.FilterIndex = 2;
             saveFile.AddExtension = true;
             saveFile.AutoUpgradeEnabled = true;
@@ -88,11 +103,18 @@ namespace SQLiteWorkshop
             saveFile.RestoreDirectory = true;
             saveFile.ValidateNames = true;
             saveFile.OverwritePrompt = false;
-            if (listBoxTables.SelectedIndex >= 0)
+            if (radioComma.Checked)
             {
-                txtFileDestination.Text = string.Format("{0}.csv", listBoxTables.SelectedItem.ToString());
-                saveFile.FileName = txtFileDestination.Text;
+                if (listBoxTables.SelectedIndex >= 0)
+                {
+                    txtFileDestination.Text = string.Format("{0}.csv", listBoxTables.SelectedItem.ToString());
+                }
             }
+            else
+            {
+                txtFileDestination.Text = "SQLWorkshop.sql";
+            }
+            saveFile.FileName = txtFileDestination.Text;
 
             if (saveFile.ShowDialog() != DialogResult.OK) return;
             txtFileDestination.Text = saveFile.FileName;
@@ -128,6 +150,13 @@ namespace SQLiteWorkshop
         private void DoExport()
         {
 
+            if (radioSQL.Checked)
+            {
+                ExportSQL();
+                return;
+            }
+
+
             StreamWriter sw;
             CsvWriter csv;
 
@@ -154,13 +183,15 @@ namespace SQLiteWorkshop
                 return;
             }
 
+            this.Cursor = Cursors.WaitCursor;
+            toolStripStatusLabel1.Text = "Working...";
             try
             {
                 cmd.CommandText = string.Format("Select Count(*) From {0}", listBoxTables.SelectedItem.ToString());
                 RecordCount = Convert.ToInt64(cmd.ExecuteScalar());
                 cmd.CommandText = string.Format("Select * From {0}", listBoxTables.SelectedItem.ToString());
                 SQLiteDataReader dr = cmd.ExecuteReader();
-                if (checkBoxHeadings.Checked) //sw.WriteLine(GetHeadingLine(dr));
+                if (checkBoxHeadings.Checked)
                 {
                     for (int i = 0; i < dr.FieldCount; i++)
                     {
@@ -171,10 +202,9 @@ namespace SQLiteWorkshop
                 long recs = 0;
                 while (dr.Read())
                 {
-                    //w.WriteLine(GetDetailLine(dr));
                     for (int i = 0; i < dr.FieldCount; i++)
                     {
-                        csv.WriteField(DBNull.Value.Equals(dr[i]) ? string.Empty : dr[i].ToString()); ;
+                        csv.WriteField(DBNull.Value.Equals(dr[i]) ? string.Empty : dr[i].GetType().Equals(typeof(byte[])) ? FormatBytes((byte[])dr[i]) : dr[i].ToString());
                     }
                     csv.NextRecord();
                     recs++;
@@ -192,39 +222,115 @@ namespace SQLiteWorkshop
             finally
             {
                 DataAccess.CloseDB(conn);
+                this.Cursor = Cursors.Default;
             }
             return;
         }
 
-        private string GetHeadingLine(SQLiteDataReader dr)
+        private void ExportSQL()
         {
-            StringBuilder sb = new StringBuilder();
-            string comma = string.Empty;
-
-            for (int i = 0; i < dr.FieldCount; i++)
+            StreamWriter sw;
+            try
             {
-                sb.AppendFormat("{0}{1}", comma, enQuote(dr.GetName(i)));
-                comma = ",";
+                sw = new StreamWriter(txtFileDestination.Text);
             }
-            return sb.ToString();
+            catch (Exception ex)
+            {
+                Common.ShowMsg(string.Format("Unable to open {0}\r\n{1}", txtFileDestination.Text, ex.Message));
+                return;
+            }
+
+            SQLiteConnection conn = new SQLiteConnection();
+            SQLiteCommand cmd = new SQLiteCommand();
+            SQLiteErrorCode returnCode;
+            long RecordCount;
+
+            var rtn = DataAccess.OpenDB(DatabaseLocation, ref conn, ref cmd, out returnCode, false);
+            if (!rtn || returnCode != SQLiteErrorCode.Ok)
+            {
+                Common.ShowMsg("Unable to open database.");
+                return;
+            }
+
+            this.Cursor = Cursors.WaitCursor;
+            StringBuilder sb = new StringBuilder();
+            StringBuilder sbVal = new StringBuilder();
+            try
+            {
+                foreach (string table in listBoxTables.SelectedItems)
+                {
+                    toolStripStatusLabel1.Text = string.Format("Exporting {0}", table);
+                    cmd.CommandText = string.Format("Select Count(*) From {0}", listBoxTables.SelectedItem.ToString());
+                    RecordCount = Convert.ToInt64(cmd.ExecuteScalar());
+                    string CreateSQL = DataAccess.SchemaDefinitions[DatabaseLocation].Tables[table].CreateSQL.Trim();
+                    if (!CreateSQL.EndsWith(";")) CreateSQL += ";";
+                    sw.WriteLine(CreateSQL);
+
+                    cmd.CommandText = string.Format("Select * From \"{0}\"", listBoxTables.SelectedItem.ToString());
+                    SQLiteDataReader dr = cmd.ExecuteReader();
+                    long recs = 0;
+                    while (dr.Read())
+                    {
+                        sb.Clear();
+                        sbVal.Clear();
+                        sb.AppendFormat("Insert Into \"{0}\" ", table);
+                        if (checkBoxHeadings.Checked) sb.Append("(");
+                        sbVal.Append("Values (");
+                        bool bComma = false;
+                        for (int i = 0; i < dr.FieldCount; i++)
+                        {
+                            if (checkBoxHeadings.Checked) sb.Append(bComma ? "," : string.Empty).AppendFormat("\"{0}\"", dr.GetName(i));
+                            sbVal.Append(bComma ? "," : string.Empty);
+                            sbVal.Append(DBNull.Value.Equals(dr[i]) ? string.Empty : FormatOutput(dr[i].GetType(), dr[i]));
+                            bComma = true;
+                        }
+                        if (checkBoxHeadings.Checked) sb.Append(")");
+                        sbVal.Append(");");
+                        sw.WriteLine(string.Format("{0} {1}", sb.ToString(), sbVal.ToString()));
+                        recs++;
+                        if (recs % 100 == 0) { toolStripStatusLabel1.Text = string.Format("Exporting {0}: {1} of {2} records written", table, recs, RecordCount); Application.DoEvents(); }
+                    }
+                    dr.Close();
+                }
+                toolStripStatusLabel1.Text = "Export Complete";
+                sw.Close();
+            }
+            catch (Exception ex)
+            {
+                Common.ShowMsg(string.Format("Export Failed.\r\n{0}", ex.Message));
+                return;
+            }
+            finally
+            {
+                DataAccess.CloseDB(conn);
+                this.Cursor = Cursors.Default;
+                try { sw.Close(); } catch { }
+            }
+            return;
         }
 
-        private string GetDetailLine(SQLiteDataReader dr)
+        private string FormatOutput(Type type, object item)
         {
-            StringBuilder sb = new StringBuilder();
-            string comma = string.Empty;
-
-            for (int i = 0; i < dr.FieldCount; i++)
+            switch (type.ToString().ToLower())
             {
-                sb.AppendFormat("{0}{1}", comma, enQuote(DBNull.Value.Equals(dr[i]) ? string.Empty : dr[i].ToString()));
-                comma = ",";
+                case "system.byte[]":
+                    return FormatBytes((byte[])item);
+                case "system.string":
+                    return string.Format("\"{0}\"", item.ToString());
+                default:
+                    return item.ToString();
+
             }
-            return sb.ToString();
         }
 
-        private string enQuote(string token)
+        private string FormatBytes(byte[] data)
         {
-            return token.Contains(",") ? string.Format("\"{0}\"", token) : token;
+            if (data == null) return string.Empty;
+            if (data.Length == 0) return string.Empty;
+
+            string binstr = string.Join("", data.Select(b => Convert.ToString(b, 16).PadLeft(2,'0')));
+            StringBuilder sb = new StringBuilder();
+            return sb.AppendFormat("x'{0}'",binstr).ToString();
         }
 
         #region ControlBox Handlers
@@ -274,8 +380,7 @@ namespace SQLiteWorkshop
                 SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
             }
         }
+
         #endregion
-
-
     }
 }
