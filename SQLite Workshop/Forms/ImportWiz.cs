@@ -962,7 +962,8 @@ namespace SQLiteWorkshop
         /// <param name="e"></param>
         internal void StatusReport(object sender, StatusEventArgs e)
         {
-            toolStripStatusMsg.Text = string.Format("{0}{1} rows imported.", e.Status == ImportStatus.Complete ? "Import Complete. " : string.Empty, e.RowCount.ToString());
+            string msg = SourceType == ImportSource.SQL ? "statements executed." : "rows imported.";           
+            toolStripStatusMsg.Text = string.Format("{0}{1} {2}", e.Status == ImportStatus.Complete ? "Import Complete. " : string.Empty, e.RowCount.ToString(), msg);
             Application.DoEvents();
         }
 

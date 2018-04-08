@@ -264,18 +264,22 @@ namespace SQLiteWorkshop
             StringBuilder sbVal = new StringBuilder();
             try
             {
+                RecordCount = 0;
+                foreach (string table in listBoxTables.SelectedItems)
+                {
+                    cmd.CommandText = string.Format("Select Count(*) From {0}", table);
+                    RecordCount += Convert.ToInt64(cmd.ExecuteScalar());
+                }
+                long recs = 0;
                 foreach (string table in listBoxTables.SelectedItems)
                 {
                     toolStripStatusLabel1.Text = string.Format("Exporting {0}", table);
-                    cmd.CommandText = string.Format("Select Count(*) From {0}", listBoxTables.SelectedItem.ToString());
-                    RecordCount = Convert.ToInt64(cmd.ExecuteScalar());
                     string CreateSQL = DataAccess.SchemaDefinitions[DatabaseLocation].Tables[table].CreateSQL.Trim();
                     if (!CreateSQL.EndsWith(";")) CreateSQL += ";";
                     sw.WriteLine(CreateSQL);
 
                     cmd.CommandText = string.Format("Select * From \"{0}\"", table);
                     SQLiteDataReader dr = cmd.ExecuteReader();
-                    long recs = 0;
                     while (dr.Read())
                     {
                         sb.Clear();
@@ -298,6 +302,13 @@ namespace SQLiteWorkshop
                         if (recs % 100 == 0) { toolStripStatusLabel1.Text = string.Format("Exporting {0}: {1} of {2} records written", table, recs, RecordCount); Application.DoEvents(); }
                     }
                     dr.Close();
+                    string IndexSql;
+                    foreach (var index in DataAccess.SchemaDefinitions[DatabaseLocation].Tables[table].Indexes)
+                    {
+                        IndexSql = index.Value.CreateSQL;
+                        if (!IndexSql.EndsWith(";")) IndexSql += ";";
+                        sw.WriteLine(IndexSql);
+                    }
                 }
                 toolStripStatusLabel1.Text = "Export Complete";
                 sw.Close();

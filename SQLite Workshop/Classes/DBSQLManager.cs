@@ -81,10 +81,13 @@ namespace SQLiteWorkshop
                     idx = line.LastIndexOf(";");
                     while (idx < 0)
                     {
-                        line += sr.ReadLine();
+                        string nextline = sr.ReadLine();
+                        if (nextline == null) break;
+                        line += nextline;
+                        if (line == null) break;
                         idx = line.LastIndexOf(";");
                     }
-                    sql = line.Substring(0, idx);
+                    sql = idx > 0 ? line.Substring(0, idx) : line;
                     line = idx < line.Length ? line.Substring(idx + 1) : string.Empty;
                     SQCmd.CommandText = sql;
                     SQCmd.ExecuteNonQuery();
