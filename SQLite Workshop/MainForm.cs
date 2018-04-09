@@ -864,6 +864,7 @@ namespace SQLiteWorkshop
                     ef.TargetNode = treeViewMain.SelectedNode;
                     ef.DatabaseLocation = CurrentDB;
                     ef.ShowDialog();
+                    if (ef.bActionComplete) ReplaceTreeEntry();
                     break;
                 case "delete all indexes":
                     ef = new ExecuteForm();
@@ -871,6 +872,7 @@ namespace SQLiteWorkshop
                     ef.TargetNode = treeViewMain.SelectedNode;
                     ef.DatabaseLocation = CurrentDB;
                     ef.ShowDialog();
+                    if (ef.bActionComplete) ReplaceTreeEntry();
                     break;
                 case "new index":
                     BuildIndex bi = new BuildIndex();
@@ -880,6 +882,12 @@ namespace SQLiteWorkshop
                 default:
                     break;
             }
+        }
+
+        private void ReplaceTreeEntry()
+        {
+            string tableName = treeViewMain.SelectedNode.Text == "Indexes" ? treeViewMain.SelectedNode.Parent.Text : treeViewMain.SelectedNode.Parent.Parent.Text;
+            AddTable(tableName);
         }
         #endregion
 
@@ -1276,12 +1284,21 @@ namespace SQLiteWorkshop
         {
             if (!DataAccess.AddTableToSchema(CurrentDB, table)) return;
 
-            TreeNode[] tblMainNodes = treeViewMain.Nodes.Find("Tables", true);
-            TreeNode[] tblNodes = tblMainNodes[0].Nodes.Find(table, true);
+            TreeNode mainNode = treeViewMain.Nodes[0];
+            TreeNode[] tblMainNodes = mainNode.Nodes.Find("Tables", false);
+            TreeNode[] tblNodes = tblMainNodes[0].Nodes.Find(table, false);
+            TreeNode newNode = BuildTableNode(table);
             if (tblNodes.Count() == 0)
             {
-                tblMainNodes[0].Nodes.Add(BuildTableNode(table));
+                tblMainNodes[0].Nodes.Add(newNode);
+                return;
             }
+            TreeNode parentNode = tblNodes[0].Parent;
+            TreeNode tblNode = parentNode.Nodes[table];
+            int idx = parentNode.Nodes.IndexOf(tblNode);
+            parentNode.Nodes.RemoveAt(idx);
+            parentNode.Nodes.Insert(idx, newNode);
+            treeViewMain.SelectedNode = newNode;
         }
 
         

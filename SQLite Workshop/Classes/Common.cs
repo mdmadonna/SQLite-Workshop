@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -349,6 +350,27 @@ namespace SQLiteWorkshop
             finally
             {  Marshal.FreeCoTaskMem(buffer); }
             return fileName;
+        }
+
+        /// <summary>
+        /// Generate a table name that is not in use within the current database;
+        /// </summary>
+        /// <returns>Table name that can safely be used in a CREATE statement.</returns>
+        internal static string TempTableName()
+        {
+            string tmpTable = "SW_TempTable";
+            string workTable = tmpTable;
+            string sql;
+
+            for (int i = 0; i < 100; i++)
+            {
+                sql = string.Format("Select Count(*) From sqlite_master Where name = \"{0}\"", workTable);
+                long count = (long)DataAccess.ExecuteScalar(MainForm.mInstance.CurrentDB, sql, out SQLiteErrorCode returnCode);
+                if (count == 0) return tmpTable;
+                workTable = string.Format("{0}_{1}", tmpTable, i.ToString());
+            }
+            return string.Empty;
+
         }
         #endregion
         #endregion

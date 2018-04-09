@@ -158,16 +158,25 @@ namespace SQLiteWorkshop
             if (result == -1 || returnCode != SQLiteErrorCode.Ok)
             {
                 Common.ShowMsg(string.Format("Add Column Failed.\r\n{0}", DataAccess.LastError));
+                return;
             }
             toolStripStatusLabel1.Text = "Column Added.";
+            MainForm.mInstance.AddTable(tablename);
         }
         protected void ModifyColumn()
-        { RebuildTable(); }
+        {
+            RebuildTable();
+            toolStripStatusLabel1.Text = "Column Modified.";
+        }
         protected void RenameColumn()
-        { RebuildTable(); }
+        {
+            RebuildTable();
+            toolStripStatusLabel1.Text = "Column Renamed.";
+        }
         protected void DeleteColumn()
         {
             RebuildTable();
+            toolStripStatusLabel1.Text = "Column Deleted.";
         }
 
 
@@ -210,7 +219,12 @@ namespace SQLiteWorkshop
                     return false;
             }
 
-            string tmptablename = "TempTable";
+            string tmptablename = Common.TempTableName();
+            if (string.IsNullOrEmpty(tmptablename))
+            {
+                Common.ShowMsg("Cannot build temporary table - terminating.");
+                return false;
+            }
             string CreateSQL = SqlFactory.CreateSQL(tmptablename, newcolumns);
             string SelectSQL = SqlFactory.SelectSql(tablename, columns);
 
@@ -271,7 +285,7 @@ namespace SQLiteWorkshop
                 DataAccess.CloseDB(conn);
                 if (foreign_key_enabled) DataAccess.ExecuteNonQuery(CurrentDB, "Pragma foreign_keys=true", out returnCode);
             }
-
+            MainForm.mInstance.AddTable(tablename);
             return true;
         }
 

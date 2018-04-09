@@ -27,6 +27,7 @@ namespace SQLiteWorkshop
         internal static string tablename;
 
         [DisplayName("Type"),
+        ReadOnly(false),
         RefreshProperties(RefreshProperties.All),
         TypeConverter(typeof(TypeConverter)),
         DescriptionAttribute("The type of data this column will hold.")]
@@ -36,11 +37,12 @@ namespace SQLiteWorkshop
             set
             {
                 type = value;
-                SetReadOnly(new string[] { "ColumnWidth" }, type == "integer" ? true : false);
+                SetReadOnly(new string[] { "Size" }, type == "integer" ? true : false);
             }
         }
 
         [DisplayName("ColumnWidth"),
+        ReadOnly(false),
         DescriptionAttribute("The size of this column.")]
         public int Size
         {
@@ -49,6 +51,7 @@ namespace SQLiteWorkshop
         }
 
         [DisplayName("Precision"),
+        ReadOnly(false),
         DescriptionAttribute("The precision of this column.")]
         public int Precision
         {
@@ -57,6 +60,7 @@ namespace SQLiteWorkshop
         }
 
         [DisplayName("Scale"),
+        ReadOnly(false),
         DescriptionAttribute("The scale of this column.")]
         public int Scale
         {
@@ -65,6 +69,7 @@ namespace SQLiteWorkshop
         }
 
         [DisplayName("Allow Nulls"),
+        ReadOnly(false),
         DescriptionAttribute("Enter true to allow null values in this column. If you enter false, you must enter a Default Value.")]
         public bool AllowNull
         {
@@ -74,6 +79,7 @@ namespace SQLiteWorkshop
 
 
         [DisplayName("Default Value"),
+        ReadOnly(false),
         DescriptionAttribute("The Default Value for this column. Note that functions are not allowed.")]
         public string DefaultValue
         {
@@ -82,6 +88,7 @@ namespace SQLiteWorkshop
         }
 
         [DisplayName("Collating Sequence"),
+        ReadOnly(false),
         TypeConverter(typeof(CollatingSequenceConverter)),
         DescriptionAttribute("The Collating Sequence for this column.")]
         public string CollatingSequence
@@ -92,6 +99,7 @@ namespace SQLiteWorkshop
 
 
         [DisplayName("Foreign Key Parent Table"),
+        ReadOnly(false),
         CategoryAttribute("Foreign Key"),
         TypeConverter(typeof(ForeignTableConverter)),
         DescriptionAttribute("The Table containing the Foreign Key Column.")]
@@ -102,6 +110,7 @@ namespace SQLiteWorkshop
         }
 
         [DisplayName("Foreign Key Column Name"),
+        ReadOnly(false),
         CategoryAttribute("Foreign Key"),
         RefreshProperties(RefreshProperties.All),
         TypeConverter(typeof(ForeignColumnConverter)),
@@ -113,6 +122,7 @@ namespace SQLiteWorkshop
         }
 
         [DisplayName("Foreign Key OnUpdate Action"),
+        ReadOnly(false),
         CategoryAttribute("Foreign Key"),
         TypeConverter(typeof(ForeignKeyActionConverter)),
         DescriptionAttribute("The action to take when a Foreign Key is updated.")]
@@ -123,6 +133,7 @@ namespace SQLiteWorkshop
         }
 
         [DisplayName("Foreign Key OnDelete Action"),
+        ReadOnly(false),
         CategoryAttribute("Foreign Key"),
         TypeConverter(typeof(ForeignKeyActionConverter)),
         DescriptionAttribute("The action to take when a Foreign Key is deleted.")]
@@ -141,7 +152,7 @@ namespace SQLiteWorkshop
                 "ForeignKeyOnUpdate",
                 "ForeignKeyOnDelete",
                 "Type",
-                "ColumnWidth",
+                "Size",
                 "Precision",
                 "Scale",
                 "AllowNull",

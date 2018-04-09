@@ -84,6 +84,7 @@ namespace SQLiteWorkshop
             else
             {
                 Common.ShowMsg(string.Format(Common.OK_IDXCREATED, txtIndexName.Text), MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MainForm.mInstance.AddTable(TableName);
             }
         }
 
@@ -151,7 +152,7 @@ namespace SQLiteWorkshop
             return sb.ToString();
         }
 
-        #region GridView hangdlers
+        #region GridView handlers
         private void dgvColumns_DoubleClick(object sender, EventArgs e)
         {
             DataGridViewRow dgr = ((DataGridView)sender).SelectedRows[0];
