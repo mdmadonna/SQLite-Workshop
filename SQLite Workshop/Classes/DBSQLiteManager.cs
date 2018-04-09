@@ -101,6 +101,7 @@ namespace SQLiteWorkshop
             }
 
             DataAccess.DetachDatabase(cmd, "Import", out returnCode);
+            MainForm.mInstance.AddTable(DestTable);
             FireStatusEvent(ImportStatus.Complete, count);
             return true;
         }

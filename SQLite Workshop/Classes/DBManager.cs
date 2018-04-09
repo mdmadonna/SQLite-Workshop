@@ -117,6 +117,7 @@ namespace SQLiteWorkshop
         abstract internal DataTable PreviewData(string TableName);
 
         abstract internal bool Import(string SourceTable, string DestTable, Dictionary<string, DBColumn> columns = null);
+        
 
         protected DataTable LoadPreviewData(IDbCommand cmd)
         {

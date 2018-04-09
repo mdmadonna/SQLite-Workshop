@@ -118,6 +118,7 @@ namespace SQLiteWorkshop
         internal const int MAX_ERRORS = 100;
 
         const string QRY_TABLES = "SELECT * FROM sqlite_master WHERE type = 'table' ORDER BY name";
+        const string QRY_TABLE = "SELECT * FROM sqlite_master WHERE name = {0} And type = 'table'";
         const string QRY_VIEWS = "SELECT * FROM sqlite_master WHERE type = 'view' ORDER BY name";
         const string QRY_TRIGGERS = "SELECT * FROM sqlite_master WHERE type = 'trigger' ORDER BY name";
         const string QRY_INDEXES = "SELECT * FROM sqlite_master WHERE type = 'index' AND tbl_name = '{0}' ORDER BY name";
@@ -175,7 +176,78 @@ namespace SQLiteWorkshop
             return sd;
         }
 
-        internal static Dictionary<string, TableLayout> GetTables(SQLiteCommand cmd)
+        internal static bool AddTableToSchema(string DBLocation, string table)
+        {
+            SQLiteConnection conn = null;
+            SQLiteCommand cmd = null;
+            SQLiteErrorCode returnCode;
+
+            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return false;
+
+            cmd.CommandText = string.Format(QRY_TABLE, "\"" + table + "\"");
+            DataTable dt = ExecuteDataTable(cmd, out returnCode);
+            if (dt.Rows.Count == 0) return false;
+
+            TableLayout tl = LoadTable(cmd, dt.Rows[0]);
+            if (SchemaDefinitions[DBLocation].Tables.ContainsKey(table))
+            { SchemaDefinitions[DBLocation].Tables[table] = tl; }
+            else
+            { SchemaDefinitions[DBLocation].Tables.Add(table, tl); }
+            return true;
+        }
+
+        internal static bool RemoveTableFromSchema(string DBLocation, string table)
+        {
+            SQLiteConnection conn = null;
+            SQLiteCommand cmd = null;
+            SQLiteErrorCode returnCode;
+
+            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return false;
+
+            cmd.CommandText = string.Format(QRY_TABLE, "\"" + table + "\"");
+            DataTable dt = ExecuteDataTable(cmd, out returnCode);
+            if (dt.Rows.Count > 0) return false;
+
+            if (SchemaDefinitions[DBLocation].Tables.ContainsKey(table))
+                SchemaDefinitions[DBLocation].Tables.Remove(table);
+            return true;
+        }
+
+        /// <summary>
+        /// Reload all Views into the Schema Definition Structure.  This is needed
+        /// to accommodate changes to Views made via Sql during the session.
+        /// </summary>
+        /// <param name="DBLocation"></param>
+        internal static void ReloadViews(string DBLocation)
+        {
+            SQLiteConnection conn = null;
+            SQLiteCommand cmd = null;
+
+            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return;
+
+            SchemaDefinition sd = SchemaDefinitions[DBLocation];
+            sd.Views = GetViews(cmd);
+            CloseDB(conn);
+        }
+
+        /// <summary>
+        /// Reload all Triggers into the Schema Definition Structure.  This is needed
+        /// to accommodate changes to Triggers made via Sql during the session.
+        /// </summary>
+        /// <param name="DBLocation"></param>
+        internal static void ReloadTriggers(string DBLocation)
+        {
+            SQLiteConnection conn = null;
+            SQLiteCommand cmd = null;
+
+            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return;
+
+            SchemaDefinition sd = SchemaDefinitions[DBLocation];
+            sd.Triggers = GetTriggers(cmd);
+            CloseDB(conn);
+        }
+
+        internal static Dictionary<string, TableLayout> GetTables(SQLiteCommand cmd, string tablename = null)
         {
             Dictionary<string, TableLayout> TableLayouts = new Dictionary<string, TableLayout>();
 
@@ -183,18 +255,7 @@ namespace SQLiteWorkshop
             DataTable dt = ExecuteDataTable(cmd, out SQLiteErrorCode returnCode);
             foreach (DataRow dr in dt.Rows)
             {
-                TableLayout tl = new TableLayout();
-                tl.rootpage = Convert.ToInt64(dr["rootpage"]);              //Appears to be long in older version and int in the current version
-                tl.CreateSQL = dr["sql"].ToString();
-                tl.Indexes = GetIndexes(dr["name"].ToString(), cmd);
-                tl.Columns = GetColumns(dr["name"].ToString(), cmd);
-                tl.ForeignKeys = GetForeignKeys(dr["name"].ToString(), cmd);
-                tl.TblType = Common.IsSystemTable(dr["name"].ToString()) ? SQLiteTableType.system : SQLiteTableType.user;
-                tl.PrimaryKeys = new Dictionary<string, long>();
-                foreach (var column in tl.Columns)
-                {
-                    if (column.Value.PrimaryKey > 0) tl.PrimaryKeys.Add(column.Key, column.Value.PrimaryKey);
-                }
+                TableLayout tl = LoadTable(cmd, dr);
                 TableLayouts.Add(dr["name"].ToString(), tl);
             }
 
@@ -210,6 +271,23 @@ namespace SQLiteWorkshop
             TableLayouts.Add(tblname, tspecial);
 
             return TableLayouts;
+        }
+
+        internal static TableLayout LoadTable(SQLiteCommand cmd, DataRow dr)
+        {
+            TableLayout tl = new TableLayout();
+            tl.rootpage = Convert.ToInt64(dr["rootpage"]);              //Appears to be long in older version and int in the current version
+            tl.CreateSQL = dr["sql"].ToString();
+            tl.Indexes = GetIndexes(dr["name"].ToString(), cmd);
+            tl.Columns = GetColumns(dr["name"].ToString(), cmd);
+            tl.ForeignKeys = GetForeignKeys(dr["name"].ToString(), cmd);
+            tl.TblType = Common.IsSystemTable(dr["name"].ToString()) ? SQLiteTableType.system : SQLiteTableType.user;
+            tl.PrimaryKeys = new Dictionary<string, long>();
+            foreach (var column in tl.Columns)
+            {
+                if (column.Value.PrimaryKey > 0) tl.PrimaryKeys.Add(column.Key, column.Value.PrimaryKey);
+            }
+            return tl;
         }
 
         internal static Dictionary<string, TableLayout> GetTables(string DBLocation)

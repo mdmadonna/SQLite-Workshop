@@ -738,6 +738,17 @@ namespace SQLiteWorkshop
                     ef.execType = SQLType.SQLRename;
                     ef.TargetNode = treeViewMain.SelectedNode;
                     ef.ShowDialog();
+                    if (ef.bActionComplete)
+                    {
+                        DataAccess.RemoveTableFromSchema(CurrentDB, treeViewMain.SelectedNode.Text);
+                        DataAccess.AddTableToSchema(CurrentDB, ef.NewTableName);
+                        TreeNode newNode = BuildTableNode(ef.NewTableName);
+                        TreeNode[] tblMainNodes = treeViewMain.Nodes.Find("Tables", true);
+                        TreeNode tblNode = tblMainNodes[0].Nodes[treeViewMain.SelectedNode.Name];
+                        int idx = tblMainNodes[0].Nodes.IndexOf(tblNode);
+                        tblMainNodes[0].Nodes.RemoveAt(idx);
+                        tblMainNodes[0].Nodes.Insert(idx, newNode);
+                    }
                     break;
                 case "truncate table":
                     ef = new ExecuteForm();
@@ -751,7 +762,11 @@ namespace SQLiteWorkshop
                     ef.execType = SQLType.SQLDrop;
                     ef.TargetNode = treeViewMain.SelectedNode;
                     ef.ShowDialog();
-                    if (ef.bActionComplete) treeViewMain.Nodes.Remove(treeViewMain.SelectedNode);
+                    if (ef.bActionComplete)
+                    {
+                        DataAccess.RemoveTableFromSchema(CurrentDB, treeViewMain.SelectedNode.Text);
+                        treeViewMain.Nodes.Remove(treeViewMain.SelectedNode);
+                    }
                     break;
                 case "export":
                     ExportWiz exp = new ExportWiz();
@@ -914,7 +929,7 @@ namespace SQLiteWorkshop
                     ef.ShowDialog();
                     break;
                 case "refresh":
-                    LoadDB(CurrentDB); ;
+                    RefreshViews();
                     break;
                 default:
                     break;
@@ -959,7 +974,7 @@ namespace SQLiteWorkshop
                     ef.ShowDialog();
                     break;
                 case "refresh":
-                    LoadDB(CurrentDB); ;
+                    RefreshTriggers(); ;
                     break;
                 default:
                     break;
@@ -1216,9 +1231,11 @@ namespace SQLiteWorkshop
 
             // Add System Tables & Tables to Treeview
             TreeNode systablesNode = new TreeNode("System Tables", 2, 2);
+            systablesNode.Name = "SysTables";
             systablesNode.Tag = DBLocation;
 
             TreeNode tablesNode = new TreeNode("Tables", 2, 2);
+            tablesNode.Name = "Tables";
             tablesNode.Tag = DBLocation;
             tablesNode.ContextMenu = tablesContextMenu;
 
@@ -1226,83 +1243,7 @@ namespace SQLiteWorkshop
             {
                 foreach (var table in sd.Tables)
                 {
-                    string[] PK = new string[table.Value.Columns.Count];
-                    TreeNode tableNode = new TreeNode(table.Key, 3, 3);
-                    tableNode.ContextMenu = tblContextMenu;
-
-                    // Process Columns
-                    TreeNode columnNode = new TreeNode("Columns", 2, 2);
-                    columnNode.ContextMenu = columnContextMenu;
-                    tableNode.Nodes.Add(columnNode);
-                    foreach (var column in table.Value.Columns)
-                    {
-                        string nul = column.Value.NullType == 0 ? "null" : "not null";
-                        string pk = column.Value.PrimaryKey == 0 ? string.Empty : ", PK";
-                        PK[column.Value.PrimaryKey] = column.Value.PrimaryKey == 0 ? string.Empty : column.Key;
-                        string df = string.IsNullOrEmpty(column.Value.DefaultValue) ? string.Empty : string.Format(", Default: {0}", column.Value.DefaultValue);
-                        TreeNode colNode = new TreeNode(string.Format("{0} ({1}, {2}{3}{4})", column.Key, column.Value.ColumnType, nul, pk, df), 4, 4);
-                        colNode.Tag = column.Key;
-                        colNode.ContextMenu = colContextMenu;
-                        columnNode.Nodes.Add(colNode);
-                    }
-                    
-                    // Process Keys
-                    TreeNode KeyNode = new TreeNode("Keys", 2, 2);
-                    tableNode.Nodes.Add(KeyNode);
-                    // Add Primary key if it exists
-                    if (PK.Length > 1 && !string.IsNullOrEmpty(PK[1]))
-                    {
-                        string pkText = string.Format("Primary Key ({0}", PK[1]);
-                        for (int i = 2; i < PK.Length; i++)
-                        {
-                            if (!string.IsNullOrEmpty(PK[i]))
-                            { pkText = string.Format("{0},{1}", pkText, PK[i]); }
-                            else break;
-                        }
-                        pkText += ")";
-                        TreeNode pkNode = new TreeNode(pkText, 7, 7);
-                        KeyNode.Nodes.Add(pkNode);
-                    }
-                    foreach (var foreignKey in table.Value.ForeignKeys)
-                    {
-                        TreeNode fkNode = new TreeNode(string.Format("Foriegn Key ({0} : {1} ({2}))", foreignKey.Value.From, foreignKey.Value.Table, foreignKey.Value.To), 7, 7);
-                        TreeNode fkTblNode = new TreeNode(string.Format("Parent Table: {0}", foreignKey.Value.Table), 4, 4);
-                        TreeNode fkFromNode = new TreeNode(string.Format("Parent Column: {0}", foreignKey.Value.To), 4, 4);
-                        TreeNode fkToNode = new TreeNode(string.Format("Column: {0}", foreignKey.Value.From), 4, 4);
-                        TreeNode fkSeqNode = new TreeNode(string.Format("Sequence: {0}", foreignKey.Value.Sequence), 4, 4);
-                        TreeNode fkUpdNode = new TreeNode(string.Format("On Update: {0}", foreignKey.Value.OnUpdate), 4, 4);
-                        TreeNode fkDelNode = new TreeNode(string.Format("On Delete: {0}", foreignKey.Value.OnDelete), 4, 4);
-                        TreeNode fkMatchNode = new TreeNode(string.Format("Match: {0}", foreignKey.Value.Match), 4, 4);
-                        fkNode.Nodes.AddRange( new TreeNode[] { fkTblNode, fkFromNode, fkToNode, fkSeqNode, fkUpdNode, fkDelNode, fkMatchNode });
-                        KeyNode.Nodes.Add(fkNode);
-                    }
-
-                    // Process Indexes
-                    TreeNode indexNode = new TreeNode("Indexes", 2, 2);
-                    indexNode.ContextMenu = indexContextMenu;
-                    tableNode.Nodes.Add(indexNode);
-                    foreach (var index in table.Value.Indexes)
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        sb.Append(index.Key);
-                        if (index.Value.Unique) sb.Append(", Unique");
-                        if (index.Value.Origin == "pk") sb.Append(", PK");
-                        if (index.Value.Partial) sb.Append(", Partial");
-
-                        TreeNode IdxNode = new TreeNode(sb.ToString(), 5, 5);
-                        IdxNode.Tag = index.Key;
-                        indexNode.Nodes.Add(IdxNode);
-                        indexNode.Nodes[indexNode.Nodes.Count - 1].ContextMenu = idxContextMenu;
-                        foreach(var IndexCol in index.Value.Columns)
-                        {
-                            string IdxColNodeName = string.Format("{0}, {1}, {2}", IndexCol.Key, IndexCol.Value.SortOrder, IndexCol.Value.CollatingSequence);
-                            TreeNode IdxColNode = new TreeNode(IdxColNodeName, 7, 7);
-                            IdxNode.Nodes.Add(IdxColNode);
-                        }
-                    }
-
-
-                
+                    TreeNode tableNode = BuildTableNode(table.Key, table.Value);
                     // Add completed node to master table node
                     if (table.Value.TblType == SQLiteTableType.user ) tablesNode.Nodes.Add(tableNode);
                     if (table.Value.TblType == SQLiteTableType.system) systablesNode.Nodes.Add(tableNode);
@@ -1310,7 +1251,146 @@ namespace SQLiteWorkshop
             }
 
             // Add views to TreeView
-            TreeNode viewsNode = new TreeNode("Views",2,2);
+
+            TreeNode viewsNode = BuildViewNode();
+            TreeNode triggersNode = BuildTriggerNode();
+
+            topNode.Nodes.Add(systablesNode);
+            topNode.Nodes.Add(tablesNode);
+            topNode.Nodes.Add(viewsNode);
+            topNode.Nodes.Add(triggersNode);
+
+            tablesNode.Expand();
+            topNode.Expand();
+            treeViewMain.Nodes.Add(topNode);
+
+            DBProperties p = new DBProperties();
+            propertyGridDBProperties.SelectedObject = p.dbprops;
+            propertyGridDBProperties.Refresh();
+            propertyGridDBRuntime.SelectedObject = p.dbRT;
+            propertyGridDBRuntime.Refresh();
+
+        }
+
+        internal void AddTable(string table)
+        {
+            if (!DataAccess.AddTableToSchema(CurrentDB, table)) return;
+
+            TreeNode[] tblMainNodes = treeViewMain.Nodes.Find("Tables", true);
+            TreeNode[] tblNodes = tblMainNodes[0].Nodes.Find(table, true);
+            if (tblNodes.Count() == 0)
+            {
+                tblMainNodes[0].Nodes.Add(BuildTableNode(table));
+            }
+        }
+
+        
+        internal TreeNode BuildTableNode(string table)
+        {
+            SchemaDefinition sd = DataAccess.SchemaDefinitions[CurrentDB];
+            TableLayout tl = sd.Tables[table];
+            if (tl.Equals(null)) return null;
+            return BuildTableNode(table, tl);
+
+        }
+
+        internal TreeNode BuildTableNode(string table, TableLayout tl)
+        {
+            string[] PK = new string[tl.Columns.Count];
+            TreeNode tableNode = new TreeNode(table, 3, 3);
+            tableNode.Name = table;
+            tableNode.ContextMenu = tblContextMenu;
+
+            // Process Columns
+            TreeNode columnNode = new TreeNode("Columns", 2, 2);
+            columnNode.ContextMenu = columnContextMenu;
+            tableNode.Nodes.Add(columnNode);
+            foreach (var column in tl.Columns)
+            {
+                string nul = column.Value.NullType == 0 ? "null" : "not null";
+                string pk = column.Value.PrimaryKey == 0 ? string.Empty : ", PK";
+                PK[column.Value.PrimaryKey] = column.Value.PrimaryKey == 0 ? string.Empty : column.Key;
+                string df = string.IsNullOrEmpty(column.Value.DefaultValue) ? string.Empty : string.Format(", Default: {0}", column.Value.DefaultValue);
+                TreeNode colNode = new TreeNode(string.Format("{0} ({1}, {2}{3}{4})", column.Key, column.Value.ColumnType, nul, pk, df), 4, 4);
+                colNode.Tag = column.Key;
+                colNode.ContextMenu = colContextMenu;
+                columnNode.Nodes.Add(colNode);
+            }
+
+            // Process Keys
+            TreeNode KeyNode = new TreeNode("Keys", 2, 2);
+            tableNode.Nodes.Add(KeyNode);
+            // Add Primary key if it exists
+            if (PK.Length > 1 && !string.IsNullOrEmpty(PK[1]))
+            {
+                string pkText = string.Format("Primary Key ({0}", PK[1]);
+                for (int i = 2; i < PK.Length; i++)
+                {
+                    if (!string.IsNullOrEmpty(PK[i]))
+                    { pkText = string.Format("{0},{1}", pkText, PK[i]); }
+                    else break;
+                }
+                pkText += ")";
+                TreeNode pkNode = new TreeNode(pkText, 7, 7);
+                KeyNode.Nodes.Add(pkNode);
+            }
+            foreach (var foreignKey in tl.ForeignKeys)
+            {
+                TreeNode fkNode = new TreeNode(string.Format("Foriegn Key ({0} : {1} ({2}))", foreignKey.Value.From, foreignKey.Value.Table, foreignKey.Value.To), 7, 7);
+                TreeNode fkTblNode = new TreeNode(string.Format("Parent Table: {0}", foreignKey.Value.Table), 4, 4);
+                TreeNode fkFromNode = new TreeNode(string.Format("Parent Column: {0}", foreignKey.Value.To), 4, 4);
+                TreeNode fkToNode = new TreeNode(string.Format("Column: {0}", foreignKey.Value.From), 4, 4);
+                TreeNode fkSeqNode = new TreeNode(string.Format("Sequence: {0}", foreignKey.Value.Sequence), 4, 4);
+                TreeNode fkUpdNode = new TreeNode(string.Format("On Update: {0}", foreignKey.Value.OnUpdate), 4, 4);
+                TreeNode fkDelNode = new TreeNode(string.Format("On Delete: {0}", foreignKey.Value.OnDelete), 4, 4);
+                TreeNode fkMatchNode = new TreeNode(string.Format("Match: {0}", foreignKey.Value.Match), 4, 4);
+                fkNode.Nodes.AddRange(new TreeNode[] { fkTblNode, fkFromNode, fkToNode, fkSeqNode, fkUpdNode, fkDelNode, fkMatchNode });
+                KeyNode.Nodes.Add(fkNode);
+            }
+
+            // Process Indexes
+            TreeNode indexNode = new TreeNode("Indexes", 2, 2);
+            indexNode.ContextMenu = indexContextMenu;
+            tableNode.Nodes.Add(indexNode);
+            foreach (var index in tl.Indexes)
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(index.Key);
+                if (index.Value.Unique) sb.Append(", Unique");
+                if (index.Value.Origin == "pk") sb.Append(", PK");
+                if (index.Value.Partial) sb.Append(", Partial");
+
+                TreeNode IdxNode = new TreeNode(sb.ToString(), 5, 5);
+                IdxNode.Tag = index.Key;
+                indexNode.Nodes.Add(IdxNode);
+                indexNode.Nodes[indexNode.Nodes.Count - 1].ContextMenu = idxContextMenu;
+                foreach (var IndexCol in index.Value.Columns)
+                {
+                    string IdxColNodeName = string.Format("{0}, {1}, {2}", IndexCol.Key, IndexCol.Value.SortOrder, IndexCol.Value.CollatingSequence);
+                    TreeNode IdxColNode = new TreeNode(IdxColNodeName, 7, 7);
+                    IdxNode.Nodes.Add(IdxColNode);
+                }
+            }
+            return tableNode;
+        }
+        
+        protected void RefreshViews()
+        {
+            DataAccess.ReloadViews(CurrentDB);
+            TreeNode viewsNode = BuildViewNode();
+            TreeNode[] tblMainNodes = treeViewMain.Nodes.Find("Views", true);
+            TreeNode parentNode = tblMainNodes[0].Parent;
+            int idx = parentNode.Nodes.IndexOf(tblMainNodes[0]);
+            parentNode.Nodes.RemoveAt(idx);
+            parentNode.Nodes.Insert(idx, viewsNode);
+            treeViewMain.SelectedNode = viewsNode;
+        }
+
+        protected TreeNode BuildViewNode()
+        {
+            SchemaDefinition sd = DataAccess.GetSchema(CurrentDB);
+            TreeNode viewsNode = new TreeNode("Views", 2, 2);
+            viewsNode.Name = "Views";
             viewsNode.ContextMenu = viewsContextMenu;
             if (sd.Views.Count > 0)
             {
@@ -1335,8 +1415,26 @@ namespace SQLiteWorkshop
                     }
                 }
             }
+            return viewsNode;
+        }
 
+        protected void RefreshTriggers()
+        {
+            //DataAccess.AddTableToSchema(CurrentDB, ef.NewTableName);
+            TreeNode triggersNode = BuildTriggerNode();
+            TreeNode[] tblMainNodes = treeViewMain.Nodes.Find("Triggers", true);
+            TreeNode parentNode = tblMainNodes[0].Parent;
+            int idx = parentNode.Nodes.IndexOf(tblMainNodes[0]);
+            parentNode.Nodes.RemoveAt(idx);
+            parentNode.Nodes.Insert(idx, triggersNode);
+            treeViewMain.SelectedNode = triggersNode;
+        }
+
+        protected TreeNode BuildTriggerNode()
+        {
+            SchemaDefinition sd = DataAccess.GetSchema(CurrentDB);
             TreeNode triggersNode = new TreeNode("Triggers", 2, 2);
+            triggersNode.Name = "Triggers";
             triggersNode.ContextMenu = triggersContextMenu;
             if (sd.Triggers.Count > 0)
             {
@@ -1347,29 +1445,22 @@ namespace SQLiteWorkshop
                     triggersNode.Nodes.Add(new TreeNode(trigger.Key, 8, 8) { ContextMenu = trContextMenu });
                 }
             }
-
-            topNode.Nodes.Add(systablesNode);
-            topNode.Nodes.Add(tablesNode);
-            topNode.Nodes.Add(viewsNode);
-            topNode.Nodes.Add(triggersNode);
-
-            tablesNode.Expand();
-            topNode.Expand();
-            treeViewMain.Nodes.Add(topNode);
-
-            DBProperties p = new DBProperties();
-            propertyGridDBProperties.SelectedObject = p.dbprops;
-            propertyGridDBProperties.Refresh();
-            propertyGridDBRuntime.SelectedObject = p.dbRT;
-            propertyGridDBRuntime.Refresh();
-
+            return triggersNode;
         }
 
+
+        /// <summary>
+        /// Place a message on the status bar
+        /// </summary>
+        /// <param name="message">Message to display on the Status Bar</param>
         internal void WriteStatusStripMessage(string message)
         {
             toolStripStatusMain.Text = message;
         }
 
+        /// <summary>
+        /// Register the Current Database.
+        /// </summary>
         internal void RegisterDB()
         {
             if (RegisteredDBs.Keys.Contains(CurrentDB)) return;
@@ -1451,6 +1542,7 @@ namespace SQLiteWorkshop
                 spTemplate.Visible = false;
             }
         }
+
         #endregion
 
         #region Form Sizing and Control

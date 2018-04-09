@@ -108,6 +108,7 @@ namespace SQLiteWorkshop
             {
                 DataAccess.CloseDB(SQConn);
             }
+            MainForm.mInstance.AddTable(string.Empty);
             try { FireStatusEvent(ImportStatus.Complete, recCount); } catch { }
             return true;
         }

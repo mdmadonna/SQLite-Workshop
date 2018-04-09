@@ -90,6 +90,7 @@ namespace SQLiteWorkshop
             else
             {
                 Common.ShowMsg(string.Format(Common.OK_DBCREATED, txtTableName.Text),MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MainForm.mInstance.AddTable(txtTableName.Text);
             }
         }
 

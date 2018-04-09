@@ -131,9 +131,6 @@ namespace SQLiteWorkshop
                 DBColumns[dr["COLUMN_NAME"].ToString()] = dbc;
             }
 
-
-
-
             CloseDB();
             return DBColumns;
         }
@@ -195,7 +192,6 @@ namespace SQLiteWorkshop
                 dr.Close();
                 CloseDB();
                 sqlT.Commit();
-                DataAccess.CloseDB(SQConn);
             }
             catch (Exception ex)
             {
@@ -207,6 +203,7 @@ namespace SQLiteWorkshop
             {
                 DataAccess.CloseDB(SQConn);
             }
+            MainForm.mInstance.AddTable(DestTable);
             try { FireStatusEvent(ImportStatus.Complete, recCount); } catch { }
             return true;
         }

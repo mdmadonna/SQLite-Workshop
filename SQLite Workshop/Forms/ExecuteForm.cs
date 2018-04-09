@@ -21,6 +21,7 @@ namespace SQLiteWorkshop
 
         internal string DatabaseLocation { get; set; }
         SchemaDefinition sd;
+        internal string NewTableName { get; private set; }
 
         bool bActionApproved;
         internal bool bActionComplete;
@@ -220,6 +221,7 @@ namespace SQLiteWorkshop
             string SqlStatement = string.Format("ALTER TABLE \"{0}\" RENAME TO \"{1}\";", TargetNode.Text, txtInfo.Text);
             string SuccessMessage = string.Format(Common.OK_RENAME, TargetNode.Text);
             string ErrorMessage = Common.ERR_RENAMEFAIL;
+            NewTableName = txtInfo.Text;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
         }
