@@ -40,6 +40,7 @@ SQLite Workshop has a wide range of features and capabilities including:
 33. Example Sql templates for a variety of common activities.
 34. Load/Save SQL capabilities.
 35. Register database locations.
+36. Perform an in-depth analysis of a database.
 
 All in a user friendly interface.
 
