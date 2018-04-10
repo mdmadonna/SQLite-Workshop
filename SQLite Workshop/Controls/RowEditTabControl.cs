@@ -599,8 +599,7 @@ namespace SQLiteWorkshop
         private void toolStripButtonMoveFirst_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-            if (!UpdateRow()) return;
-            LoadRecord(0);
+            if (UpdateRow()) LoadRecord(0);
             this.Cursor = Cursors.Default;
         }
 
@@ -612,9 +611,11 @@ namespace SQLiteWorkshop
         private void toolStripButtonMovePrevious_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-            if (!UpdateRow()) return;
-            if (CurrentRow > 1) CurrentRow--;
-            LoadRecord(CurrentRow);
+            if (UpdateRow())
+            {
+                if (CurrentRow > 1) CurrentRow--;
+                LoadRecord(CurrentRow);
+            }
             this.Cursor = Cursors.Default;
         }
 
@@ -626,9 +627,11 @@ namespace SQLiteWorkshop
         private void toolStripButtonMoveNext_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-            if (!UpdateRow()) return;
-            if (CurrentRow < RowCount) CurrentRow++;
-            LoadRecord(CurrentRow);
+            if (UpdateRow())
+            {
+                if (CurrentRow < RowCount) CurrentRow++;
+                LoadRecord(CurrentRow);
+            }
             this.Cursor = Cursors.Default;
         }
 
@@ -640,8 +643,7 @@ namespace SQLiteWorkshop
         private void toolStripButtonMoveLast_Click(object sender, EventArgs e)
         {
             this.Cursor = Cursors.WaitCursor;
-            if (!UpdateRow()) return;
-            LoadRecord(RowCount);
+            if (UpdateRow()) LoadRecord(RowCount);
             this.Cursor = Cursors.Default;
         }
 
