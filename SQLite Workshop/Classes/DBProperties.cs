@@ -349,8 +349,8 @@ namespace SQLiteWorkshop
 
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                options[i] = dt.Rows[i].ItemArray[0] == null ? string.Empty : dt.Rows[i].ItemArray[0].ToString();
-                for (int j = 1; j < dt.Rows[j].ItemArray.Count(); i++)
+                options[i] = dt.Rows[i].ItemArray[0] == null ? string.Empty : dt.Rows[i].ItemArray[0].ToString(); 
+                for (int j = 1; j < dt.Rows[i].ItemArray.Count(); j++)
                 {
                     options[i] = string.Format("{0} | {1}", options[i], dt.Rows[i].ItemArray[j].ToString());
                 }

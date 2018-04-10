@@ -357,15 +357,18 @@ namespace SQLiteWorkshop
 
             cmd.CommandText = string.Format(QRY_COLUMNS, TableName);
             DataTable dt = ExecuteDataTable(cmd, out SQLiteErrorCode returnCode);
-            foreach (DataRow dr in dt.Rows)
+            if (dt != null)
             {
-                ColumnLayout cl = new ColumnLayout();
-                cl.Cid = Convert.ToInt64(dr["cid"]);
-                cl.ColumnType = dr["type"].ToString();
-                cl.NullType = Convert.ToInt64(dr["notnull"]);
-                cl.DefaultValue = dr["dflt_value"].ToString();
-                cl.PrimaryKey = Convert.ToInt64(dr["pk"]);
-                ColumnLayouts.Add(dr["name"].ToString(), cl);
+                foreach (DataRow dr in dt.Rows)
+                {
+                    ColumnLayout cl = new ColumnLayout();
+                    cl.Cid = Convert.ToInt64(dr["cid"]);
+                    cl.ColumnType = dr["type"].ToString();
+                    cl.NullType = Convert.ToInt64(dr["notnull"]);
+                    cl.DefaultValue = dr["dflt_value"].ToString();
+                    cl.PrimaryKey = Convert.ToInt64(dr["pk"]);
+                    ColumnLayouts.Add(dr["name"].ToString(), cl);
+                }
             }
 
             return ColumnLayouts;
