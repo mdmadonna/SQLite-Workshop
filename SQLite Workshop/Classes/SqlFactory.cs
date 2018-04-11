@@ -112,14 +112,15 @@ namespace SQLiteWorkshop
             return sb.ToString();
         }
 
-        internal static string CreateIndexSQL(string TableName, string IndexName, Dictionary<string, ColumnLayout> columns, bool Unique = false)
+        internal static string CreateIndexSQL(string TableName, string IndexName, Dictionary<string, IndexColumnLayout> columns, bool Unique = false)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("Create").Append(Unique ? " Unique" : string.Empty).AppendFormat(" Index {0} On {1} (", IndexName, TableName);
             bool bComma = false;
             foreach (var col in columns)
             {
-                sb.Append(bComma ? "," : string.Empty).Append(col.Key);
+                sb.Append(bComma ? "," : string.Empty).AppendFormat("{0} {1}", col.Key, col.Value.SortOrder);
+                if (!string.IsNullOrEmpty(col.Value.CollatingSequence)) sb.AppendFormat(" Collate {0}", col.Value.CollatingSequence);
                 bComma = true;
             }
             sb.Append(")");

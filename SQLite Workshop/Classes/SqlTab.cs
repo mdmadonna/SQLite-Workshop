@@ -95,7 +95,7 @@ namespace SQLiteWorkshop
             sTab.Text = "  New Query.sql          ";
         }
 
-            internal void BuildTab(TreeNode TargetNode, SQLType sqlType)
+        internal void BuildTab(TreeNode TargetNode, SQLType sqlType)
         {
 
 
@@ -186,7 +186,7 @@ namespace SQLiteWorkshop
             int curtab = m.sqlTabTrack;
 
             sd = DataAccess.SchemaDefinitions[dbLocation];
-            BuildTab(sd.DBLocation);
+            //BuildTab(sd.DBLocation);
 
             sTab.Text = string.Format("  Query{0}.sql - {1}          ", curtab, sd.DBName);
 

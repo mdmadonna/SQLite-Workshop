@@ -403,7 +403,8 @@ namespace SQLiteWorkshop
                 icl.SortOrder = Convert.ToInt32(dr["desc"].ToString()) == 1 ? "Desc" : "Asc";
                 icl.CollatingSequence = dr["coll"].ToString();
                 icl.key = Convert.ToInt64(dr["key"]);
-                IndexColumnLayouts.Add(dr["name"] == null || string.IsNullOrEmpty(dr["Name"].ToString()) ? "rowid" : dr["name"].ToString(), icl);
+                string idxKey = dr["name"] == null || string.IsNullOrEmpty(dr["Name"].ToString()) ? "rowid" : dr["name"].ToString();
+                if (!IndexColumnLayouts.ContainsKey(idxKey)) IndexColumnLayouts.Add(idxKey, icl);
             }
 
             return IndexColumnLayouts;

@@ -154,7 +154,6 @@ namespace SQLiteWorkshop
             try
             {
                 dt = DataAccess.ExecuteDataTable(DatabaseName, sql, out SQLiteErrorCode returnCode);
-                //SQLiteDataAdapter da  = DataAccess.ExecuteDataAdapter(DatabaseName, sql, out dt, out SQLiteErrorCode returnCode);
                 if (returnCode == SQLiteErrorCode.Ok || (returnCode == SQLiteErrorCode.Error && DataAccess.FormatErrorCount > 0))
                 {
                     //Populate DataGridView

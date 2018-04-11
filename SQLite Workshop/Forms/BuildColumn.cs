@@ -165,23 +165,30 @@ namespace SQLiteWorkshop
         }
         protected void ModifyColumn()
         {
-            RebuildTable();
-            toolStripStatusLabel1.Text = "Column Modified.";
+            if (RebuildTable())
+                toolStripStatusLabel1.Text = "Column Modified.";
         }
         protected void RenameColumn()
         {
-            RebuildTable();
-            toolStripStatusLabel1.Text = "Column Renamed.";
+            if (RebuildTable())
+                toolStripStatusLabel1.Text = "Column Renamed.";
         }
         protected void DeleteColumn()
         {
-            RebuildTable();
-            toolStripStatusLabel1.Text = "Column Deleted.";
+            if (RebuildTable())
+                toolStripStatusLabel1.Text = "Column Deleted.";
         }
 
 
         protected bool RebuildTable()
         {
+            bool bNoWarning = false;
+            bool.TryParse(MainForm.cfg.appsetting(Config.CFG_COLUMNEDITWARN), out bNoWarning);
+            if (!bNoWarning)
+            {
+                if (!ShowWarning()) return false;
+            }
+
             string sql;
             SQLiteErrorCode returnCode;
             bool foreign_key_enabled;
@@ -265,6 +272,7 @@ namespace SQLiteWorkshop
                     cmd.CommandText = dr["sql"].ToString();
                     var indexRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
                 }
+               
 
                 //Rebuild Triggers
                 foreach (DataRow dr in trigDT.Rows)
@@ -290,6 +298,15 @@ namespace SQLiteWorkshop
         }
 
         #region Helpers
+
+        private bool ShowWarning()
+        {
+            ShowMsg sm = new ShowMsg();
+            sm.Message = "WARNING!!!.  This feature is not natively supported by SQLite.  It is implemented by copying the table with column changes, deleteing the old table and renaming the copied table.  Once complete, YOU MUST MANUALLY CHANGE ANY INDEX, VIEW OR TRIGGER CONTAINING THIS COLUMN!!!. IF YOU DO NOT DO THIS YOU MAY LEAVE YOUR INDEX, VIEW OR TRIGGER IN AN INCONSISTENT STATE!!!\r\n\r\nPress 'Ok' to continue or 'Cancel' to exit.";
+            sm.ShowDialog();
+            if (sm.DoNotShow) MainForm.cfg.SetSetting(Config.CFG_COLUMNEDITWARN, "true");
+            return sm.Result == DialogResult.Cancel ? false : true;
+        }
 
         protected void InitializePropertyGrid(string TableName, string ColumnName)
         {

@@ -29,6 +29,7 @@ namespace SQLiteWorkshop
         internal const string CFG_TSPLITP           = "TSPLITP";                    //Template *Right Panel) splitter position
         internal const string CFG_PSPLITP           = "TPPLITP";                    //Property splitter position
         internal const string CFG_ANALYZEWARN       = "ANALYZEWARN";                //Analyzer warning message
+        internal const string CFG_COLUMNEDITWARN    = "COLUMNEDITWARN";             //Column editor warning
 
 
         //Configuration File

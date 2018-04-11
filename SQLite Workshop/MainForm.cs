@@ -774,8 +774,8 @@ namespace SQLiteWorkshop
                     exp.TableName = treeViewMain.SelectedNode.Text;
                     exp.ShowDialog();
                     break;
-                case "refresh":
-                    LoadDB(CurrentDB);
+                case "refresh table":
+                    AddTable(treeViewMain.SelectedNode.Text);
                     break;
                 default:
                     break;
