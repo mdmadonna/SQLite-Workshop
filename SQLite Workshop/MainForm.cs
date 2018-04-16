@@ -215,9 +215,6 @@ namespace SQLiteWorkshop
             propertiesToolStripMenuItem.Checked = bool.TryParse(cfg.appsetting(Config.CFG_PROPSVISIBLE), out b) ? true : b;
             SetRightPanelStatus();
 
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_TSPLITP), out parm)) spTemplate.SplitPosition = parm;
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_PSPLITP), out parm)) spTemplate.SplitPosition = parm;
-
             string RecentDBList = cfg.appsetting(Config.CFG_RECENTDB);
             if (!string.IsNullOrEmpty(RecentDBList))
             {

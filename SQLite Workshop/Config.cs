@@ -26,8 +26,8 @@ namespace SQLiteWorkshop
         internal const string CFG_REGISTEREDDBS     = "REGISTEREDDBS";              //Registered Databases
         internal const string CFG_TEMPLATESVISIBLE  = "TEMPLATESVISIBLE";           //Template tree visible
         internal const string CFG_PROPSVISIBLE      = "PROPSVISIBLE";               //Properties visible
-        internal const string CFG_TSPLITP           = "TSPLITP";                    //Template *Right Panel) splitter position
-        internal const string CFG_PSPLITP           = "TPPLITP";                    //Property splitter position
+        internal const string CFG_TSPLITP           = "TSPLITP";                    //Template (Right Panel) splitter position
+        internal const string CFG_PSPLITP           = "PSPLITP";                    //Property splitter position
         internal const string CFG_ANALYZEWARN       = "ANALYZEWARN";                //Analyzer warning message
         internal const string CFG_COLUMNEDITWARN    = "COLUMNEDITWARN";             //Column editor warning
 
