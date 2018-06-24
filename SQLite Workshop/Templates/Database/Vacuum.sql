@@ -1,19 +1,7 @@
 --***************************************************************************************************************************
 --
---     SQL Template for a simple view
+--     SQL Template to Vacuum a Database
 --
 --***************************************************************************************************************************
-Create View If Not Exists "ViewName"
-(
-	"ColumnName 1",
-	"ColumnName 2",
-	"ColumnName ..."
-)
-As 
-Select 
-	"ColumnName 1",
-	"ColumnName 2",
-	"ColumnName ..."
-From 
-	"TableName" 
-Where "ColumnName 1" = expression
+
+Vacuum;

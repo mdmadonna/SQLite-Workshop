@@ -207,6 +207,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Classes\SqlTab.cs" />
+    <Compile Include="Classes\TemplateManager.cs" />
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -338,6 +339,12 @@
     <None Include="assets\MainSmall.png" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Templates\View\Create View.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\View\Drop View.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="assets\UndoEdit.png" />
     <None Include="assets\Add-New.png" />
     <None Include="assets\Delete.png" />
@@ -357,6 +364,22 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="dll\SQLite 1.0.108.0\Mixed\System.Data.SQLite.dll" />
+    <Content Include="Main.ico" />
+    <Content Include="Templates\Database\Database List.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Database\Vacuum.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Index\Create Index.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Index\Drop Index.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Index\Rebuild Index.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Templates\Query\Column Profile.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -366,13 +389,22 @@
     <Content Include="Templates\Query\Summary Counts.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Templates\Table\Create Table.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Table\Drop Table.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Templates\Table\Index List.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Templates\Trigger\Create Trigger.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Templates\Trigger\Last Update Date.sql">
+    <Content Include="Templates\Trigger\Drop Trigger.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Templates\View\Create View.sql">
+    <Content Include="Templates\Trigger\Last Update Date.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="assets\DB New.png" />
@@ -391,14 +423,10 @@
     <None Include="assets\Properties.png" />
     <None Include="assets\New Query.png" />
     <None Include="assets\Trigger.png" />
-    <Content Include="Main.ico" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
     <Folder Include="Templates\Backup\" />
-    <Folder Include="Templates\Database\" />
-    <Folder Include="Templates\Index\" />
-    <Folder Include="Templates\Table\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

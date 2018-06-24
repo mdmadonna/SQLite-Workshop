@@ -1,19 +1,6 @@
 --***************************************************************************************************************************
 --
---     SQL Template for a simple view
+--     SQL Template to Drop a View
 --
 --***************************************************************************************************************************
-Create View If Not Exists "ViewName"
-(
-	"ColumnName 1",
-	"ColumnName 2",
-	"ColumnName ..."
-)
-As 
-Select 
-	"ColumnName 1",
-	"ColumnName 2",
-	"ColumnName ..."
-From 
-	"TableName" 
-Where "ColumnName 1" = expression
+Drop View If Exists "ViewName";

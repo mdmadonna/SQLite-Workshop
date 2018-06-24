@@ -1,12 +1,12 @@
 --***************************************************************************************************************************
 --
---     SQL Template for a Query to produce summary totals by Account Number. The
---       Where Clause should be customized as needed.
+--     SQL Template for a Query to produce summary totals by Column Number. The
+--       Where Clause should be removed or customized as needed.
 --
 --***************************************************************************************************************************
 
-SELECT 	"AcctNum"
+SELECT 	"Column1"
 	,Sum(1) AS Count
 	FROM "TableName"
-	WHERE "TransactionDate" Like '2018%'
-	GROUP BY "AcctNum";
+	WHERE "Column" Like expression
+	GROUP BY "Column1";

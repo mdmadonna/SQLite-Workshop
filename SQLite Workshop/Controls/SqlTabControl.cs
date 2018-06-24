@@ -34,9 +34,8 @@ namespace SQLiteWorkshop
 
         internal bool CancelExecution;
         internal string DatabaseName { get; set; }
-        internal string SqlFileName { get; set; }
-
-        internal string SqlStatement
+        public string SqlFileName { get; set; }
+        public string SqlStatement
         {
             get { return txtSqlStatement.Text; }
             set { txtSqlStatement.Text = value; }

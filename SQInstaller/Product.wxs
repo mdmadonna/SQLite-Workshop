@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+	<Product Id="868a81bf-b8c5-46f9-94e5-08d52c3d5c35" Name="SQLite Workshop" Language="1033" Version="1.0.0.0" Manufacturer="ajm Software" UpgradeCode="c5dca0a0-c878-4b76-914b-b843081c24f1">
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+
+		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+		<MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="Main.ico" SourceFile="..\SQLite Workshop\bin\Release\SQLite Workshop.exe" />
+    <Property Id="ARPPRODUCTICON" Value="Main.ico" />
+    
+		<Feature Id="ProductFeature" Title="SQLite Workshop" Level="1">
+			<ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="DllsComponent"/>
+      <ComponentGroupRef Id="DatabaseComponent"/>
+      <ComponentGroupRef Id="IndexComponent"/>
+      <ComponentGroupRef Id="QueryComponent"/>
+      <ComponentGroupRef Id="TableComponent"/>
+      <ComponentGroupRef Id="TriggerComponent"/>
+      <ComponentGroupRef Id="ViewComponent"/>
+      <ComponentRef Id="cmpDesktopShortcut" />
+      <ComponentRef Id="cmpProgramShortcut" />
+		</Feature>
+	</Product>
+
+	<Fragment>
+		<Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="DesktopFolder" />
+      <Directory Id="ProgramMenuFolder" />
+			<Directory Id="ProgramFiles64Folder">
+				<Directory Id="INSTALLFOLDER" Name="SQLite Workshop" />
+			</Directory>
+      <Directory Id="CommonAppDataFolder">
+        <Directory Id="DATAFOLDER" Name="SQLite Workshop" >
+          <Directory Id="TEMPLATESFOLDER" Name="Templates" >
+            <Directory Id="BACKUPFOLDER" Name="Backup"/>
+            <Directory Id="DATABASEFOLDER" Name="Database"/>
+            <Directory Id="INDEXFOLDER" Name="Index"/>
+            <Directory Id="QUERYFOLDER" Name="Query"/>
+            <Directory Id="TABLEFOLDER" Name="Table"/>
+            <Directory Id="TRIGGERFOLDER" Name="Trigger"/>
+            <Directory Id="VIEWFOLDER" Name="View"/>
+          </Directory>
+        </Directory>
+      </Directory>		
+    </Directory>
+	</Fragment>
+
+  
+	<Fragment>
+		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
+			<Component Id="ProductComponent" Win64="yes">
+        <File Source="$(var.SQLite Workshop.TargetPath)" />
+			</Component>
+		</ComponentGroup>
+	</Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="DllsComponent" Directory="INSTALLFOLDER" >
+      <Component Win64="yes">
+        <File Source="..\SQLite Workshop\bin\Release\CsvHelper.dll" />
+      </Component>
+      <Component Win64="yes">
+        <File Source="..\SQLite Workshop\bin\Release\System.Data.SQLite.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="DatabaseComponent" Directory="DATABASEFOLDER" >
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Database\Database List.sql"   />
+      </Component>
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Database\Vacuum.sql"   />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="IndexComponent" Directory="INDEXFOLDER" >
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Index\Create Index.sql"   />
+      </Component>
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Index\Drop Index.sql"   />
+      </Component>
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Index\Rebuild Index.sql"   />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  
+  <Fragment>
+    <ComponentGroup Id="QueryComponent" Directory="QUERYFOLDER" >
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Query\Column Profile.sql"   />
+      </Component>
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Query\Select Duplicate Rows.sql"   />
+      </Component>
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Query\Summary Counts.sql"   />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="TableComponent" Directory="TABLEFOLDER" >
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Table\Create Table.sql"   />
+      </Component>
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Table\Drop Table.sql"   />
+      </Component>
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Table\Index List.sql"   />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  
+  <Fragment>
+    <ComponentGroup Id="TriggerComponent" Directory="TRIGGERFOLDER" >
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Trigger\Create Trigger.sql"   />
+      </Component>
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Trigger\Drop Trigger.sql"   />
+      </Component>
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\Trigger\Last Update Date.sql"   />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="ViewComponent" Directory="VIEWFOLDER" >
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\View\Create View.sql"   />
+      </Component>
+      <Component>
+        <File Source="..\SQLite Workshop\Templates\View\Drop View.sql"   />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+  
+  <Fragment>
+    <Component Id="cmpDesktopShortcut" Guid="9e735c42-5414-4482-be2c-6dff81071885" Directory="DesktopFolder" >
+      <Shortcut Id="SQLiteWorkshopD"
+                Name="SQLite Workshop"
+                Description="SQLite DB Manager."
+                Directory="DesktopFolder"
+                Target="[INSTALLFOLDER]SQLite Workshop.exe"
+                WorkingDirectory="INSTALLFOLDER"
+                Icon ="Main.ico" />
+      <RegistryValue Root="HKCU" Key="Software\SQLite Workshop" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+  </Fragment>
+
+  <Fragment>
+    <Component Id="cmpProgramShortcut" Guid="f058930b-8939-48b4-a25f-2c99e4845832" Directory="ProgramMenuFolder" >
+      <Shortcut Id="SQLiteWorkshopP"
+                Name="SQLite Workshop"
+                Description="SQLite DB Manager."
+                Directory="ProgramMenuFolder"
+                Target="[INSTALLFOLDER]SQLite Workshop.exe"
+                WorkingDirectory="INSTALLFOLDER"
+                Icon ="Main.ico" />
+      <RegistryValue Root="HKCU" Key="Software\SQLite Workshop" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+  </Fragment>
+  
+</Wix>

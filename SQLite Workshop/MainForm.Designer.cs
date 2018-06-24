@@ -47,10 +47,10 @@
             this.label2 = new System.Windows.Forms.Label();
             this.spProp = new System.Windows.Forms.Splitter();
             this.panelTemplates = new System.Windows.Forms.Panel();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
             this.treeTemplates = new System.Windows.Forms.TreeView();
             this.imageListTreeView = new System.Windows.Forms.ImageList(this.components);
+            this.panel1 = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
             this.vSplitter = new System.Windows.Forms.Splitter();
             this.treeViewMain = new System.Windows.Forms.TreeView();
             this.panelTop = new System.Windows.Forms.Panel();
@@ -122,6 +122,7 @@
             this.statusStripMain = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusMain = new System.Windows.Forms.ToolStripStatusLabel();
             this.spRight = new System.Windows.Forms.Splitter();
+            this.saveAsTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panelMain.SuspendLayout();
             this.panelRight.SuspendLayout();
             this.panelProperties.SuspendLayout();
@@ -337,13 +338,40 @@
             // 
             // panelTemplates
             // 
-            this.panelTemplates.Controls.Add(this.panel1);
             this.panelTemplates.Controls.Add(this.treeTemplates);
+            this.panelTemplates.Controls.Add(this.panel1);
             this.panelTemplates.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTemplates.Location = new System.Drawing.Point(0, 0);
             this.panelTemplates.Name = "panelTemplates";
             this.panelTemplates.Size = new System.Drawing.Size(200, 100);
             this.panelTemplates.TabIndex = 0;
+            // 
+            // treeTemplates
+            // 
+            this.treeTemplates.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.treeTemplates.ImageIndex = 0;
+            this.treeTemplates.ImageList = this.imageListTreeView;
+            this.treeTemplates.Location = new System.Drawing.Point(0, 17);
+            this.treeTemplates.Name = "treeTemplates";
+            this.treeTemplates.SelectedImageIndex = 0;
+            this.treeTemplates.Size = new System.Drawing.Size(200, 83);
+            this.treeTemplates.TabIndex = 5;
+            this.treeTemplates.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeTemplates_AfterSelect);
+            this.treeTemplates.MouseDown += new System.Windows.Forms.MouseEventHandler(this.treeTemplates_MouseDown);
+            // 
+            // imageListTreeView
+            // 
+            this.imageListTreeView.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListTreeView.ImageStream")));
+            this.imageListTreeView.TransparentColor = System.Drawing.Color.Transparent;
+            this.imageListTreeView.Images.SetKeyName(0, "server.png");
+            this.imageListTreeView.Images.SetKeyName(1, "database.png");
+            this.imageListTreeView.Images.SetKeyName(2, "folder.png");
+            this.imageListTreeView.Images.SetKeyName(3, "table.png");
+            this.imageListTreeView.Images.SetKeyName(4, "column.png");
+            this.imageListTreeView.Images.SetKeyName(5, "index.png");
+            this.imageListTreeView.Images.SetKeyName(6, "view.png");
+            this.imageListTreeView.Images.SetKeyName(7, "Key.png");
+            this.imageListTreeView.Images.SetKeyName(8, "Trigger.png");
             // 
             // panel1
             // 
@@ -365,32 +393,6 @@
             this.label1.Size = new System.Drawing.Size(48, 12);
             this.label1.TabIndex = 0;
             this.label1.Text = "Templates";
-            // 
-            // treeTemplates
-            // 
-            this.treeTemplates.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.treeTemplates.ImageIndex = 0;
-            this.treeTemplates.ImageList = this.imageListTreeView;
-            this.treeTemplates.Location = new System.Drawing.Point(0, 0);
-            this.treeTemplates.Name = "treeTemplates";
-            this.treeTemplates.SelectedImageIndex = 0;
-            this.treeTemplates.Size = new System.Drawing.Size(200, 100);
-            this.treeTemplates.TabIndex = 5;
-            this.treeTemplates.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeTemplates_AfterSelect);
-            // 
-            // imageListTreeView
-            // 
-            this.imageListTreeView.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListTreeView.ImageStream")));
-            this.imageListTreeView.TransparentColor = System.Drawing.Color.Transparent;
-            this.imageListTreeView.Images.SetKeyName(0, "server.png");
-            this.imageListTreeView.Images.SetKeyName(1, "database.png");
-            this.imageListTreeView.Images.SetKeyName(2, "folder.png");
-            this.imageListTreeView.Images.SetKeyName(3, "table.png");
-            this.imageListTreeView.Images.SetKeyName(4, "column.png");
-            this.imageListTreeView.Images.SetKeyName(5, "index.png");
-            this.imageListTreeView.Images.SetKeyName(6, "view.png");
-            this.imageListTreeView.Images.SetKeyName(7, "Key.png");
-            this.imageListTreeView.Images.SetKeyName(8, "Trigger.png");
             // 
             // vSplitter
             // 
@@ -773,6 +775,7 @@
             this.openToolStripMenuItem,
             this.savetoolStripMenuItem,
             this.saveAstoolStripMenuItem,
+            this.saveAsTemplateToolStripMenuItem,
             this.saveAlltoolStripMenuItem,
             this.toolStripSeparator8,
             this.openRegisteredDBtoolStripMenuItem,
@@ -966,8 +969,9 @@
             // sQLiteHomePageToolStripMenuItem
             // 
             this.sQLiteHomePageToolStripMenuItem.Name = "sQLiteHomePageToolStripMenuItem";
-            this.sQLiteHomePageToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            this.sQLiteHomePageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.sQLiteHomePageToolStripMenuItem.Text = "SQLite Home Page";
+            this.sQLiteHomePageToolStripMenuItem.Click += new System.EventHandler(this.sQLiteHomePageToolStripMenuItem_Click);
             // 
             // panelHeading
             // 
@@ -1091,6 +1095,13 @@
             this.spRight.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sp_MouseDown);
             this.spRight.MouseMove += new System.Windows.Forms.MouseEventHandler(this.spMouseMove);
             this.spRight.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sp_MouseUp);
+            // 
+            // saveAsTemplateToolStripMenuItem
+            // 
+            this.saveAsTemplateToolStripMenuItem.Name = "saveAsTemplateToolStripMenuItem";
+            this.saveAsTemplateToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.saveAsTemplateToolStripMenuItem.Text = "Save As Template";
+            this.saveAsTemplateToolStripMenuItem.Click += new System.EventHandler(this.saveAsTemplateToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -1245,6 +1256,7 @@
         private System.Windows.Forms.TabPage tabPageDB;
         private System.Windows.Forms.TabPage tabPageRuntime;
         private System.Windows.Forms.PropertyGrid propertyGridDBRuntime;
+        private System.Windows.Forms.ToolStripMenuItem saveAsTemplateToolStripMenuItem;
     }
 }
 

@@ -21,6 +21,7 @@ namespace SQLiteWorkshop
         internal int sqlTabTrack;
         internal static Config cfg;
         internal string CurrentDB;
+        internal TemplateManager tm;
 
 
         ToolTip toolTip;
@@ -308,6 +309,19 @@ namespace SQLiteWorkshop
                 if (c.GetType().Equals(typeof(SqlTabControl)))
                 {
                     ((SqlTabControl)c).SaveSql(true);
+                }
+            }
+        }
+
+        private void saveAsTemplateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (tabMain.TabPages.Count == 0) return;
+            TabPage tb = tabMain.SelectedTab;
+            foreach (Control c in tb.Controls)
+            {
+                if (c.GetType().Equals(typeof(SqlTabControl)))
+                {
+                    tm.SaveTemplate((SqlTabControl)c);
                 }
             }
         }
@@ -1005,32 +1019,7 @@ namespace SQLiteWorkshop
 
         internal void LoadTemplates()
         {
-            ContextMenu tmpContextMenu = new ContextMenu();
-            tmpContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Refresh", tmpContextMenu_Clicked, tmpContextMenu_Popup, tmpContextMenu_Selected, null));
-            treeTemplates.Nodes.Clear();
-
-            TreeNode topNode = new TreeNode("Sql Templates", 0, 0);
-            topNode.ContextMenu = tmpContextMenu;
-
-            string templatesDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Templates");
-            DirectoryInfo di = new DirectoryInfo(templatesDirectory);
-            if (!di.Exists) return;
-
-            string[] dirs = Directory.GetDirectories(templatesDirectory);
-            foreach (string dir in dirs)
-            {
-                TreeNode dirNode = new TreeNode(new DirectoryInfo(dir).Name, 2, 2);
-                string[] files = Directory.GetFiles(dir, "*.sql");
-                foreach (string file in files)
-                {
-                    TreeNode sqlNode = new TreeNode(Path.GetFileNameWithoutExtension(file), 3, 3);
-                    sqlNode.Tag = file;
-                    dirNode.Nodes.Add(sqlNode);
-                }
-                topNode.Nodes.Add(dirNode);
-            }
-            treeTemplates.Nodes.Add(topNode);
-            topNode.Expand();
+            tm = new TemplateManager(treeTemplates);
         }
 
         private void treeTemplates_AfterSelect(object sender, TreeViewEventArgs e)
@@ -1052,26 +1041,12 @@ namespace SQLiteWorkshop
 
         }
 
-        private void tmpContextMenu_Popup(object sender, EventArgs e)
+        private void treeTemplates_MouseDown(object sender, MouseEventArgs e)
         {
-
+            TreeNode t = treeTemplates.GetNodeAt(e.Location);
+            if (t != null) treeTemplates.SelectedNode = t;
         }
-
-        private void tmpContextMenu_Selected(object sender, EventArgs e)
-        {
-        }
-
-        private void tmpContextMenu_Clicked(object sender, EventArgs e)
-        {
-            switch (((MenuItem)sender).Text.ToLower())
-            {
-                case "refresh":
-                    LoadTemplates();
-                    break;
-                default:
-                    break;
-            }
-        }
+            
 
         #endregion
 
@@ -1557,9 +1532,9 @@ namespace SQLiteWorkshop
             }
         }
 
-        #endregion
+#endregion
 
-        #region Form Sizing and Control
+#region Form Sizing and Control
 
         bool grabbed = false;
         int minWidth = 500;
@@ -1613,7 +1588,7 @@ namespace SQLiteWorkshop
            }
         }
 
-        #region Form Dragging Event Handler
+#region Form Dragging Event Handler
 
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
@@ -1632,11 +1607,11 @@ namespace SQLiteWorkshop
             }
         }
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region Main Tab Control
+#region Main Tab Control
 
         internal void SetTabHeader()
         {
@@ -1712,9 +1687,9 @@ namespace SQLiteWorkshop
             }
         }
 
-        #endregion
+#endregion
 
-        #region ControlBox Handlers
+#region ControlBox Handlers
         private void pbClose_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -1767,5 +1742,9 @@ namespace SQLiteWorkshop
 
         #endregion
 
+        private void sQLiteHomePageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://sqlite.org");
+        }
     }
 }

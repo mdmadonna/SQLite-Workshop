@@ -6,9 +6,11 @@
 --       the row is inserted.  If you need to track Insert time, use a default value of
 --       datetime('now', 'localtime') when creating the table.
 --
+--    IMPORTANT - Id should be a unique identifier included in the row being updated  
+--
 --***************************************************************************************************************************
 
-CREATE TRIGGER "TriggerName"
+CREATE TRIGGER IF NOT EXISTS "TriggerName"
 	After Update On "TableName"
 	For Each Row
 	Begin

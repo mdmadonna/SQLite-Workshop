@@ -1,19 +1,9 @@
 --***************************************************************************************************************************
 --
---     SQL Template for a simple view
+--     SQL Template to recreate an Index
+--       If you use and Index Name only that Index is rebuilt. If you use a Table Name, all indexes 
+--       associated with that Table are rebuilt
 --
 --***************************************************************************************************************************
-Create View If Not Exists "ViewName"
-(
-	"ColumnName 1",
-	"ColumnName 2",
-	"ColumnName ..."
-)
-As 
-Select 
-	"ColumnName 1",
-	"ColumnName 2",
-	"ColumnName ..."
-From 
-	"TableName" 
-Where "ColumnName 1" = expression
+
+REINDEX "IndexorTableName"

@@ -1,19 +1,13 @@
 --***************************************************************************************************************************
 --
---     SQL Template for a simple view
+--     SQL Template to Drop and Create an Index
 --
 --***************************************************************************************************************************
-Create View If Not Exists "ViewName"
-(
-	"ColumnName 1",
-	"ColumnName 2",
-	"ColumnName ..."
+
+Drop Index if Exists "IndexName";
+
+CREATE UNIQUE INDEX IF NOT EXISTS "IndexName" ON "TableName" (
+    "Column1"
+    ,"Column2"
 )
-As 
-Select 
-	"ColumnName 1",
-	"ColumnName 2",
-	"ColumnName ..."
-From 
-	"TableName" 
-Where "ColumnName 1" = expression
+WHERE "Column1" = expression;
