@@ -2,6 +2,7 @@
 Database Manager for SQLite
 
 Current <a href="https://github.com/mdmadonna/SQLite-Workshop/blob/master/SQLiteWorkshop.msi"> 64-bit Installer</a>.
+
 See <a href="https://github.com/mdmadonna/SQLite-Workshop/issues">Issues</a> for current status. I am interested in feedback :-).
 
 SQLite Workshop has a wide range of features and capabilities including:
