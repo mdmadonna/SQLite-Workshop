@@ -1,7 +1,7 @@
 # SQLite-Workshop
 Database Manager for SQLite
 
-Current <a href="https://github.com/mdmadonna/SQLite-Workshop/raw/master/SQLiteWorkshop.msi"> 64-bit Installer</a>.
+Current <a href="https://github.com/mdmadonna/SQLite-Workshop/raw/master/SQLiteWorkshop.msi"> 64-bit Installer</a> (.NET 4.7).
 
 See <a href="https://github.com/mdmadonna/SQLite-Workshop/issues">Issues</a> for current status. I am interested in feedback :-).
 
