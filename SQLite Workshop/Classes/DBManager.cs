@@ -226,9 +226,15 @@ namespace SQLiteWorkshop
                 sb.Append("\r\n\t").Append(colCount == 0 ? string.Empty : ",").Append("\"").Append(column.Value.Name).Append("\" ");
                 sbI.Append(colCount == 0 ? string.Empty : ",").Append("\"").Append(column.Value.Name).Append("\" ");
                 sbV.Append(colCount == 0 ? string.Empty : ",").Append("?");
-                sb.Append(GetColumnType(column.Value.SqlType, column.Value.Size, column.Value.NumericPrecision, column.Value.NumericScale, out ColumnType colType, out bool isText));
-                if (column.Value.IsAutoIncrement) sb.Append(" auto_increment");
-                sb.Append(column.Value.IsNullable ? " Null" : " Not Null");
+                if (column.Value.IsAutoIncrement)
+                {
+                    sb.Append(" integer primary key autoincrement not null");
+                }
+                else
+                {
+                    sb.Append(GetColumnType(column.Value.SqlType, column.Value.Size, column.Value.NumericPrecision, column.Value.NumericScale, out ColumnType colType, out bool isText));
+                    sb.Append(column.Value.IsNullable ? " Null" : " Not Null");
+                }
                 if (column.Value.HasDefault)
                 {  sb.Append(" Default ").Append(column.Value.DefaultValue);  }
                 colCount++;

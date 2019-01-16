@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportWiz));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelTop = new System.Windows.Forms.Panel();
@@ -638,7 +638,7 @@
             this.cmbSourceDB.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbSourceDB.FormattingEnabled = true;
             this.cmbSourceDB.Items.AddRange(new object[] {
-            "Comma Delimited Text File",
+            "Delimited Text File",
             "Excel",
             "SQLite Database",
             "MS Access Database",
@@ -899,8 +899,8 @@
             // 
             this.dataGridViewText.AllowUserToAddRows = false;
             this.dataGridViewText.AllowUserToDeleteRows = false;
-            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.dataGridViewText.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridViewText.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGridViewText.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewText.Dock = System.Windows.Forms.DockStyle.Fill;

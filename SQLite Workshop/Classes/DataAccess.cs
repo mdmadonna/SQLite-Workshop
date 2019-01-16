@@ -142,8 +142,10 @@ namespace SQLiteWorkshop
 
             if (DataAccess.IsEncrypted(DBLocation))
             {
-                GetPassword gp = new GetPassword();
-                gp.DBLocation = DBLocation;
+                GetPassword gp = new GetPassword
+                {
+                    DBLocation = DBLocation
+                };
                 gp.ShowDialog();
                 if (gp.Cancelled) { sd.LoadStatus = -1; return sd; }
                 sd.password = gp.Password;
@@ -180,9 +182,8 @@ namespace SQLiteWorkshop
         {
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
-            SQLiteErrorCode returnCode;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return false;
+            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return false;
 
             cmd.CommandText = string.Format(QRY_TABLE, "\"" + table + "\"");
             DataTable dt = ExecuteDataTable(cmd, out returnCode);
@@ -200,9 +201,8 @@ namespace SQLiteWorkshop
         {
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
-            SQLiteErrorCode returnCode;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return false;
+            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return false;
 
             cmd.CommandText = string.Format(QRY_TABLE, "\"" + table + "\"");
             DataTable dt = ExecuteDataTable(cmd, out returnCode);
@@ -261,13 +261,15 @@ namespace SQLiteWorkshop
 
             // Special case sqlite_master
             string tblname = "sqlite_master";
-            TableLayout tspecial = new TableLayout();
-            tspecial.rootpage = 0;
-            tspecial.CreateSQL = string.Empty;
-            tspecial.Indexes = GetIndexes(tblname, cmd);
-            tspecial.Columns = GetColumns(tblname, cmd);
-            tspecial.ForeignKeys = GetForeignKeys(tblname, cmd);
-            tspecial.TblType = SQLiteTableType.system;
+            TableLayout tspecial = new TableLayout
+            {
+                rootpage = 0,
+                CreateSQL = string.Empty,
+                Indexes = GetIndexes(tblname, cmd),
+                Columns = GetColumns(tblname, cmd),
+                ForeignKeys = GetForeignKeys(tblname, cmd),
+                TblType = SQLiteTableType.system
+            };
             TableLayouts.Add(tblname, tspecial);
 
             return TableLayouts;
@@ -275,14 +277,16 @@ namespace SQLiteWorkshop
 
         internal static TableLayout LoadTable(SQLiteCommand cmd, DataRow dr)
         {
-            TableLayout tl = new TableLayout();
-            tl.rootpage = Convert.ToInt64(dr["rootpage"]);              //Appears to be long in older version and int in the current version
-            tl.CreateSQL = dr["sql"].ToString();
-            tl.Indexes = GetIndexes(dr["name"].ToString(), cmd);
-            tl.Columns = GetColumns(dr["name"].ToString(), cmd);
-            tl.ForeignKeys = GetForeignKeys(dr["name"].ToString(), cmd);
-            tl.TblType = Common.IsSystemTable(dr["name"].ToString()) ? SQLiteTableType.system : SQLiteTableType.user;
-            tl.PrimaryKeys = new Dictionary<string, long>();
+            TableLayout tl = new TableLayout
+            {
+                rootpage = Convert.ToInt64(dr["rootpage"]),              //Appears to be long in older version and int in the current version
+                CreateSQL = dr["sql"].ToString(),
+                Indexes = GetIndexes(dr["name"].ToString(), cmd),
+                Columns = GetColumns(dr["name"].ToString(), cmd),
+                ForeignKeys = GetForeignKeys(dr["name"].ToString(), cmd),
+                TblType = Common.IsSystemTable(dr["name"].ToString()) ? SQLiteTableType.system : SQLiteTableType.user,
+                PrimaryKeys = new Dictionary<string, long>()
+            };
             foreach (var column in tl.Columns)
             {
                 if (column.Value.PrimaryKey > 0) tl.PrimaryKeys.Add(column.Key, column.Value.PrimaryKey);
@@ -307,20 +311,21 @@ namespace SQLiteWorkshop
         internal static Dictionary<string, IndexLayout> GetIndexes(string TableName, SQLiteCommand cmd)
         {
             Dictionary<string, IndexLayout> IndexLayouts = new Dictionary<string, IndexLayout>();
-            SQLiteErrorCode returnCode;
 
             cmd.CommandText = string.Format(QRY_INDEXES, TableName);
-            DataTable dt = ExecuteDataTable(cmd, out returnCode);
+            DataTable dt = ExecuteDataTable(cmd, out SQLiteErrorCode returnCode);
             cmd.CommandText = string.Format(QRY_INDEXDETAIL, TableName);
             DataTable dtDetail = ExecuteDataTable(cmd, out returnCode);
 
             foreach (DataRow dr in dt.Rows)
             {
-                IndexLayout il = new IndexLayout();
-                il.rootpage = Convert.ToInt64(dr["rootpage"]);
-                il.TableName = dr["name"].ToString();
-                il.CreateSQL = dr["sql"].ToString();
-                il.Columns = GetIndexColumns(dr["name"].ToString(), cmd);
+                IndexLayout il = new IndexLayout
+                {
+                    rootpage = Convert.ToInt64(dr["rootpage"]),
+                    TableName = dr["name"].ToString(),
+                    CreateSQL = dr["sql"].ToString(),
+                    Columns = GetIndexColumns(dr["name"].ToString(), cmd)
+                };
                 foreach (DataRow drDetail in dtDetail.Rows)
                 {
                     if (dr["name"].ToString() == drDetail["name"].ToString())
@@ -361,12 +366,14 @@ namespace SQLiteWorkshop
             {
                 foreach (DataRow dr in dt.Rows)
                 {
-                    ColumnLayout cl = new ColumnLayout();
-                    cl.Cid = Convert.ToInt64(dr["cid"]);
-                    cl.ColumnType = dr["type"].ToString();
-                    cl.NullType = Convert.ToInt64(dr["notnull"]);
-                    cl.DefaultValue = dr["dflt_value"].ToString();
-                    cl.PrimaryKey = Convert.ToInt64(dr["pk"]);
+                    ColumnLayout cl = new ColumnLayout
+                    {
+                        Cid = Convert.ToInt64(dr["cid"]),
+                        ColumnType = dr["type"].ToString(),
+                        NullType = Convert.ToInt64(dr["notnull"]),
+                        DefaultValue = dr["dflt_value"].ToString(),
+                        PrimaryKey = Convert.ToInt64(dr["pk"])
+                    };
                     ColumnLayouts.Add(dr["name"].ToString(), cl);
                 }
             }
@@ -397,12 +404,14 @@ namespace SQLiteWorkshop
             DataTable dt = ExecuteDataTable(cmd, out SQLiteErrorCode returnCode);
             foreach (DataRow dr in dt.Rows)
             {
-                IndexColumnLayout icl = new IndexColumnLayout();
-                icl.seqno = Convert.ToInt64(dr["seqno"]);
-                icl.Cid = Convert.ToInt64(dr["cid"]);
-                icl.SortOrder = Convert.ToInt32(dr["desc"].ToString()) == 1 ? "Desc" : "Asc";
-                icl.CollatingSequence = dr["coll"].ToString();
-                icl.key = Convert.ToInt64(dr["key"]);
+                IndexColumnLayout icl = new IndexColumnLayout
+                {
+                    seqno = Convert.ToInt64(dr["seqno"]),
+                    Cid = Convert.ToInt64(dr["cid"]),
+                    SortOrder = Convert.ToInt32(dr["desc"].ToString()) == 1 ? "Desc" : "Asc",
+                    CollatingSequence = dr["coll"].ToString(),
+                    key = Convert.ToInt64(dr["key"])
+                };
                 string idxKey = dr["name"] == null || string.IsNullOrEmpty(dr["Name"].ToString()) ? "rowid" : dr["name"].ToString();
                 if (!IndexColumnLayouts.ContainsKey(idxKey)) IndexColumnLayouts.Add(idxKey, icl);
             }
@@ -419,15 +428,17 @@ namespace SQLiteWorkshop
             int i = 0;
             foreach (DataRow dr in dt.Rows)
             {
-                ForeignKeyLayout fl = new ForeignKeyLayout();
-                fl.id = Convert.ToInt64(dr["id"]);
-                fl.Sequence = Convert.ToInt64(dr["seq"]);
-                fl.Table = dr["table"].ToString();
-                fl.From = dr["from"].ToString();
-                fl.To = dr["to"].ToString();
-                fl.OnUpdate = dr["on_update"].ToString();
-                fl.OnDelete = dr["on_delete"].ToString();
-                fl.Match = dr["match"].ToString();
+                ForeignKeyLayout fl = new ForeignKeyLayout
+                {
+                    id = Convert.ToInt64(dr["id"]),
+                    Sequence = Convert.ToInt64(dr["seq"]),
+                    Table = dr["table"].ToString(),
+                    From = dr["from"].ToString(),
+                    To = dr["to"].ToString(),
+                    OnUpdate = dr["on_update"].ToString(),
+                    OnDelete = dr["on_delete"].ToString(),
+                    Match = dr["match"].ToString()
+                };
                 FKeyLayouts.Add(i.ToString(), fl);
                 i++;
             }
@@ -458,10 +469,12 @@ namespace SQLiteWorkshop
             DataTable dt = ExecuteDataTable(cmd, out SQLiteErrorCode returnCode);
             foreach (DataRow dr in dt.Rows)
             {
-                ViewLayout vl = new ViewLayout();
-                vl.rootpage = Convert.ToInt64(dr["rootpage"]);
-                vl.CreateSQL = dr["sql"].ToString();
-                vl.Columns = GetColumns(dr["name"].ToString(), cmd);
+                ViewLayout vl = new ViewLayout
+                {
+                    rootpage = Convert.ToInt64(dr["rootpage"]),
+                    CreateSQL = dr["sql"].ToString(),
+                    Columns = GetColumns(dr["name"].ToString(), cmd)
+                };
                 ViewLayouts.Add(dr["name"].ToString(), vl);
             }
 
@@ -476,9 +489,11 @@ namespace SQLiteWorkshop
             DataTable dt = ExecuteDataTable(cmd, out SQLiteErrorCode returnCode);
             foreach (DataRow dr in dt.Rows)
             {
-                TriggerLayout vl = new TriggerLayout();
-                vl.rootpage = Convert.ToInt64(dr["rootpage"]);
-                vl.CreateSQL = dr["sql"].ToString();
+                TriggerLayout vl = new TriggerLayout
+                {
+                    rootpage = Convert.ToInt64(dr["rootpage"]),
+                    CreateSQL = dr["sql"].ToString()
+                };
                 TriggerLayouts.Add(dr["name"].ToString(), vl);
             }
 
@@ -508,10 +523,9 @@ namespace SQLiteWorkshop
         {
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
-            SQLiteErrorCode returnCode;
 
             // The open creates the file
-            if (!OpenDB(dbName, ref conn, ref cmd, out returnCode, true)) return false;
+            if (!OpenDB(dbName, ref conn, ref cmd, out SQLiteErrorCode returnCode, true)) return false;
 
             // SQLite appears to create an empty file that stays empty until you put something in it
             // Create a dummy table
@@ -840,12 +854,13 @@ namespace SQLiteWorkshop
         internal static bool OpenDB(string DBLocation, ref SQLiteConnection Conn, ref SQLiteCommand Cmd, out SQLiteErrorCode returnCode, bool IsNew = false, string password = null)
         {
             LastError = string.Empty;
-            Conn = new SQLiteConnection();
-            Conn.ConnectionString = string.Format("Data Source={0};Version=3;New={1}", DBLocation, IsNew ? "True" : "False");
+            Conn = new SQLiteConnection
+            {
+                ConnectionString = string.Format("Data Source={0};Version=3;New={1}", DBLocation, IsNew ? "True" : "False")
+            };
             if (password != null) Conn.ConnectionString += string.Format(";Password={0}", password);
 
-            SchemaDefinition sd;
-            if (SchemaDefinitions.TryGetValue(DBLocation, out sd))
+            if (SchemaDefinitions.TryGetValue(DBLocation, out SchemaDefinition sd))
                 if (!string.IsNullOrEmpty(sd.password)) Conn.ConnectionString += string.Format(";Password={0}", sd.password);
 
             try
@@ -858,8 +873,10 @@ namespace SQLiteWorkshop
                 // Initialize ProgressOps before registering the handler.  It will not work if you don't do it this way.
                 Conn.ProgressOps = 100;
                 Conn.Progress += ProgressEventHandler;
-                Cmd = new SQLiteCommand();
-                Cmd.Connection = Conn;
+                Cmd = new SQLiteCommand()
+                {
+                    Connection = Conn
+                };
                 returnCode = SQLiteErrorCode.Ok;
                 return true;
             }
@@ -900,9 +917,8 @@ namespace SQLiteWorkshop
         {
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
-            SQLiteErrorCode returnCode;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode, false, password)) return false;
+            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode, false, password)) return false;
 
             // It appears that the database may open successfully if the wrong password is supplied.
             // Attempt to access it to determine if the password is valid.
@@ -1008,9 +1024,8 @@ namespace SQLiteWorkshop
 
             SQLiteConnection conn = new SQLiteConnection();
             SQLiteCommand cmd = new SQLiteCommand();
-            SQLiteErrorCode returnCode;
 
-            DataAccess.OpenDB(DatabaseName, ref conn, ref cmd, out returnCode, false);
+            DataAccess.OpenDB(DatabaseName, ref conn, ref cmd, out SQLiteErrorCode returnCode, false);
 
             cmd.CommandText = string.Format("Select {0} from \"{1}\" Limit 1", rowidName, table);
             SQLiteDataReader dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly);

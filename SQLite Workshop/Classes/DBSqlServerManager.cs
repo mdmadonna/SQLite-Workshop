@@ -36,8 +36,10 @@ namespace SQLiteWorkshop
              * Server=myServerAddress;Database=myDataBase;User Id=myUsername;Password=myPassword;
              * Server=myServerAddress;Database=myDataBase;Trusted_Connection=True;
              */
-            conn = new SqlConnection();
-            conn.ConnectionString = UseWindowsAuthentication ? string.Format("Server={0};Database={1};Trusted_Connection=True;", DatabaseServer, DatabaseName) : string.Format("Server={0};Database={1};User Id={2};Password={3};", DatabaseServer, DatabaseName, DatabaseUserName, DatabasePassword);
+            conn = new SqlConnection
+            {
+                ConnectionString = UseWindowsAuthentication ? string.Format("Server={0};Database={1};Trusted_Connection=True;", DatabaseServer, DatabaseName) : string.Format("Server={0};Database={1};User Id={2};Password={3};", DatabaseServer, DatabaseName, DatabaseUserName, DatabasePassword)
+            };
             try
             {
                 conn.Open();
@@ -61,12 +63,16 @@ namespace SQLiteWorkshop
         internal override DBDatabaseList GetDatabaseList()
         {
             OpenDB();
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "SELECT name FROM sys.databases WHERE name NOT IN('master', 'tempdb', 'model', 'msdb', 'ReportServer', 'ReportServerTempDB')";
+            SqlCommand cmd = new SqlCommand
+            {
+                Connection = conn,
+                CommandText = "SELECT name FROM sys.databases WHERE name NOT IN('master', 'tempdb', 'model', 'msdb', 'ReportServer', 'ReportServerTempDB')"
+            };
 
-            DBDatabaseList DbDl = new DBDatabaseList();
-            DbDl.Databases = new Dictionary<string, DBInfo>();
+            DBDatabaseList DbDl = new DBDatabaseList
+            {
+                Databases = new Dictionary<string, DBInfo>()
+            };
             SqlDataReader dr;
 
             try
@@ -74,8 +80,10 @@ namespace SQLiteWorkshop
                 dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
-                    DBInfo di = new DBInfo();
-                    di.Name = dr["name"].ToString();
+                    DBInfo di = new DBInfo
+                    {
+                        Name = dr["name"].ToString()
+                    };
                     DbDl.Databases.Add(di.Name, di);
                 }
                 dr.Close();
@@ -95,9 +103,11 @@ namespace SQLiteWorkshop
 
             if (conn == null || conn.State != ConnectionState.Open) OpenDB();
 
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'";
+            SqlCommand cmd = new SqlCommand
+            {
+                Connection = conn,
+                CommandText = "SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'"
+            };
             SqlDataReader dr = cmd.ExecuteReader();
 
             while (dr.Read())
@@ -106,8 +116,10 @@ namespace SQLiteWorkshop
                 Tables.Add(dbt.Name, dbt);
             }
 
-            DBSchema schema = new DBSchema();
-            schema.Tables = Tables;
+            DBSchema schema = new DBSchema
+            {
+                Tables = Tables
+            };
             CloseDB();
             return schema;
         }
@@ -120,9 +132,11 @@ namespace SQLiteWorkshop
 
             if (conn == null || conn.State != ConnectionState.Open) OpenDB();
 
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = string.Format("Select Top(1) * From [{0}]", TableName);
+            SqlCommand cmd = new SqlCommand
+            {
+                Connection = conn,
+                CommandText = string.Format("Select Top(1) * From [{0}]", TableName)
+            };
             try
             {
                 sqldr = cmd.ExecuteReader(CommandBehavior.SingleRow);
@@ -188,20 +202,18 @@ namespace SQLiteWorkshop
         {
             bool rCode;
             int rtnCode;
-            string InsertSQL;
             int recCount = 0;
             SQLiteTransaction sqlT = null; ;
 
-            SQLiteErrorCode returnCode;
             if (columns == null) columns = GetColumns(SourceTable);
 
             //Only if table does not exist
-            string CreateSql = BuildCreateSql(DestTable, columns, out InsertSQL);
+            string CreateSql = BuildCreateSql(DestTable, columns, out string InsertSQL);
 
             SQLiteConnection SQConn = new SQLiteConnection();
             SQLiteCommand SQCmd = new SQLiteCommand();
 
-            rCode = DataAccess.OpenDB(MainForm.mInstance.CurrentDB, ref SQConn, ref SQCmd, out returnCode);
+            rCode = DataAccess.OpenDB(MainForm.mInstance.CurrentDB, ref SQConn, ref SQCmd, out SQLiteErrorCode returnCode);
             if (!rCode || returnCode != SQLiteErrorCode.Ok)
             {
                 Common.ShowMsg(String.Format(Common.ERR_SQL, DataAccess.LastError, returnCode));
@@ -222,9 +234,11 @@ namespace SQLiteWorkshop
                 SQCmd.CommandText = InsertSQL;
 
                 OpenDB();
-                SqlCommand SqlCmd = new SqlCommand();
-                SqlCmd.Connection = conn;
-                SqlCmd.CommandText = string.Format("Select * FROM [{0}]", SourceTable);
+                SqlCommand SqlCmd = new SqlCommand
+                {
+                    Connection = conn,
+                    CommandText = string.Format("Select * FROM [{0}]", SourceTable)
+                };
                 SqlDataReader dr = SqlCmd.ExecuteReader();
                 while (dr.Read())
                 {
@@ -259,9 +273,11 @@ namespace SQLiteWorkshop
         internal override DataTable PreviewData(string TableName)
         {
             OpenDB();
-            SqlCommand cmd = new SqlCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = string.Format("Select Top 100 * FROM [{0}]", TableName);
+            SqlCommand cmd = new SqlCommand()
+            {
+                Connection = conn,
+                CommandText = string.Format("Select Top 100 * FROM [{0}]", TableName)
+            };
             DataTable dt = LoadPreviewData(cmd);
             CloseDB();
             return dt;

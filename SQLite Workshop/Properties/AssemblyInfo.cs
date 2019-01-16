@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ajm Software, L.L.C.")]
 [assembly: AssemblyProduct("SQLite Workshop")]
-[assembly: AssemblyCopyright("Copyright ©  2018 ajm Software, LL.C.")]
+[assembly: AssemblyCopyright("Copyright ©  2019 ajm Software, LL.C.")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -32,5 +32,5 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.*")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("1.0.1.*")]
+[assembly: AssemblyFileVersion("1.0.1.0")]

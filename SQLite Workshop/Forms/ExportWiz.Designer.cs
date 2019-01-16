@@ -258,7 +258,7 @@
             this.radioComma.Size = new System.Drawing.Size(106, 17);
             this.radioComma.TabIndex = 0;
             this.radioComma.TabStop = true;
-            this.radioComma.Text = "Comma Delimited";
+            this.radioComma.Text = "Delimited";
             this.radioComma.UseVisualStyleBackColor = true;
             this.radioComma.CheckedChanged += new System.EventHandler(this.radioComma_CheckedChanged);
             // 

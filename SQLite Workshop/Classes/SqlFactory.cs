@@ -79,7 +79,7 @@ namespace SQLiteWorkshop
             StringBuilder sb = new StringBuilder();
 
             sb.Append("\"").Append(ColumnName).Append("\" ");
-            sb.Append(column.ColumnType == "autoincrement" ? "integer auto_increment" : column.ColumnType);
+            sb.Append(column.ColumnType == "autoincrement" ? "integer primary key autoincrement" : column.ColumnType);
             sb.Append(column.NullType == 0 ? " Null" : " Not Null");
             if (column.Unique) sb.Append(" Unique");
             if (!string.IsNullOrEmpty(column.DefaultValue))

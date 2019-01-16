@@ -157,7 +157,7 @@
             "double",
             "float",
             "int",
-            "integer auto_increment",
+            "integer primary key autoincrement",
             "mediumint",
             "nchar(20)",
             "numeric",

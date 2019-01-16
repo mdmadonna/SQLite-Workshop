@@ -1091,7 +1091,7 @@ namespace SQLiteWorkshop
                     txtPassword.Visible = true;
                     break;
 
-                case "Comma Delimited Text File":
+                case "Delimited Text File":
                     SourceType = ImportSource.Text;
                     panelWizMainText.Visible = true;
                     panelWizMainDB.Visible = false;
@@ -1241,7 +1241,7 @@ namespace SQLiteWorkshop
                 case ImportSource.Text:
                     Title = "Open Text File";
                     Extension = "csv";
-                    Filter = "All files (*.*)|*.*|Comma Delimited Files (*.csv;*.txt)|*.csv;*.txt";
+                    Filter = "All files (*.*)|*.*|Text Files (*.csv;*.txt)|*.csv;*.txt";
                     break;
                     
                 case ImportSource.Excel:

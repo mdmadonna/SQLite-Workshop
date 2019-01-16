@@ -80,7 +80,7 @@ namespace SQLiteWorkshop
 
         [DisplayName("Default Value"),
         ReadOnly(false),
-        DescriptionAttribute("The Default Value for this column. Note that functions are not allowed.")]
+        DescriptionAttribute("The Default Value for this column. Note that functions MUST be enclosed in parentheses().")]
         public string DefaultValue
         {
             get { return defaultValue; }
