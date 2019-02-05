@@ -37,7 +37,7 @@ namespace SQLiteWorkshop
             set
             {
                 type = value;
-                SetReadOnly(new string[] { "Size" }, type == "integer" ? true : false);
+                SetReadOnly(new string[] { "Size" }, !Common.IsText(type));
             }
         }
 

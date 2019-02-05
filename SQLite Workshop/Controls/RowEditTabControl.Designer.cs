@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(RecordEditTabControl));
             this.panelTop = new System.Windows.Forms.Panel();
+            this.btnRefresh = new System.Windows.Forms.Button();
             this.lblTable = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.richTextWhere = new System.Windows.Forms.RichTextBox();
@@ -37,21 +38,20 @@
             this.panelBody = new System.Windows.Forms.Panel();
             this.panelSeparator = new System.Windows.Forms.Panel();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripTextBoxCurrentItem = new System.Windows.Forms.ToolStripTextBox();
-            this.toolStripLabelTotalRecords = new System.Windows.Forms.ToolStripLabel();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripLabelStatus = new System.Windows.Forms.ToolStripLabel();
             this.toolStripButtonMoveFirst = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonMovePrevious = new System.Windows.Forms.ToolStripButton();
+            this.toolStripTextBoxCurrentItem = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripLabelTotalRecords = new System.Windows.Forms.ToolStripLabel();
             this.toolStripButtonMoveNext = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonMoveLast = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButtonInsert = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonDelete = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripButtonCancel = new System.Windows.Forms.ToolStripButton();
             this.toolStripButtonCommit = new System.Windows.Forms.ToolStripButton();
-            this.btnRefresh = new System.Windows.Forms.Button();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripLabelStatus = new System.Windows.Forms.ToolStripLabel();
             this.panelTop.SuspendLayout();
             this.toolStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -69,6 +69,16 @@
             this.panelTop.Name = "panelTop";
             this.panelTop.Size = new System.Drawing.Size(837, 63);
             this.panelTop.TabIndex = 1;
+            // 
+            // btnRefresh
+            // 
+            this.btnRefresh.Image = global::SQLiteWorkshop.Properties.Resources.Reload_small;
+            this.btnRefresh.Location = new System.Drawing.Point(736, 14);
+            this.btnRefresh.Name = "btnRefresh";
+            this.btnRefresh.Size = new System.Drawing.Size(30, 24);
+            this.btnRefresh.TabIndex = 4;
+            this.btnRefresh.UseVisualStyleBackColor = true;
+            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
             // 
             // lblTable
             // 
@@ -115,9 +125,9 @@
             this.panelBody.AutoScroll = true;
             this.panelBody.BackColor = System.Drawing.SystemColors.Window;
             this.panelBody.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelBody.Location = new System.Drawing.Point(0, 63);
+            this.panelBody.Location = new System.Drawing.Point(0, 65);
             this.panelBody.Name = "panelBody";
-            this.panelBody.Size = new System.Drawing.Size(837, 344);
+            this.panelBody.Size = new System.Drawing.Size(837, 317);
             this.panelBody.TabIndex = 0;
             // 
             // panelSeparator
@@ -153,42 +163,6 @@
             this.toolStrip1.TabIndex = 3;
             this.toolStrip1.Text = "toolStrip1";
             // 
-            // toolStripTextBoxCurrentItem
-            // 
-            this.toolStripTextBoxCurrentItem.Name = "toolStripTextBoxCurrentItem";
-            this.toolStripTextBoxCurrentItem.Size = new System.Drawing.Size(50, 25);
-            this.toolStripTextBoxCurrentItem.ToolTipText = "Current record.";
-            this.toolStripTextBoxCurrentItem.Leave += new System.EventHandler(this.toolStripTextBoxCurrentItem_Leave);
-            this.toolStripTextBoxCurrentItem.KeyDown += new System.Windows.Forms.KeyEventHandler(this.toolStripTextBoxCurrentItem_KeyDown);
-            // 
-            // toolStripLabelTotalRecords
-            // 
-            this.toolStripLabelTotalRecords.Name = "toolStripLabelTotalRecords";
-            this.toolStripLabelTotalRecords.Size = new System.Drawing.Size(80, 22);
-            this.toolStripLabelTotalRecords.Text = "toolStripLabel";
-            this.toolStripLabelTotalRecords.ToolTipText = "Total records in the table.";
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
-            // 
-            // toolStripSeparator3
-            // 
-            this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
-            // 
-            // toolStripSeparator4
-            // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
-            // 
-            // toolStripLabelStatus
-            // 
-            this.toolStripLabelStatus.Name = "toolStripLabelStatus";
-            this.toolStripLabelStatus.Size = new System.Drawing.Size(111, 22);
-            this.toolStripLabelStatus.Text = "toolStripLabelstatus";
-            // 
             // toolStripButtonMoveFirst
             // 
             this.toolStripButtonMoveFirst.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -210,6 +184,21 @@
             this.toolStripButtonMovePrevious.Text = "toolStripButtonMovePrevious";
             this.toolStripButtonMovePrevious.ToolTipText = "Move to the previous row in the table.";
             this.toolStripButtonMovePrevious.Click += new System.EventHandler(this.toolStripButtonMovePrevious_Click);
+            // 
+            // toolStripTextBoxCurrentItem
+            // 
+            this.toolStripTextBoxCurrentItem.Name = "toolStripTextBoxCurrentItem";
+            this.toolStripTextBoxCurrentItem.Size = new System.Drawing.Size(50, 25);
+            this.toolStripTextBoxCurrentItem.ToolTipText = "Current record.";
+            this.toolStripTextBoxCurrentItem.Leave += new System.EventHandler(this.toolStripTextBoxCurrentItem_Leave);
+            this.toolStripTextBoxCurrentItem.KeyDown += new System.Windows.Forms.KeyEventHandler(this.toolStripTextBoxCurrentItem_KeyDown);
+            // 
+            // toolStripLabelTotalRecords
+            // 
+            this.toolStripLabelTotalRecords.Name = "toolStripLabelTotalRecords";
+            this.toolStripLabelTotalRecords.Size = new System.Drawing.Size(80, 22);
+            this.toolStripLabelTotalRecords.Text = "toolStripLabel";
+            this.toolStripLabelTotalRecords.ToolTipText = "Total records in the table.";
             // 
             // toolStripButtonMoveNext
             // 
@@ -233,6 +222,11 @@
             this.toolStripButtonMoveLast.ToolTipText = "Move to the last row in the table.";
             this.toolStripButtonMoveLast.Click += new System.EventHandler(this.toolStripButtonMoveLast_Click);
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
+            // 
             // toolStripButtonInsert
             // 
             this.toolStripButtonInsert.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
@@ -254,6 +248,11 @@
             this.toolStripButtonDelete.Text = "toolStripButtonDelete";
             this.toolStripButtonDelete.ToolTipText = "Delete the current row.";
             this.toolStripButtonDelete.Click += new System.EventHandler(this.toolStripButtonDelete_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
             // 
             // toolStripButtonCancel
             // 
@@ -277,23 +276,24 @@
             this.toolStripButtonCommit.ToolTipText = "Commit the current changes.";
             this.toolStripButtonCommit.Click += new System.EventHandler(this.toolStripButtonCommit_Click);
             // 
-            // btnRefresh
+            // toolStripSeparator4
             // 
-            this.btnRefresh.Image = global::SQLiteWorkshop.Properties.Resources.Reload_small;
-            this.btnRefresh.Location = new System.Drawing.Point(736, 14);
-            this.btnRefresh.Name = "btnRefresh";
-            this.btnRefresh.Size = new System.Drawing.Size(30, 24);
-            this.btnRefresh.TabIndex = 4;
-            this.btnRefresh.UseVisualStyleBackColor = true;
-            this.btnRefresh.Click += new System.EventHandler(this.btnRefresh_Click);
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripLabelStatus
+            // 
+            this.toolStripLabelStatus.Name = "toolStripLabelStatus";
+            this.toolStripLabelStatus.Size = new System.Drawing.Size(111, 22);
+            this.toolStripLabelStatus.Text = "toolStripLabelstatus";
             // 
             // RecordEditTabControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.panelBody);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.panelSeparator);
-            this.Controls.Add(this.panelBody);
             this.Controls.Add(this.panelTop);
             this.Name = "RecordEditTabControl";
             this.Size = new System.Drawing.Size(837, 407);

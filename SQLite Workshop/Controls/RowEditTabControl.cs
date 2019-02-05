@@ -16,6 +16,12 @@ namespace SQLiteWorkshop
 {
     public partial class RecordEditTabControl : UserControl
     {
+        internal struct ColData
+        {
+            internal string colname;
+            internal string coltype;
+        }
+
         string RowIDColName;
         int RowIdIndex;
         string PrimaryKeyName;
@@ -76,10 +82,10 @@ namespace SQLiteWorkshop
 
             BaseSQL = string.Format("Select Count(*) From \"{0}\"", TableName);
             searchWhereClause = string.IsNullOrEmpty(richTextWhere.Text) ? string.Empty : string.Format("Where {0}", richTextWhere.Text.Trim());
-           
+
             RowIdIndex = -1;
             searchSQL = string.Format("{0} {1}", BaseSQL, searchWhereClause);
-            
+
             int iRowCount = Convert.ToInt32(DataAccess.ExecuteScalar(DatabaseName, searchSQL, out returnCode));
             if (iRowCount == -1 || returnCode != SQLiteErrorCode.Ok)
             {
@@ -117,14 +123,14 @@ namespace SQLiteWorkshop
             }
 
             int start = 50;
-            int lablen = 100;
-            int height = 40;
+            int lablen = 180;
+            int height = 30;
 
             // draw a textbox for each column in the row except rowid.
             for (int i = 0; i < dr.FieldCount; i++)
             {
                 string colname = dr.GetName(i);
-                if (RowIdIndex < 0)  if (tableHasRowID) if (RowIDColName == colname) RowIdIndex = i;
+                if (RowIdIndex < 0) if (tableHasRowID) if (RowIDColName == colname) RowIdIndex = i;
                 if (i == RowIdIndex) continue;
                 if (colname == PrimaryKeyName) PKIndex = i;
 
@@ -132,16 +138,22 @@ namespace SQLiteWorkshop
                 lbl.Text = string.Format("{0}:", colname);
                 lbl.Top = start;
                 lbl.Left = 50;
+                lbl.Width = lablen - 10;
                 panelBody.Controls.Add(lbl);
 
                 TextBox txt = new TextBox();
                 txt.Name = string.Format("txt{0}", i.ToString().PadLeft(4, '0'));
-                txt.Tag = colname;
+                ColData cd = new ColData()
+                {
+                    colname = colname,
+                    coltype = dr.GetDataTypeName(i)
+                };
+                txt.Tag = cd;
                 txt.Top = start;
                 txt.Left = lbl.Left + lablen;
                 txt.Width = 300;
                 panelBody.Controls.Add(txt);
-                
+
                 if (dr.GetFieldType(i).Equals(typeof(byte[])))
                 {
                     txt.ReadOnly = true;
@@ -354,9 +366,11 @@ namespace SQLiteWorkshop
                 TextBox t = FindTextBox(string.Format("txt{0}", i.ToString().PadLeft(4, '0')));
                 if (dr[i].ToString() != t.Text)
                 {
+                    ColData cd = (ColData)t.Tag;
                     count++;
-                    sb.Append(count > 1 ? "," : string.Empty).AppendFormat(" \"{0}\" = ?", t.Tag);
-                    parms.Add(t.Text);
+                    sb.Append(count > 1 ? "," : string.Empty).AppendFormat(" \"{0}\" = ?", cd.colname);
+                    if (!ValidateData(t, out string szData)) return false;
+                    parms.Add(szData);
                 }
             }
             // If no data has changed, just return
@@ -419,9 +433,11 @@ namespace SQLiteWorkshop
                 if (!string.IsNullOrEmpty(t.Text))
                 {
                     count++;
-                    sb.Append(count > 1 ? "," : string.Empty).AppendFormat(" \"{0}\"", t.Tag);
+                    ColData cd = (ColData)t.Tag;
+                    sb.Append(count > 1 ? "," : string.Empty).AppendFormat(" \"{0}\"", cd.colname);
                     sbValues.Append(count > 1 ? "," : string.Empty).Append("?");
-                    parms.Add(t.Text);
+                    if (!ValidateData(t, out string szData)) return false;
+                    parms.Add(szData);
                 }
             }
             if (count == 0)
@@ -442,7 +458,7 @@ namespace SQLiteWorkshop
             toolStripLabelStatus.Text = string.Format("{0} Record(s) added.", recsupdated.ToString());
             AddingRow = false;
             RowCount++;
-            CurrentRow = RowCount;      
+            CurrentRow = RowCount;
             return true;
         }
         #endregion
@@ -480,10 +496,10 @@ namespace SQLiteWorkshop
                 default:
                     break;
             }
-           
+
             dgResult = Common.ShowMsg("Confirm Delete. Press 'Ok' to Delete or 'Cancel' to abort.", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
             if (dgResult == DialogResult.Cancel) return false;
-           
+
             if (!BuildWhereClause(currDataRow, out string whereClause)) return false;
             string sql = string.Format("Delete from \"{0}\" {1}", TableName, whereClause);
             int recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, sql, out SQLiteErrorCode returnCode);
@@ -494,6 +510,106 @@ namespace SQLiteWorkshop
         #endregion
 
         #region helpers
+
+        string[] boolvalues = new string[] { "0" , "1", "true", "false"};
+        /// <summary>
+        /// Validate entered data and convert it to SQLite acceptablr value
+        /// </summary>
+        /// <param name="t"></param>
+        /// <param name="szValue"></param>
+        /// <returns></returns>
+        protected bool ValidateData(TextBox t, out string szValue)
+        {
+            szValue = "";
+            ColData cd = (ColData)t.Tag;
+            switch (cd.coltype.ToLower())
+            {
+                case "boolean":
+                    if (boolvalues.Contains(t.Text.ToLower().Trim()))
+                    {
+                        szValue = t.Text;
+                        return true;
+                    }
+                    Common.ShowMsg("Please enter 'true' or 'false'");
+                    t.Focus();
+                    break;
+
+                case "datetime":
+                case "date":
+                case "timestamp":
+                    if (DateTime.TryParse(t.Text, out DateTime newdate))
+                    {
+                        szValue = newdate.ToString("yyyy-MM-dd HH:mm:ss");
+                        return true;
+                    }
+                    Common.ShowMsg("Please enter a valid Date");
+                    t.Focus();
+                    break;
+
+                case "time":
+                    if (DateTime.TryParse(t.Text, out DateTime newtime))
+                    {
+                        szValue = newtime.ToString("HH:mm:ss");
+                        return true;
+                    }
+                    Common.ShowMsg("Please enter a valid Time");
+                    t.Focus();
+                    break;
+
+                case "integer":
+                case "int":
+                case "tinyint":
+                case "smallint":
+                case "mediumint":
+                case "bigint":
+                case "unsigned big int":
+                case "int2":
+                case "int4":
+                case "int8":
+                    if (int.TryParse(t.Text, out int newint))
+                    {
+                        szValue = t.Text;
+                        return true;
+                    }
+                    Common.ShowMsg("Please enter a valid Integer");
+                    t.Focus();
+                    break;
+
+                case "float":
+                case "numeric":
+                case "real":
+                case "double":
+                case "double precision":
+                case "single":
+                case "single precision":
+                    if (double.TryParse(t.Text, out double newdbl))
+                    {
+                        szValue = newdbl.ToString();
+                        return true;
+                    }
+                    Common.ShowMsg("Please enter a valid value");
+                    t.Focus();
+                    break;
+
+                default:
+                    if (cd.coltype.ToLower().StartsWith("decimal"))
+                    {
+                        if (decimal.TryParse(t.Text, out decimal newdec))
+                        {
+                            szValue = newdec.ToString();
+                            return true;
+                        }
+                        Common.ShowMsg("Please enter a valid Decimal value");
+                        t.Focus();
+                        break;
+                    }
+                    szValue = t.Text;
+                    return true;
+            }
+
+            return false;
+
+        }
         /// <summary>
         /// determine if the underlying row has been modified or deleted
         /// </summary>
@@ -678,8 +794,7 @@ namespace SQLiteWorkshop
         /// <param name="e"></param>
         private void toolStripButtonCommit_Click(object sender, EventArgs e)
         {
-            UpdateRow();
-            LoadRecord(CurrentRow);
+            if (UpdateRow()) LoadRecord(CurrentRow);
         }
 
         /// <summary>

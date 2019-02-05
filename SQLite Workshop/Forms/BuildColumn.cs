@@ -56,31 +56,63 @@ namespace SQLiteWorkshop
                     break;
                 case SQLType.SQLModifyColumn:
                     lblPanelHeading.Text = "Modify Column";
-                    txtColumn.Text = TargetNode.Tag.ToString();
-                    txtColumn.ReadOnly = true;
+                    InitProps();
                     lblNewColumnName.Visible = false;
                     txtNewColumn.Visible = false;
+
                     break;
                 case SQLType.SQLDeleteColumn:
                     lblPanelHeading.Text = "Delete Column";
-                    txtColumn.Text = TargetNode.Tag.ToString();
-                    txtColumn.ReadOnly = true;
-                    InitializePropertyGrid(tablename, TargetNode.Tag.ToString());
+                    InitProps();
                     props.ReadOnly(true);
                     lblNewColumnName.Visible = false;
                     txtNewColumn.Visible = false;
                     break;
                 case SQLType.SQLRenameColumn:
                     lblPanelHeading.Text = "Rename Column";
-                    txtColumn.Text = TargetNode.Tag.ToString();
-                    txtColumn.ReadOnly = true;
-                    
+                    InitProps();
+                    props.ReadOnly(true);
                     break;
                 default:
                     break;
             }
 
             propertyGridColumn.SelectedObject = props;
+        }
+
+        private void InitProps()
+        {
+            txtColumn.Text = TargetNode.Tag.ToString();
+            txtColumn.ReadOnly = true;
+            ColumnLayout cl = Common.FindColumnLayout(tablename, txtColumn.Text);
+            props.Type = GetColumnType(cl.ColumnType);
+            props.Size = GetColumnSize(cl.ColumnType);
+            props.DefaultValue = cl.DefaultValue;
+            props.AllowNull = cl.NullType == 0 ? true : false ;
+            props.CollatingSequence = cl.Collation;
+            props.ForeignKeyColumn = cl.ForeignKey.From;
+            props.ForeignKeyParent = cl.ForeignKey.Table;
+            props.ForeignKeyOnDelete = cl.ForeignKey.OnDelete;
+            props.ForeignKeyOnUpdate = cl.ForeignKey.OnUpdate;
+        }
+
+        private string GetColumnType(string coltype)
+        {
+            int i = coltype.IndexOf("(");
+            return i < 0 ? coltype : coltype.Substring(0, i);
+        }
+
+        private int GetColumnSize(string coltype)
+        {
+            int size = 0;
+            int i = coltype.IndexOf("(");
+            string type = i < 0 ? coltype : coltype.Substring(0, i);
+            if (Common.IsText(type))
+            {
+                int j = coltype.IndexOf(")");
+                if (j > i) size = Convert.ToInt32(coltype.Substring(i + 1, j - (i+1)).Trim());
+            }
+            return size;
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -121,7 +153,7 @@ namespace SQLiteWorkshop
                 txtColumn.Focus();
                 return false;
             }
-            return true;
+            return ValidateModifyInput();
         }
 
         protected bool ValidateModifyInput()
@@ -208,7 +240,7 @@ namespace SQLiteWorkshop
             SQLiteCommand cmd = null;
 
             Dictionary<string, ColumnLayout> columns = DataAccess.SchemaDefinitions[CurrentDB].Tables[tablename].Columns;
-            Dictionary<string, ColumnLayout> newcolumns = new Dictionary<string, ColumnLayout>(); ;
+            Dictionary<string, ColumnLayout> newcolumns = new Dictionary<string, ColumnLayout>(); 
 
             switch (ExecType)
             {
@@ -252,25 +284,30 @@ namespace SQLiteWorkshop
                 //Create the temp table
                 cmd.CommandText = CreateSQL;
                 var createRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
+                if (createRtnCode != 0) throw new Exception(String.Format("Cannot create Temp Table.\r\n{0}", DataAccess.LastError));
 
                 //Copy data from the current table to the temp table
                 string insertSQL = string.Format("Insert Into {0} {1}", tmptablename, SelectSQL);
                 cmd.CommandText = insertSQL;
                 var insertRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
+                if (insertRtnCode != 0) throw new Exception(String.Format("Cannot Copy Rows into Temp Table.\r\n{0}", DataAccess.LastError));
 
                 //delete the current table
                 cmd.CommandText = SqlFactory.DropSql(tablename);
                 var deleteRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
+                if (deleteRtnCode != 0) throw new Exception(String.Format("Cannot Delete Original Table.\r\n{0}", DataAccess.LastError));
 
                 //rename the temp table to the old table name
                 cmd.CommandText = string.Format("Alter Table {0} Rename To {1}", tmptablename, tablename);
                 var renameRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
+                if (renameRtnCode != 0) throw new Exception(String.Format("Cannot Rename Temp Table.\r\n{0}", DataAccess.LastError));
 
                 //Rebuild Indexes
                 foreach (DataRow dr in idxDT.Rows)
                 {
                     cmd.CommandText = dr["sql"].ToString();
                     var indexRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
+                    if (indexRtnCode != 0) throw new Exception(String.Format("Cannot Rebuild Indexes.\r\n{0}", DataAccess.LastError));
                 }
                
 
@@ -278,15 +315,17 @@ namespace SQLiteWorkshop
                 foreach (DataRow dr in trigDT.Rows)
                 {
                     cmd.CommandText = dr["sql"].ToString();
-                    var indexRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
+                    var triggerRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
+                    if (triggerRtnCode != 0) throw new Exception(String.Format("Cannot Create Triggers.\r\n{0}", DataAccess.LastError));
                 }
 
                 sqlT.Commit();
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(String.Format(Common.ERR_SQL, ex.Message, returnCode));
                 sqlT.Rollback();
+                Common.ShowMsg(String.Format(Common.ERR_SQL, ex.Message, returnCode));
+                return false;
             }
             finally
             {
@@ -302,17 +341,12 @@ namespace SQLiteWorkshop
         private bool ShowWarning()
         {
             ShowMsg sm = new ShowMsg();
-            sm.Message = "WARNING!!!.  This feature is not natively supported by SQLite.  It is implemented by copying the table with column changes, deleteing the old table and renaming the copied table.  Once complete, YOU MUST MANUALLY CHANGE ANY INDEX, VIEW OR TRIGGER CONTAINING THIS COLUMN!!!. IF YOU DO NOT DO THIS YOU MAY LEAVE YOUR INDEX, VIEW OR TRIGGER IN AN INCONSISTENT STATE!!!\r\n\r\nPress 'Ok' to continue or 'Cancel' to exit.";
+            sm.Message = "WARNING!!!.  This feature is not natively supported by SQLite.  It is implemented by copying the table with column changes, deleting the old table and renaming the copied table.  Once complete, YOU MUST MANUALLY CHANGE ANY INDEX, VIEW OR TRIGGER CONTAINING THIS COLUMN!!!. IF YOU DO NOT DO THIS YOU MAY LEAVE YOUR INDEX, VIEW OR TRIGGER IN AN INCONSISTENT STATE!!!\r\n\r\nPress 'Ok' to continue or 'Cancel' to exit.";
             sm.ShowDialog();
             if (sm.DoNotShow) MainForm.cfg.SetSetting(Config.CFG_COLUMNEDITWARN, "true");
             return sm.Result == DialogResult.Cancel ? false : true;
         }
 
-        protected void InitializePropertyGrid(string TableName, string ColumnName)
-        {
-            
-            //Columnse props.SetCustomAttribute(cab);
-        }
 
         internal ColumnLayout BuildColumnLayout()
         {

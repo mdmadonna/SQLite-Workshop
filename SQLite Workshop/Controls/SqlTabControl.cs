@@ -222,7 +222,7 @@ namespace SQLiteWorkshop
         /// <summary>
         /// Execute an Explain or Explain Query Plan on the SQL Statement and show the results.
         /// </summary>
-        /// <param name="ExplainPlan">true- Execute 'Explain Query Plan', false - Execute 'Explain'</param>
+        /// <param name="ExplainPlan">true- Execute 'Explain', false - Execute 'Explain Query Plan'</param>
         internal void Explain(bool ExplainPlan)
         {
             string sql = GetSQL();
@@ -233,7 +233,7 @@ namespace SQLiteWorkshop
             toolStripClock.Text = string.Empty;
 
             Int64 startclock = Timers.QueryPerformanceCounter();
-            sql = ExplainPlan ? string.Format("Explain Query Plan {0}", sql) : string.Format("Explain {0}", sql);
+            sql = ExplainPlan ? string.Format("Explain {0}", sql) : string.Format("Explain Query Plan {0}", sql);
             DataTable dt = DataAccess.ExecuteDataTable(DatabaseName, sql, out SQLiteErrorCode returnCode);
             if (returnCode == SQLiteErrorCode.Ok)
             {

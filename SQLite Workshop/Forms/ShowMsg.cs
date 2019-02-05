@@ -15,6 +15,13 @@ namespace SQLiteWorkshop
     {
         ToolTip toolTip;
 
+        public enum ButtonStyle
+        {
+            OKCancel,
+            OK
+        }
+
+        public ButtonStyle ButtonStyleValue { get; set; }
         public string Caption { get; set; }
 
         public string Message { get; set; }
@@ -23,8 +30,9 @@ namespace SQLiteWorkshop
 
         public bool DoNotShow { get; set; }
 
-        public ShowMsg()
+        public ShowMsg(ButtonStyle buttonStyle = ButtonStyle.OKCancel)
         {
+            ButtonStyleValue = buttonStyle;
             InitializeComponent();
         }
 
@@ -32,11 +40,23 @@ namespace SQLiteWorkshop
         {
             lblFormHeading.Text = string.IsNullOrEmpty(Caption) ? "Warning" : Caption;
             textBoxMessage.Text = Message;
-            Result = DialogResult.Cancel;
+            Result = DialogResult.Cancel;       //Set default even if Cancel Button is not displayed
 
             // Establish ToolTips for various controls.
             toolTip = new ToolTip();
             toolTip.SetToolTip(pbClose, "Close");
+
+            switch (ButtonStyleValue)
+            {
+                case ButtonStyle.OKCancel:          //Default - do nothing
+                    break;
+                case ButtonStyle.OK:                //Hide Cancel button and move OK button
+                    btnCancel.Visible = false;
+                    btnOK.Left = btnCancel.Left;
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void ShowMsg_FormClosing(object sender, FormClosingEventArgs e)

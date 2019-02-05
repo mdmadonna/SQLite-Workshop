@@ -104,6 +104,8 @@ namespace SQLiteWorkshop
 
     abstract class DataAccess
     {
+        public static string DatabaseName;
+
         public static event EventHandler<ProgressEventArgs> ProgressReport = delegate { };
         public static void ProgressEventHandler(object sender, ProgressEventArgs e)
         {
@@ -129,6 +131,7 @@ namespace SQLiteWorkshop
 
         internal static SchemaDefinition GetSchema(string DBLocation)
         {
+            DatabaseName = DBLocation;
 
             SchemaDefinition sd = new SchemaDefinition();
 

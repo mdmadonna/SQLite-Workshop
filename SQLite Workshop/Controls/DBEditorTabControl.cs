@@ -56,7 +56,19 @@ namespace SQLiteWorkshop
 
         internal bool Execute()
         {
-            return InitializeWindow();
+            bool rtn = InitializeWindow();
+            bool bNoWarning = false;
+            bool.TryParse(MainForm.cfg.appsetting(Config.CFG_ROWEDITWARN), out bNoWarning);
+            if (!bNoWarning) ShowWarning();
+            return rtn;
+        }
+
+        private void ShowWarning()
+        {
+            ShowMsg sm = new ShowMsg(ShowMsg.ButtonStyle.OK);
+            sm.Message = "WARNING!!!.  This editor does not provide any data validation.  Data will be stored as entered.  If you enter the wrong format (i.e. text in a datetime column), programs using this data may experience unpredictable results.\n\r\n\r\nIMPORTANT!!! Enter datetime columns as yyy-mm-dd hh:mm:ss.\n\r\n\r\nPress 'Ok' to continue.";
+            sm.ShowDialog();
+            if (sm.DoNotShow) MainForm.cfg.SetSetting(Config.CFG_ROWEDITWARN, "true");
         }
 
         /// <summary>
@@ -220,6 +232,12 @@ namespace SQLiteWorkshop
                         if (ColumnsToUpdate > 0) sb.Append(",");
                         sb.Append("\"").Append(dr.Table.Columns[i].ColumnName).Append("\" = ?");
                         ColumnsToUpdate++;
+                        ColumnLayout cl = Common.FindColumnLayout(TableName, dr.Table.Columns[i].ColumnName);
+                        if (!Common.ValidateData(cl.ColumnType, dr[i, DataRowVersion.Proposed].ToString(), out string szValue))
+                        {
+                            Common.ShowMsg(string.Format("Invalid value entered for Column [{0}]", dr.Table.Columns[i].ColumnName));
+                            return false;
+                        }
                         parms.Add(dr[i, DataRowVersion.Proposed]);
                     }
                 }
@@ -400,6 +418,21 @@ namespace SQLiteWorkshop
             finally { dr.Close(); }
             returnCode = cmd.Connection.ExtendedResultCode();
             return dt;
+        }
+
+        private void dgMain_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+        {
+            int i = e.RowIndex;
+            int j = e.ColumnIndex;
+            string datacolumn = dgMain.Columns[e.ColumnIndex].Name;
+            ColumnLayout cl = Common.FindColumnLayout(TableName, datacolumn);
+            if (!Common.ValidateData(cl.ColumnType, dgMain.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString(), out string szValue))
+            {
+                Common.ShowMsg("Invalid value");
+                dgMain.Focus();
+                dgMain.CurrentCell = dgMain.Rows[e.RowIndex].Cells[e.ColumnIndex];
+                dgMain.BeginEdit(true);
+            }
         }
     }
 }

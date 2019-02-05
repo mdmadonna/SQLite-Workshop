@@ -393,7 +393,6 @@ namespace SQLiteWorkshop
         /// <returns>True if the column has text affinity, False if not</returns>
         internal static bool IsText(string ColType)
         {
-            // Note that this routines assume all Column types are in lower case
             foreach (string szType in TextTypes)
             {
                 if (ColType.ToLower().StartsWith(szType.ToLower())) return true;
@@ -408,10 +407,9 @@ namespace SQLiteWorkshop
         /// <returns>True if the column has Integer affinity, False if not</returns>
         internal static bool IsInteger(string ColType)
         {
-            // Note that this routines assume all Column types are in lower case
             foreach (string szType in IntegerTypes)
             {
-                if (ColType.StartsWith(szType)) return true;
+                if (ColType.ToLower().StartsWith(szType)) return true;
             }
             return false;
         }
@@ -423,10 +421,9 @@ namespace SQLiteWorkshop
         /// <returns>True if the column has Real affinity, False if not</returns>
         internal static bool IsReal(string ColType)
         {
-            // Note that this routines assume all Column types are in lower case
             foreach (string szType in RealTypes)
             {
-                if (ColType.StartsWith(szType)) return true;
+                if (ColType.ToLower().StartsWith(szType)) return true;
             }
             return false;
         }
@@ -438,10 +435,9 @@ namespace SQLiteWorkshop
         /// <returns>True if the column is boolean, False if not</returns>
         internal static bool IsBoolean(string ColType)
         {
-            // Note that this routines assume all Column types are in lower case
             foreach (string szType in BooleanTypes)
             {
-                if (ColType.StartsWith(szType)) return true;
+                if (ColType.ToLower().StartsWith(szType)) return true;
             }
             return false;
         }
@@ -452,10 +448,9 @@ namespace SQLiteWorkshop
         /// <returns>True if the column has Numeric affinity, False if not</returns>
         internal static bool IsNumeric(string ColType)
         {
-            // Note that this routines assume all Column types are in lower case
             foreach (string szType in NumericTypes)
             {
-                if (ColType.StartsWith(szType)) return true;
+                if (ColType.ToLower().StartsWith(szType)) return true;
             }
             return false;
         }
@@ -466,10 +461,9 @@ namespace SQLiteWorkshop
         /// <returns>True if the column is a Date type, False if not</returns>
         internal static bool IsDate(string ColType)
         {
-            // Note that this routines assume all Column types are in lower case
             foreach (string szType in DateTypes)
             {
-                if (ColType.StartsWith(szType)) return true;
+                if (ColType.ToLower().StartsWith(szType)) return true;
             }
             return false;
         }
@@ -482,10 +476,9 @@ namespace SQLiteWorkshop
         /// <returns>True if the column has affinity to a numeric value, False if not</returns>
         internal static bool IsNumber(string ColType)
         {
-            // Note that this routines assume all Column types are in lower case
             foreach (string szType in NumberTypes)
             {
-                if (ColType.StartsWith(szType)) return true;
+                if (ColType.ToLower().StartsWith(szType)) return true;
             }
             return false;
         }
@@ -641,6 +634,76 @@ namespace SQLiteWorkshop
                 cs.Close();
             }
         }
+        #endregion
+
+        #region TableData
+
+        internal static TableLayout FindTableLayout(string tablename)
+        {
+            SchemaDefinition sd = DataAccess.GetSchema(DataAccess.DatabaseName);
+            return sd.Tables[tablename];
+        }
+
+        internal static ColumnLayout FindColumnLayout(string tablename, string columnname)
+        {
+            SchemaDefinition sd = DataAccess.GetSchema(DataAccess.DatabaseName);
+            TableLayout tl = sd.Tables[tablename];
+            return tl.Columns[columnname];
+        }
+
+        static string[] boolvalues = new string[] { "0", "1", "true", "false" };
+        /// <summary>
+        /// Validate data based on datatype and convert it to SQLite acceptable value
+        /// </summary>
+        /// <param name="datatype"></param>   Type of database column
+        /// <param name="datavalue"></param>  Value entered 
+        /// <param name="szValue"></param>    Value to be inserted into DB
+        /// <returns></returns>
+        internal static bool ValidateData(string datatype, string datavalue, out string szValue)
+        {
+            szValue = "";
+            if (IsBoolean(datatype))
+            {
+                if (boolvalues.Contains(datavalue.ToLower().Trim()))
+                {
+                    szValue = datavalue;
+                    return true;
+                }
+            }
+            else if (IsDate(datatype))
+            {
+                if (DateTime.TryParse(datavalue, out DateTime newdate))
+                {
+                    szValue = newdate.ToString("yyyy-MM-dd HH:mm:ss");
+                    return true;
+                }
+            }
+            else if (IsInteger(datatype))
+            {
+                if (int.TryParse(datavalue, out int newint))
+                {
+                    szValue = datavalue;
+                    return true;
+                }
+            }
+            else if (IsNumber(datatype))
+            {
+                if (double.TryParse(datavalue, out double newdbl))
+                {
+                    szValue = newdbl.ToString();
+                    return true;
+                }
+            }
+            else
+            {
+                szValue = datavalue;
+                return true;
+            }
+
+            return false;
+
+        }
+
         #endregion
     }
 }

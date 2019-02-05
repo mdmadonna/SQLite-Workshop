@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
 	<Product Id="868a81bf-b8c5-46f9-94e5-08d52c3d5c35" Name="SQLite Workshop" Language="1033" Version="1.0.0.0" Manufacturer="ajm Software" UpgradeCode="c5dca0a0-c878-4b76-914b-b843081c24f1">
-		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
 		<MediaTemplate EmbedCab="yes" />
@@ -18,6 +18,8 @@
       <ComponentGroupRef Id="TableComponent"/>
       <ComponentGroupRef Id="TriggerComponent"/>
       <ComponentGroupRef Id="ViewComponent"/>
+      <ComponentGroupRef Id="SQLitex64Component"/>
+      <ComponentGroupRef Id="SQLitex86Component"/>
       <ComponentRef Id="cmpDesktopShortcut" />
       <ComponentRef Id="cmpProgramShortcut" />
 		</Feature>
@@ -27,9 +29,12 @@
 		<Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="DesktopFolder" />
       <Directory Id="ProgramMenuFolder" />
-			<Directory Id="ProgramFiles64Folder">
-				<Directory Id="INSTALLFOLDER" Name="SQLite Workshop" />
-			</Directory>
+		  <Directory Id="ProgramFilesFolder">
+		    <Directory Id="INSTALLFOLDER" Name="SQLite Workshop" >
+          <Directory Id="SQLitex86FOLDER" Name="x86" />
+          <Directory Id="SQLitex64FOLDER" Name="x64" />
+        </Directory>
+		  </Directory>
       <Directory Id="CommonAppDataFolder">
         <Directory Id="DATAFOLDER" Name="SQLite Workshop" >
           <Directory Id="TEMPLATESFOLDER" Name="Templates" >
@@ -49,10 +54,10 @@
   
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-			<Component Id="ProductComponent" Win64="yes">
+			<Component Id="ProductComponent" Win64="no">
         <File Source="$(var.SQLite Workshop.TargetPath)" />
 			</Component>
-			<Component Win64="yes">
+			<Component Win64="no">
         <File Source="..\SQLite Workshop\Definitions.txt" />
 			</Component>
     </ComponentGroup>
@@ -60,11 +65,27 @@
 
   <Fragment>
     <ComponentGroup Id="DllsComponent" Directory="INSTALLFOLDER" >
-      <Component Win64="yes">
+      <Component Win64="no">
         <File Source="..\SQLite Workshop\bin\Release\CsvHelper.dll" />
       </Component>
-      <Component Win64="yes">
+      <Component Win64="no">
         <File Source="..\SQLite Workshop\bin\Release\System.Data.SQLite.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="SQLitex86Component" Directory="SQLitex86FOLDER" >
+      <Component Win64="no">
+        <File Id="SQLite86" Source="..\SQLite Workshop\bin\Release\x86\SQLite.Interop.dll" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+
+  <Fragment>
+    <ComponentGroup Id="SQLitex64Component" Directory="SQLitex64FOLDER" >
+      <Component Win64="no">
+        <File Id="SQLite64" Source="..\SQLite Workshop\bin\Release\x64\SQLite.Interop.dll" />
       </Component>
     </ComponentGroup>
   </Fragment>
