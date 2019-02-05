@@ -366,7 +366,6 @@
     <Content Include="Definitions.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="dll\SQLite 1.0.108.0\Mixed\System.Data.SQLite.dll" />
     <Content Include="Main.ico" />
     <Content Include="Templates\Database\Database List.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
