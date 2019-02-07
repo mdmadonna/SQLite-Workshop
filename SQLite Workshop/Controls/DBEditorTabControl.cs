@@ -66,7 +66,7 @@ namespace SQLiteWorkshop
         private void ShowWarning()
         {
             ShowMsg sm = new ShowMsg(ShowMsg.ButtonStyle.OK);
-            sm.Message = "WARNING!!!.  This editor does not provide any data validation.  Data will be stored as entered.  If you enter the wrong format (i.e. text in a datetime column), programs using this data may experience unpredictable results.\n\r\n\r\nIMPORTANT!!! Enter datetime columns as yyy-mm-dd hh:mm:ss.\n\r\n\r\nPress 'Ok' to continue.";
+            sm.Message = "WARNING!!!.  This editor does not provide any data validation.  Data will be stored as entered.  If you enter the wrong format (i.e. text in a datetime column), programs using this data may experience unpredictable results.\n\r\n\r\nIMPORTANT!!! Enter datetime columns as yyyy-mm-dd hh:mm:ss.\n\r\n\r\nPress 'Ok' to continue.";
             sm.ShowDialog();
             if (sm.DoNotShow) MainForm.cfg.SetSetting(Config.CFG_ROWEDITWARN, "true");
         }
