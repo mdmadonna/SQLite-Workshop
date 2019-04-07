@@ -215,6 +215,22 @@ namespace SQLiteWorkshop
                 SchemaDefinitions[DBLocation].Tables.Remove(table);
             return true;
         }
+        /// <summary>
+        /// Reload all Tables into the Schema Definition Structure.  This is needed
+        /// to accommodate changes to Tables made via Sql during the session.
+        /// </summary>
+        /// <param name="DBLocation"></param>
+        internal static void ReloadTables(string DBLocation)
+        {
+            SQLiteConnection conn = null;
+            SQLiteCommand cmd = null;
+
+            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return;
+
+            SchemaDefinition sd = SchemaDefinitions[DBLocation];
+            sd.Tables = GetTables(cmd);
+            CloseDB(conn);
+        }
 
         /// <summary>
         /// Reload all Views into the Schema Definition Structure.  This is needed

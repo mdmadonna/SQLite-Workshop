@@ -100,16 +100,18 @@ namespace SQLiteWorkshop
 
         protected void GetFile()
         {
-            SaveFileDialog saveFile = new SaveFileDialog();
-            saveFile.Title = "Select Destination File";
-            saveFile.Filter = radioComma.Checked ? "All files (*.*)|*.*|Comma-delimited FIles (*.csv)|*.csv" : "All files (*.*)|*.*|Sql FIles (*.sql)|*.sql";
-            saveFile.FilterIndex = 2;
-            saveFile.AddExtension = true;
-            saveFile.AutoUpgradeEnabled = true;
-            saveFile.DefaultExt = "csv";
-            saveFile.RestoreDirectory = true;
-            saveFile.ValidateNames = true;
-            saveFile.OverwritePrompt = false;
+            SaveFileDialog saveFile = new SaveFileDialog
+            {
+                Title = "Select Destination File",
+                Filter = radioComma.Checked ? "All files (*.*)|*.*|Comma-delimited FIles (*.csv)|*.csv" : "All files (*.*)|*.*|Sql FIles (*.sql)|*.sql",
+                FilterIndex = 2,
+                AddExtension = true,
+                AutoUpgradeEnabled = true,
+                DefaultExt = "csv",
+                RestoreDirectory = true,
+                ValidateNames = true,
+                OverwritePrompt = false
+            };
             if (radioComma.Checked)
             {
                 if (listBoxTables.SelectedIndex >= 0)
@@ -180,10 +182,9 @@ namespace SQLiteWorkshop
 
             SQLiteConnection conn = new SQLiteConnection();
             SQLiteCommand cmd = new SQLiteCommand();
-            SQLiteErrorCode returnCode;
             long RecordCount;
 
-            var rtn = DataAccess.OpenDB(DatabaseLocation, ref conn, ref cmd, out returnCode, false);
+            var rtn = DataAccess.OpenDB(DatabaseLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode, false);
             if (!rtn || returnCode != SQLiteErrorCode.Ok)
             {
                 Common.ShowMsg("Unable to open database.");
@@ -249,10 +250,9 @@ namespace SQLiteWorkshop
 
             SQLiteConnection conn = new SQLiteConnection();
             SQLiteCommand cmd = new SQLiteCommand();
-            SQLiteErrorCode returnCode;
             long RecordCount;
 
-            var rtn = DataAccess.OpenDB(DatabaseLocation, ref conn, ref cmd, out returnCode, false);
+            var rtn = DataAccess.OpenDB(DatabaseLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode, false);
             if (!rtn || returnCode != SQLiteErrorCode.Ok)
             {
                 Common.ShowMsg("Unable to open database.");
@@ -292,7 +292,7 @@ namespace SQLiteWorkshop
                         {
                             if (checkBoxHeadings.Checked) sb.Append(bComma ? "," : string.Empty).AppendFormat("\"{0}\"", dr.GetName(i));
                             sbVal.Append(bComma ? "," : string.Empty);
-                            sbVal.Append(DBNull.Value.Equals(dr[i]) ? string.Empty : FormatOutput(dr[i].GetType(), dr[i]));
+                            sbVal.Append(DBNull.Value.Equals(dr[i]) ? "null" : FormatOutput(dr[i].GetType(), dr[i]));
                             bComma = true;
                         }
                         if (checkBoxHeadings.Checked) sb.Append(")");
@@ -335,6 +335,12 @@ namespace SQLiteWorkshop
                     return FormatBytes((byte[])item);
                 case "system.string":
                     return string.Format("\"{0}\"", item.ToString().Replace("\"", "\"\""));
+                case "system.boolean":
+                    bool.TryParse(item.ToString(), out bool boolValue);
+                    return boolValue ? "1" : "0";
+                case "system.datetime":
+                    DateTime.TryParse(item.ToString(), out DateTime dateValue);
+                    return string.Format("\"{0}\"", dateValue.ToString("o"));
                 default:
                     return item.ToString();
 

@@ -94,6 +94,7 @@
             this.sQLFileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.savetoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAstoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAsTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAlltoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.openRegisteredDBtoolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -122,7 +123,6 @@
             this.statusStripMain = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusMain = new System.Windows.Forms.ToolStripStatusLabel();
             this.spRight = new System.Windows.Forms.Splitter();
-            this.saveAsTemplateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panelMain.SuspendLayout();
             this.panelRight.SuspendLayout();
             this.panelProperties.SuspendLayout();
@@ -839,6 +839,13 @@
             this.saveAstoolStripMenuItem.Text = "Save &As";
             this.saveAstoolStripMenuItem.Click += new System.EventHandler(this.saveAstoolStripMenuItem_Click);
             // 
+            // saveAsTemplateToolStripMenuItem
+            // 
+            this.saveAsTemplateToolStripMenuItem.Name = "saveAsTemplateToolStripMenuItem";
+            this.saveAsTemplateToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
+            this.saveAsTemplateToolStripMenuItem.Text = "Save As Template";
+            this.saveAsTemplateToolStripMenuItem.Click += new System.EventHandler(this.saveAsTemplateToolStripMenuItem_Click);
+            // 
             // saveAlltoolStripMenuItem
             // 
             this.saveAlltoolStripMenuItem.Name = "saveAlltoolStripMenuItem";
@@ -969,7 +976,7 @@
             // sQLiteHomePageToolStripMenuItem
             // 
             this.sQLiteHomePageToolStripMenuItem.Name = "sQLiteHomePageToolStripMenuItem";
-            this.sQLiteHomePageToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sQLiteHomePageToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
             this.sQLiteHomePageToolStripMenuItem.Text = "SQLite Home Page";
             this.sQLiteHomePageToolStripMenuItem.Click += new System.EventHandler(this.sQLiteHomePageToolStripMenuItem_Click);
             // 
@@ -1095,13 +1102,6 @@
             this.spRight.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sp_MouseDown);
             this.spRight.MouseMove += new System.Windows.Forms.MouseEventHandler(this.spMouseMove);
             this.spRight.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sp_MouseUp);
-            // 
-            // saveAsTemplateToolStripMenuItem
-            // 
-            this.saveAsTemplateToolStripMenuItem.Name = "saveAsTemplateToolStripMenuItem";
-            this.saveAsTemplateToolStripMenuItem.Size = new System.Drawing.Size(183, 22);
-            this.saveAsTemplateToolStripMenuItem.Text = "Save As Template";
-            this.saveAsTemplateToolStripMenuItem.Click += new System.EventHandler(this.saveAsTemplateToolStripMenuItem_Click);
             // 
             // MainForm
             // 

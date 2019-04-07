@@ -200,8 +200,7 @@ namespace SQLiteWorkshop
         /// </summary>
         private void InitializeFormGUI()
         {
-            int parm;
-            if (Int32.TryParse(cfg.appsetting(Config.CFG_FTOP), out parm)) this.Top = parm;
+            if (Int32.TryParse(cfg.appsetting(Config.CFG_FTOP), out int parm)) this.Top = parm;
             if (Int32.TryParse(cfg.appsetting(Config.CFG_FLEFT), out parm)) this.Left = parm;
             if (Int32.TryParse(cfg.appsetting(Config.CFG_FHEIGHT), out parm)) this.Height = parm;
             if (Int32.TryParse(cfg.appsetting(Config.CFG_FWIDTH), out parm)) this.Width = parm;
@@ -210,7 +209,9 @@ namespace SQLiteWorkshop
             if (Int32.TryParse(cfg.appsetting(Config.CFG_PSPLITP), out parm)) spProp.SplitPosition = parm;
 
             // Setting the Right Panel Visibility
+#pragma warning disable IDE0018 // Inline variable declaration
             bool b = true;
+#pragma warning restore IDE0018 // Inline variable declaration
             templatesToolStripMenuItem.Checked = bool.TryParse(cfg.appsetting(Config.CFG_TEMPLATESVISIBLE), out b) ? true : b;
             b = true;
             propertiesToolStripMenuItem.Checked = bool.TryParse(cfg.appsetting(Config.CFG_PROPSVISIBLE), out b) ? true : b;
@@ -412,10 +413,12 @@ namespace SQLiteWorkshop
         {
             if (string.IsNullOrEmpty(CurrentDB)) return;
 
-            ExecuteForm ef = new ExecuteForm();
-            ef.execType = SQLType.SQLCompress;
-            ef.TargetNode = null;
-            ef.DatabaseLocation = CurrentDB;
+            ExecuteForm ef = new ExecuteForm
+            {
+                execType = SQLType.SQLCompress,
+                TargetNode = null,
+                DatabaseLocation = CurrentDB
+            };
             ef.ShowDialog();
         }
 
@@ -423,10 +426,12 @@ namespace SQLiteWorkshop
         {
             if (string.IsNullOrEmpty(CurrentDB)) return;
 
-            ExecuteForm ef = new ExecuteForm();
-            ef.execType = SQLType.SQLEncrypt;
-            ef.TargetNode = null;
-            ef.DatabaseLocation = CurrentDB;
+            ExecuteForm ef = new ExecuteForm
+            {
+                execType = SQLType.SQLEncrypt,
+                TargetNode = null,
+                DatabaseLocation = CurrentDB
+            };
             ef.ShowDialog();
         }
 
@@ -572,18 +577,22 @@ namespace SQLiteWorkshop
         private void toolStripToolImport_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(CurrentDB)) return;
-            ImportWiz iWiz = new ImportWiz();
-            iWiz.DatabaseLocation = CurrentDB;
-            iWiz.ShowInTaskbar = true;
+            ImportWiz iWiz = new ImportWiz
+            {
+                DatabaseLocation = CurrentDB,
+                ShowInTaskbar = true
+            };
             iWiz.ShowDialog();
         }
 
         private void toolStripToolExport_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(CurrentDB)) return;
-            ExportWiz eWiz = new ExportWiz();
-            eWiz.DatabaseLocation = CurrentDB;
-            eWiz.ShowInTaskbar = true;
+            ExportWiz eWiz = new ExportWiz
+            {
+                DatabaseLocation = CurrentDB,
+                ShowInTaskbar = true
+            };
             eWiz.ShowDialog();
         }
         #endregion
@@ -610,24 +619,30 @@ namespace SQLiteWorkshop
                     newToolStripMenuItem_Click(sender, e);
                     break;
                 case "backup database":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLBackup;
-                    ef.TargetNode = null;
-                    ef.DatabaseLocation = CurrentDB;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLBackup,
+                        TargetNode = null,
+                        DatabaseLocation = CurrentDB
+                    };
                     ef.ShowDialog();
                     break;
                 case "optimize database":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLOptimize;
-                    ef.TargetNode = null;
-                    ef.DatabaseLocation = CurrentDB;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLOptimize,
+                        TargetNode = null,
+                        DatabaseLocation = CurrentDB
+                    };
                     ef.ShowDialog();
                     break;
                 case "clone database":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLClone;
-                    ef.TargetNode = null;
-                    ef.DatabaseLocation = CurrentDB;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLClone,
+                        TargetNode = null,
+                        DatabaseLocation = CurrentDB
+                    };
                     ef.ShowDialog();
                     break;
                 case "compress database":
@@ -745,9 +760,11 @@ namespace SQLiteWorkshop
                     this.Cursor = Cursors.Default;
                     break;
                 case "rename table":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLRename;
-                    ef.TargetNode = treeViewMain.SelectedNode;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLRename,
+                        TargetNode = treeViewMain.SelectedNode
+                    };
                     ef.ShowDialog();
                     if (ef.bActionComplete)
                     {
@@ -762,16 +779,20 @@ namespace SQLiteWorkshop
                     }
                     break;
                 case "truncate table":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLTruncate;
-                    ef.TargetNode = treeViewMain.SelectedNode;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLTruncate,
+                        TargetNode = treeViewMain.SelectedNode
+                    };
                     ef.ShowDialog();
                     break;
 
                 case "delete table":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLDrop;
-                    ef.TargetNode = treeViewMain.SelectedNode;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLDrop,
+                        TargetNode = treeViewMain.SelectedNode
+                    };
                     ef.ShowDialog();
                     if (ef.bActionComplete)
                     {
@@ -780,10 +801,15 @@ namespace SQLiteWorkshop
                     }
                     break;
                 case "export":
-                    ExportWiz exp = new ExportWiz();
-                    exp.DatabaseLocation = CurrentDB;
-                    exp.TableName = treeViewMain.SelectedNode.Text;
+                    ExportWiz exp = new ExportWiz
+                    {
+                        DatabaseLocation = CurrentDB,
+                        TableName = treeViewMain.SelectedNode.Text
+                    };
                     exp.ShowDialog();
+                    break;
+                case "refresh":
+                    RefreshTables();
                     break;
                 case "refresh table":
                     AddTable(treeViewMain.SelectedNode.Text);
@@ -806,9 +832,11 @@ namespace SQLiteWorkshop
 
         private void colContextMenu_Clicked(object sender, EventArgs e)
         {
-            BuildColumn bc = new BuildColumn();
-            bc.TargetNode = treeViewMain.SelectedNode;
-            bc.DatabaseLocation = CurrentDB;
+            BuildColumn bc = new BuildColumn
+            {
+                TargetNode = treeViewMain.SelectedNode,
+                DatabaseLocation = CurrentDB
+            };
             switch (((MenuItem)sender).Text.ToLower())
             {
                 case "add column":
@@ -856,38 +884,48 @@ namespace SQLiteWorkshop
                     st = new SqlTab();
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenAllIndexes); break;
                 case "rebuild index":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLRebuildIndex;
-                    ef.TargetNode = treeViewMain.SelectedNode;
-                    ef.DatabaseLocation = CurrentDB;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLRebuildIndex,
+                        TargetNode = treeViewMain.SelectedNode,
+                        DatabaseLocation = CurrentDB
+                    };
                     ef.ShowDialog();
                     break;
                 case "rebuild all indexes":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLRebuildAllIndexes;
-                    ef.TargetNode = treeViewMain.SelectedNode;
-                    ef.DatabaseLocation = CurrentDB;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLRebuildAllIndexes,
+                        TargetNode = treeViewMain.SelectedNode,
+                        DatabaseLocation = CurrentDB
+                    };
                     ef.ShowDialog();
                     break;
                 case "delete index":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLDeleteIndex;
-                    ef.TargetNode = treeViewMain.SelectedNode;
-                    ef.DatabaseLocation = CurrentDB;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLDeleteIndex,
+                        TargetNode = treeViewMain.SelectedNode,
+                        DatabaseLocation = CurrentDB
+                    };
                     ef.ShowDialog();
                     if (ef.bActionComplete) ReplaceTreeEntry();
                     break;
                 case "delete all indexes":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLDeleteAllIndexes;
-                    ef.TargetNode = treeViewMain.SelectedNode;
-                    ef.DatabaseLocation = CurrentDB;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLDeleteAllIndexes,
+                        TargetNode = treeViewMain.SelectedNode,
+                        DatabaseLocation = CurrentDB
+                    };
                     ef.ShowDialog();
                     if (ef.bActionComplete) ReplaceTreeEntry();
                     break;
                 case "new index":
-                    BuildIndex bi = new BuildIndex();
-                    bi.TableName = treeViewMain.SelectedNode.Text == "Indexes" ? treeViewMain.SelectedNode.Parent.Text : treeViewMain.SelectedNode.Parent.Parent.Text;
+                    BuildIndex bi = new BuildIndex
+                    {
+                        TableName = treeViewMain.SelectedNode.Text == "Indexes" ? treeViewMain.SelectedNode.Parent.Text : treeViewMain.SelectedNode.Parent.Parent.Text
+                    };
                     bi.Show();
                     break;
                 default:
@@ -935,16 +973,20 @@ namespace SQLiteWorkshop
                     toolStripTbCreateView_Click(sender, e);
                     break;
                 case "export view":
-                    ExportWiz exp = new ExportWiz();
-                    exp.DatabaseLocation = CurrentDB;
-                    exp.TableName = treeViewMain.SelectedNode.Text;
+                    ExportWiz exp = new ExportWiz
+                    {
+                        DatabaseLocation = CurrentDB,
+                        TableName = treeViewMain.SelectedNode.Text
+                    };
                     exp.ShowDialog();
                     break;
                 case "delete view":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLDeleteView;
-                    ef.TargetNode = treeViewMain.SelectedNode;
-                    ef.DatabaseLocation = CurrentDB;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLDeleteView,
+                        TargetNode = treeViewMain.SelectedNode,
+                        DatabaseLocation = CurrentDB
+                    };
                     ef.ShowDialog();
                     break;
                 case "refresh":
@@ -986,10 +1028,12 @@ namespace SQLiteWorkshop
                     toolStripTbCreateTrigger_Click(sender, e);
                     break;
                 case "delete trigger":
-                    ef = new ExecuteForm();
-                    ef.execType = SQLType.SQLDeleteTrigger;
-                    ef.TargetNode = treeViewMain.SelectedNode;
-                    ef.DatabaseLocation = CurrentDB;
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLDeleteTrigger,
+                        TargetNode = treeViewMain.SelectedNode,
+                        DatabaseLocation = CurrentDB
+                    };
                     ef.ShowDialog();
                     break;
                 case "refresh":
@@ -1053,18 +1097,20 @@ namespace SQLiteWorkshop
         #region Helpers
         private string FindDBFileLocation(bool bFileExists = true)
         {
-            OpenFileDialog openFile = new OpenFileDialog();
-            openFile.Title = "Open SQLite DB";
-            openFile.Filter = "All files (*.*)|*.*|Database Files (*.db)|*.db";
-            openFile.FilterIndex = 2;
-            openFile.CheckFileExists = bFileExists;
-            openFile.AddExtension = true;
-            openFile.AutoUpgradeEnabled = true;
-            openFile.DefaultExt = "db";
-            openFile.InitialDirectory = cfg.appsetting(Config.CFG_LASTOPEN);
-            openFile.Multiselect = false;
-            openFile.ShowReadOnly = false;
-            openFile.ValidateNames = true;
+            OpenFileDialog openFile = new OpenFileDialog
+            {
+                Title = "Open SQLite DB",
+                Filter = "All files (*.*)|*.*|Database Files (*.db)|*.db",
+                FilterIndex = 2,
+                CheckFileExists = bFileExists,
+                AddExtension = true,
+                AutoUpgradeEnabled = true,
+                DefaultExt = "db",
+                InitialDirectory = cfg.appsetting(Config.CFG_LASTOPEN),
+                Multiselect = false,
+                ShowReadOnly = false,
+                ValidateNames = true
+            };
             if (openFile.ShowDialog() != DialogResult.OK) return string.Empty;
             cfg.SetSetting(Config.CFG_LASTOPEN, Path.GetDirectoryName(openFile.FileName));
             return openFile.FileName;
@@ -1167,9 +1213,11 @@ namespace SQLiteWorkshop
                 tdi.Click += toolStripDBOpenDropDownItem_Click;
                 toolStripDBOpenDropDown.DropDownItems.Add(tdi);
 
-                ToolStripMenuItem tdj = new ToolStripMenuItem();
-                tdj.ToolTipText = dbName;
-                tdj.Text = dbName.Substring(dbName.LastIndexOf('\\') + 1);
+                ToolStripMenuItem tdj = new ToolStripMenuItem
+                {
+                    ToolTipText = dbName,
+                    Text = dbName.Substring(dbName.LastIndexOf('\\') + 1)
+                };
                 tdj.Click += toolStripDBOpenDropDownItem_Click;
                 databaseToolStripMenuItem.DropDownItems.Add(tdj);
             }
@@ -1183,10 +1231,12 @@ namespace SQLiteWorkshop
 
             foreach (var rDB in sortedDictionary)
             {
-                ToolStripMenuItem tdi = new ToolStripMenuItem();
-                tdi.ToolTipText = rDB.Key;
-                tdi.Text = rDB.Value.Name;
-                tdi.Tag = rDB.Value.Password;
+                ToolStripMenuItem tdi = new ToolStripMenuItem
+                {
+                    ToolTipText = rDB.Key,
+                    Text = rDB.Value.Name,
+                    Tag = rDB.Value.Password
+                };
                 tdi.Click += toolStripDBOpenDropDownItem_Click;
                 openRegisteredDBtoolStripMenuItem.DropDownItems.Add(tdi);
             }
@@ -1204,20 +1254,26 @@ namespace SQLiteWorkshop
                 return;
             }
 
-            TreeNode topNode = new TreeNode(sd.DBName, 0, 0);
-            topNode.ContextMenu = dbContextMenu;
+            TreeNode topNode = new TreeNode(sd.DBName, 0, 0)
+            {
+                ContextMenu = dbContextMenu
+            };
             MenuItem mi = topNode.ContextMenu.MenuItems["Register"];
             mi.Text = RegisteredDBs.Keys.Contains(DBLocation) ? "Unregister" : "Register";
 
             // Add System Tables & Tables to Treeview
-            TreeNode systablesNode = new TreeNode("System Tables", 2, 2);
-            systablesNode.Name = "SysTables";
-            systablesNode.Tag = DBLocation;
+            TreeNode systablesNode = new TreeNode("System Tables", 2, 2)
+            {
+                Name = "SysTables",
+                Tag = DBLocation
+            };
 
-            TreeNode tablesNode = new TreeNode("Tables", 2, 2);
-            tablesNode.Name = "Tables";
-            tablesNode.Tag = DBLocation;
-            tablesNode.ContextMenu = tablesContextMenu;
+            TreeNode tablesNode = new TreeNode("Tables", 2, 2)
+            {
+                Name = "Tables",
+                Tag = DBLocation,
+                ContextMenu = tablesContextMenu
+            };
 
             if (sd.Tables.Count > 0)
             {
@@ -1241,6 +1297,8 @@ namespace SQLiteWorkshop
             topNode.Nodes.Add(triggersNode);
 
             tablesNode.Expand();
+            viewsNode.Expand();
+            triggersNode.Expand();
             topNode.Expand();
             treeViewMain.Nodes.Add(topNode);
 
@@ -1286,13 +1344,17 @@ namespace SQLiteWorkshop
         internal TreeNode BuildTableNode(string table, TableLayout tl)
         {
             string[] PK = new string[tl.Columns.Count];
-            TreeNode tableNode = new TreeNode(table, 3, 3);
-            tableNode.Name = table;
-            tableNode.ContextMenu = tblContextMenu;
+            TreeNode tableNode = new TreeNode(table, 3, 3)
+            {
+                Name = table,
+                ContextMenu = tblContextMenu
+            };
 
             // Process Columns
-            TreeNode columnNode = new TreeNode("Columns", 2, 2);
-            columnNode.ContextMenu = columnContextMenu;
+            TreeNode columnNode = new TreeNode("Columns", 2, 2)
+            {
+                ContextMenu = columnContextMenu
+            };
             tableNode.Nodes.Add(columnNode);
             foreach (var column in tl.Columns)
             {
@@ -1300,9 +1362,11 @@ namespace SQLiteWorkshop
                 string pk = column.Value.PrimaryKey == 0 ? string.Empty : ", PK";
                 PK[column.Value.PrimaryKey] = column.Value.PrimaryKey == 0 ? string.Empty : column.Key;
                 string df = string.IsNullOrEmpty(column.Value.DefaultValue) ? string.Empty : string.Format(", Default: {0}", column.Value.DefaultValue);
-                TreeNode colNode = new TreeNode(string.Format("{0} ({1}, {2}{3}{4})", column.Key, column.Value.ColumnType, nul, pk, df), 4, 4);
-                colNode.Tag = column.Key;
-                colNode.ContextMenu = colContextMenu;
+                TreeNode colNode = new TreeNode(string.Format("{0} ({1}, {2}{3}{4})", column.Key, column.Value.ColumnType, nul, pk, df), 4, 4)
+                {
+                    Tag = column.Key,
+                    ContextMenu = colContextMenu
+                };
                 columnNode.Nodes.Add(colNode);
             }
 
@@ -1338,8 +1402,10 @@ namespace SQLiteWorkshop
             }
 
             // Process Indexes
-            TreeNode indexNode = new TreeNode("Indexes", 2, 2);
-            indexNode.ContextMenu = indexContextMenu;
+            TreeNode indexNode = new TreeNode("Indexes", 2, 2)
+            {
+                ContextMenu = indexContextMenu
+            };
             tableNode.Nodes.Add(indexNode);
             foreach (var index in tl.Indexes)
             {
@@ -1349,8 +1415,10 @@ namespace SQLiteWorkshop
                 if (index.Value.Origin == "pk") sb.Append(", PK");
                 if (index.Value.Partial) sb.Append(", Partial");
 
-                TreeNode IdxNode = new TreeNode(sb.ToString(), 5, 5);
-                IdxNode.Tag = index.Key;
+                TreeNode IdxNode = new TreeNode(sb.ToString(), 5, 5)
+                {
+                    Tag = index.Key
+                };
                 indexNode.Nodes.Add(IdxNode);
                 indexNode.Nodes[indexNode.Nodes.Count - 1].ContextMenu = idxContextMenu;
                 foreach (var IndexCol in index.Value.Columns)
@@ -1363,6 +1431,49 @@ namespace SQLiteWorkshop
             return tableNode;
         }
         
+        protected void RefreshTables()
+        {
+            DataAccess.ReloadTables(CurrentDB);
+            TreeNode tablesNode = BuildTablesNode();
+            if (tablesNode == null) return;
+
+            TreeNode[] tblMainNodes = treeViewMain.Nodes.Find("Tables", true);
+            TreeNode parentNode = tblMainNodes[0].Parent;
+            int idx = parentNode.Nodes.IndexOf(tblMainNodes[0]);
+            parentNode.Nodes.RemoveAt(idx);
+            parentNode.Nodes.Insert(idx, tablesNode);
+            treeViewMain.SelectedNode = tablesNode;
+            tablesNode.Expand();
+        }
+
+        protected TreeNode BuildTablesNode()
+        {
+            SchemaDefinition sd = DataAccess.GetSchema(CurrentDB);
+            if (sd.LoadStatus != 0)
+            {
+                Common.ShowMsg(string.Format("The database {0} cannot be loaded.\r\n{1}", CurrentDB, DataAccess.LastError));
+                return null;
+            }
+
+            TreeNode tablesNode = new TreeNode("Tables", 2, 2)
+            {
+                Name = "Tables",
+                Tag = CurrentDB,
+                ContextMenu = tablesContextMenu
+            };
+
+            if (sd.Tables.Count > 0)
+            {
+                foreach (var table in sd.Tables)
+                {
+                    TreeNode tableNode = BuildTableNode(table.Key, table.Value);
+                    // Add completed node to master table node
+                    if (table.Value.TblType == SQLiteTableType.user) tablesNode.Nodes.Add(tableNode);
+                    //if (table.Value.TblType == SQLiteTableType.system) systablesNode.Nodes.Add(tableNode);
+                }
+            }
+            return tablesNode;
+        }
         protected void RefreshViews()
         {
             DataAccess.ReloadViews(CurrentDB);
@@ -1373,21 +1484,26 @@ namespace SQLiteWorkshop
             parentNode.Nodes.RemoveAt(idx);
             parentNode.Nodes.Insert(idx, viewsNode);
             treeViewMain.SelectedNode = viewsNode;
+            viewsNode.Expand();
         }
 
         protected TreeNode BuildViewNode()
         {
             SchemaDefinition sd = DataAccess.GetSchema(CurrentDB);
-            TreeNode viewsNode = new TreeNode("Views", 2, 2);
-            viewsNode.Name = "Views";
-            viewsNode.ContextMenu = viewsContextMenu;
+            TreeNode viewsNode = new TreeNode("Views", 2, 2)
+            {
+                Name = "Views",
+                ContextMenu = viewsContextMenu
+            };
             if (sd.Views.Count > 0)
             {
                 foreach (var view in sd.Views)
                 {
                     string[] PKV = new string[view.Value.Columns.Count];
-                    TreeNode vwNode = new TreeNode(view.Key, 6, 6);
-                    vwNode.ContextMenu = vwContextMenu;
+                    TreeNode vwNode = new TreeNode(view.Key, 6, 6)
+                    {
+                        ContextMenu = vwContextMenu
+                    };
                     viewsNode.Nodes.Add(vwNode);
                     // Process Columns
                     TreeNode columnNode = new TreeNode("Columns", 2, 2);
@@ -1398,8 +1514,10 @@ namespace SQLiteWorkshop
                         string pk = column.Value.PrimaryKey == 0 ? string.Empty : ", PK";
                         PKV[column.Value.PrimaryKey] = column.Value.PrimaryKey == 0 ? string.Empty : column.Key;
                         string df = string.IsNullOrEmpty(column.Value.DefaultValue) ? string.Empty : string.Format(", Default: {0}", column.Value.DefaultValue);
-                        TreeNode colNode = new TreeNode(string.Format("{0} ({1}, {2}{3}{4})", column.Key, column.Value.ColumnType, nul, pk, df), 4, 4);
-                        colNode.Tag = column.Key;
+                        TreeNode colNode = new TreeNode(string.Format("{0} ({1}, {2}{3}{4})", column.Key, column.Value.ColumnType, nul, pk, df), 4, 4)
+                        {
+                            Tag = column.Key
+                        };
                         columnNode.Nodes.Add(colNode);
                     }
                 }
@@ -1417,20 +1535,25 @@ namespace SQLiteWorkshop
             parentNode.Nodes.RemoveAt(idx);
             parentNode.Nodes.Insert(idx, triggersNode);
             treeViewMain.SelectedNode = triggersNode;
+            triggersNode.Expand();
         }
 
         protected TreeNode BuildTriggerNode()
         {
             SchemaDefinition sd = DataAccess.GetSchema(CurrentDB);
-            TreeNode triggersNode = new TreeNode("Triggers", 2, 2);
-            triggersNode.Name = "Triggers";
-            triggersNode.ContextMenu = triggersContextMenu;
+            TreeNode triggersNode = new TreeNode("Triggers", 2, 2)
+            {
+                Name = "Triggers",
+                ContextMenu = triggersContextMenu
+            };
             if (sd.Triggers.Count > 0)
             {
                 foreach (var trigger in sd.Triggers)
                 {
-                    TreeNode trNode = new TreeNode(trigger.Key, 8, 8);
-                    trNode.ContextMenu = trContextMenu;
+                    TreeNode trNode = new TreeNode(trigger.Key, 8, 8)
+                    {
+                        ContextMenu = trContextMenu
+                    };
                     triggersNode.Nodes.Add(new TreeNode(trigger.Key, 8, 8) { ContextMenu = trContextMenu });
                 }
             }
@@ -1454,9 +1577,11 @@ namespace SQLiteWorkshop
         {
             if (RegisteredDBs.Keys.Contains(CurrentDB)) return;
 
-            RegisteredDB rDB = new RegisteredDB();
-            rDB.Name = Path.GetFileName(CurrentDB);
-            rDB.Password = string.Empty;            //when implemented, always keep this encrypted
+            RegisteredDB rDB = new RegisteredDB
+            {
+                Name = Path.GetFileName(CurrentDB),
+                Password = string.Empty            //when implemented, always keep this encrypted
+            };
 
             RegisteredDBs.Add(CurrentDB, rDB);
             SaveRegisteredDBSetting(RegisteredDBs);
@@ -1506,9 +1631,11 @@ namespace SQLiteWorkshop
             {
                 string token = Common.Decrypt(r);
                 string[] tokens = token.Split('|');
-                RegisteredDB rDB = new RegisteredDB();
-                rDB.Name = tokens[1];
-                rDB.Password = tokens[2];
+                RegisteredDB rDB = new RegisteredDB
+                {
+                    Name = tokens[1],
+                    Password = tokens[2]
+                };
                 RegisteredDBs.Add(tokens[0], rDB);
             }
             InitToolStripRegisteredDBDropDown(RegisteredDBs);

@@ -76,7 +76,6 @@ namespace SQLiteWorkshop
         protected void InitializePage()
         {
             lblTable.Text = TableName;
-            SQLiteErrorCode returnCode;
 
             tableHasRowID = DataAccess.CheckForRowID(DatabaseName, TableName, out RowIDColName, out PrimaryKeyName);
 
@@ -86,7 +85,7 @@ namespace SQLiteWorkshop
             RowIdIndex = -1;
             searchSQL = string.Format("{0} {1}", BaseSQL, searchWhereClause);
 
-            int iRowCount = Convert.ToInt32(DataAccess.ExecuteScalar(DatabaseName, searchSQL, out returnCode));
+            int iRowCount = Convert.ToInt32(DataAccess.ExecuteScalar(DatabaseName, searchSQL, out SQLiteErrorCode returnCode));
             if (iRowCount == -1 || returnCode != SQLiteErrorCode.Ok)
             {
                 Common.ShowMsg(string.Format("Error processing SQL.  Please review your WHERE clause.\r\n{0}", DataAccess.LastError));
@@ -134,15 +133,19 @@ namespace SQLiteWorkshop
                 if (i == RowIdIndex) continue;
                 if (colname == PrimaryKeyName) PKIndex = i;
 
-                Label lbl = new Label();
-                lbl.Text = string.Format("{0}:", colname);
-                lbl.Top = start;
-                lbl.Left = 50;
-                lbl.Width = lablen - 10;
+                Label lbl = new Label
+                {
+                    Text = string.Format("{0}:", colname),
+                    Top = start,
+                    Left = 50,
+                    Width = lablen - 10
+                };
                 panelBody.Controls.Add(lbl);
 
-                TextBox txt = new TextBox();
-                txt.Name = string.Format("txt{0}", i.ToString().PadLeft(4, '0'));
+                TextBox txt = new TextBox
+                {
+                    Name = string.Format("txt{0}", i.ToString().PadLeft(4, '0'))
+                };
                 ColData cd = new ColData()
                 {
                     colname = colname,
@@ -157,15 +160,17 @@ namespace SQLiteWorkshop
                 if (dr.GetFieldType(i).Equals(typeof(byte[])))
                 {
                     txt.ReadOnly = true;
-                    Button btn = new Button();
-                    btn.Name = string.Format("btn{0}", i.ToString().PadLeft(4, '0'));
-                    btn.Text = "View";
-                    btn.Left = txt.Left + 320;
-                    btn.Top = txt.Top - 2;
-                    btn.Height = 24;
-                    btn.Width = 60;
-                    btn.BackColor = SystemColors.Control;
-                    btn.Tag = colname;
+                    Button btn = new Button
+                    {
+                        Name = string.Format("btn{0}", i.ToString().PadLeft(4, '0')),
+                        Text = "View",
+                        Left = txt.Left + 320,
+                        Top = txt.Top - 2,
+                        Height = 24,
+                        Width = 60,
+                        BackColor = SystemColors.Control,
+                        Tag = colname
+                    };
                     btn.Click += button_clicked;
                     panelBody.Controls.Add(btn);
 
@@ -356,7 +361,6 @@ namespace SQLiteWorkshop
             int count = 0;
             int i = 0;
             ArrayList parms = new ArrayList();
-            SQLiteErrorCode returnCode;
 
             DataRow dr = dt.Rows[0];
 
@@ -402,7 +406,7 @@ namespace SQLiteWorkshop
             if (!BuildWhereClause(currDataRow, out string whereClause)) return false;
             sb.AppendFormat(" {0}", whereClause);
 
-            int recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, sb.ToString(), parms, out returnCode);
+            int recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, sb.ToString(), parms, out SQLiteErrorCode returnCode);
             toolStripLabelStatus.Text = string.Format("{0} Record(s) updated.", recsupdated.ToString());
             return true;
         }
@@ -423,7 +427,6 @@ namespace SQLiteWorkshop
 
             int count = 0;
             int i = 0;
-            SQLiteErrorCode returnCode;
 
             for (i = 0; i <= panelBody.Controls.Count; i++)
             {
@@ -448,7 +451,7 @@ namespace SQLiteWorkshop
             sb.Append(")");
             sbValues.Append(")");
 
-            int recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, string.Format("{0} {1}", sb.ToString(), sbValues.ToString()), parms, out returnCode);
+            int recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, string.Format("{0} {1}", sb.ToString(), sbValues.ToString()), parms, out SQLiteErrorCode returnCode);
             if (recsupdated == -1 || returnCode != SQLiteErrorCode.Ok)
             {
                 DialogResult dgResult = Common.ShowMsg(string.Format(Common.ERR_SQL, DataAccess.LastError, returnCode));

@@ -163,6 +163,9 @@
         <File Source="..\SQLite Workshop\Templates\View\Create View.sql"   />
       </Component>
       <Component>
+        <File Source="..\SQLite Workshop\Templates\View\Create Join.sql"   />
+      </Component>      
+      <Component>
         <File Source="..\SQLite Workshop\Templates\View\Drop View.sql"   />
       </Component>
     </ComponentGroup>
