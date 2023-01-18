@@ -1,27 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SQLiteWorkshop
 {
-    class DBEditorTab
+    class DBEditorTab : TabManager
     {
 
-        MainForm m;
         TabPage sTab;
         DBEditorTabControl dbeTabControl;
         SchemaDefinition sd;
 
-        static string SPACER = Environment.NewLine + "\t";
-
-        internal string DatabaseLocation { get; set; }
-        internal DBEditorTab()
+        internal DBEditorTab(string DbLocation)
         {
             m = MainForm.mInstance;
             m.tabMain.Visible = true;
+            DatabaseLocation = DbLocation;
         }
 
         internal void BuildTab(TreeNode TargetNode)
@@ -29,7 +22,6 @@ namespace SQLiteWorkshop
             m.sqlTabTrack++;
             int curtab = m.sqlTabTrack;
 
-            DatabaseLocation = TargetNode.Parent.Tag.ToString();
             sd = DataAccess.SchemaDefinitions[DatabaseLocation];
             BuildTab(sd.DBLocation, TargetNode.Text);
 
@@ -44,12 +36,15 @@ namespace SQLiteWorkshop
         {
 
             sTab = new TabPage();
-
+            sTab.Enter += new EventHandler(OnEnter);
             dbeTabControl = new DBEditorTabControl(dbName, tblname);
             sTab.Controls.Add(dbeTabControl);
             m.tabMain.TabPages.Add(sTab);
             m.SetTabHeader();
             m.tabMain.SelectedTab = sTab;
+            // Reserved for future use.
+            //m.SQLButton(true);
+            if (m.tabMain.TabPages.Count == 1) m.LoadConnectionProperties();
         }
     }
 }

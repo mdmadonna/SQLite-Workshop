@@ -1,15 +1,15 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Emit;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.GUIManager;
 
 namespace SQLiteWorkshop
 {
@@ -24,19 +24,21 @@ namespace SQLiteWorkshop
             InitializeComponent();
         }
 
-        internal string DatabaseLocation { get; set; }
+        internal string DatabaseName { get; set; }
         internal TreeNode TargetNode { get; set; }
         internal SQLType ExecType { get; set; }
 
 
         private void BuildColumn_Load(object sender, EventArgs e)
         {
-            lblFormHeading.Text = "Column Editor";
-
-            // Establish ToolTips for various controls.
             toolTip = new ToolTip();
-            toolTip.SetToolTip(pbClose, "Close");
+            HouseKeeping(this, "Column Editor");
             InitializeForm();
+        }
+
+        private void BuildColumn_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            FormClose(this);
         }
 
         protected void InitializeForm()
@@ -53,13 +55,14 @@ namespace SQLiteWorkshop
                     props.Type = "varchar";
                     props.AllowNull = true;
                     props.Size = 50;
+                    btnSave.Text = "Add";
                     break;
                 case SQLType.SQLModifyColumn:
                     lblPanelHeading.Text = "Modify Column";
                     InitProps();
                     lblNewColumnName.Visible = false;
                     txtNewColumn.Visible = false;
-
+                    btnSave.Text = "Modify";
                     break;
                 case SQLType.SQLDeleteColumn:
                     lblPanelHeading.Text = "Delete Column";
@@ -67,11 +70,13 @@ namespace SQLiteWorkshop
                     props.ReadOnly(true);
                     lblNewColumnName.Visible = false;
                     txtNewColumn.Visible = false;
+                    btnSave.Text = "Delete";
                     break;
                 case SQLType.SQLRenameColumn:
                     lblPanelHeading.Text = "Rename Column";
                     InitProps();
                     props.ReadOnly(true);
+                    btnSave.Text = "Rename";
                     break;
                 default:
                     break;
@@ -84,11 +89,11 @@ namespace SQLiteWorkshop
         {
             txtColumn.Text = TargetNode.Tag.ToString();
             txtColumn.ReadOnly = true;
-            ColumnLayout cl = Common.FindColumnLayout(tablename, txtColumn.Text);
+            ColumnLayout cl = FindColumnLayout(DatabaseName, tablename, txtColumn.Text);
             props.Type = GetColumnType(cl.ColumnType);
             props.Size = GetColumnSize(cl.ColumnType);
             props.DefaultValue = cl.DefaultValue;
-            props.AllowNull = cl.NullType == 0 ? true : false ;
+            props.AllowNull = cl.NullType == 0 ;
             props.CollatingSequence = cl.Collation;
             props.ForeignKeyColumn = cl.ForeignKey.From;
             props.ForeignKeyParent = cl.ForeignKey.Table;
@@ -107,7 +112,7 @@ namespace SQLiteWorkshop
             int size = 0;
             int i = coltype.IndexOf("(");
             string type = i < 0 ? coltype : coltype.Substring(0, i);
-            if (Common.IsText(type))
+            if (IsText(type))
             {
                 int j = coltype.IndexOf(")");
                 if (j > i) size = Convert.ToInt32(coltype.Substring(i + 1, j - (i+1)).Trim());
@@ -122,6 +127,7 @@ namespace SQLiteWorkshop
 
         private void btnSave_Click(object sender, EventArgs e)
         {
+            toolStripStatusLabel1.Text = string.Empty;
             switch (ExecType)
             {
                 case SQLType.SQLAddColumn:
@@ -130,26 +136,39 @@ namespace SQLiteWorkshop
                     break;
                 case SQLType.SQLModifyColumn:
                     if (!ValidateModifyInput()) return;
-                    ModifyColumn();
+                    if (RebuildTable())
+                    {
+                        toolStripStatusLabel1.Text = "Column Modified.";
+                        btnSave.Enabled = false;
+                    }
                     break;
                 case SQLType.SQLRenameColumn:
                     if (!ValidateRenameInput()) return;
-                    RenameColumn();
+                    if (RebuildTable())
+                    {
+                        toolStripStatusLabel1.Text = "Column Renamed.";
+                        btnSave.Enabled = false;
+                    }
                     break;
                 case SQLType.SQLDeleteColumn:
                     if (!ValidateDeleteInput()) return;
-                    DeleteColumn();
+                    if (RebuildTable())
+                    {
+                        toolStripStatusLabel1.Text = "Column Deleted.";
+                        btnSave.Enabled = false;
+                    }
                     break;
                 default:
                     break;
             }
         }
 
+
         protected bool ValidateAddInput()
         {
             if (string.IsNullOrEmpty(txtColumn.Text))
             {
-                Common.ShowMsg("Please enter a name for this column.");
+                ShowMsg("Please enter a name for this column.");
                 txtColumn.Focus();
                 return false;
             }
@@ -165,13 +184,13 @@ namespace SQLiteWorkshop
         {
             if (string.IsNullOrEmpty(txtNewColumn.Text))
             {
-                Common.ShowMsg("Please enter a new name for this column.");
+                ShowMsg("Please enter a new name for this column.");
                 txtNewColumn.Focus();
                 return false;
             }
-            if (Common.HasInvalidChars(txtNewColumn.Text, out string chars))
+            if (HasInvalidChars(txtNewColumn.Text, out string chars))
             {
-                Common.ShowMsg(string.Format("Please remove characters \"{0}\" from the new column name.", chars));
+                ShowMsg(string.Format("Please remove characters \"{0}\" from the new column name.", chars));
                 txtNewColumn.Focus();
                 return false;
             }
@@ -189,46 +208,28 @@ namespace SQLiteWorkshop
             var result = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, sql, out SQLiteErrorCode returnCode);
             if (result == -1 || returnCode != SQLiteErrorCode.Ok)
             {
-                Common.ShowMsg(string.Format("Add Column Failed.\r\n{0}", DataAccess.LastError));
+                ShowMsg(string.Format("Add Column Failed.\r\n{0}", DataAccess.LastError));
                 return;
             }
             toolStripStatusLabel1.Text = "Column Added.";
-            MainForm.mInstance.AddTable(tablename);
+            MainForm.mInstance.AddTable(tablename, DatabaseName);
         }
-        protected void ModifyColumn()
-        {
-            if (RebuildTable())
-                toolStripStatusLabel1.Text = "Column Modified.";
-        }
-        protected void RenameColumn()
-        {
-            if (RebuildTable())
-                toolStripStatusLabel1.Text = "Column Renamed.";
-        }
-        protected void DeleteColumn()
-        {
-            if (RebuildTable())
-                toolStripStatusLabel1.Text = "Column Deleted.";
-        }
-
 
         protected bool RebuildTable()
         {
-            bool bNoWarning = false;
-            bool.TryParse(MainForm.cfg.appsetting(Config.CFG_COLUMNEDITWARN), out bNoWarning);
+            bool.TryParse(appSetting(Config.CFG_COLUMNEDITWARN), out bool bNoWarning);
             if (!bNoWarning)
             {
                 if (!ShowWarning()) return false;
             }
 
             string sql;
-            SQLiteErrorCode returnCode;
             bool foreign_key_enabled;
             string CurrentDB = MainForm.mInstance.CurrentDB;
 
             sql = "Pragma foreign_keys";
-            var data = DataAccess.ExecuteScalar(CurrentDB, sql, out returnCode);
-            foreign_key_enabled = (long)data == 0 ? false : true;
+            var data = DataAccess.ExecuteScalar(CurrentDB, sql, out SQLiteErrorCode returnCode);
+            foreign_key_enabled = (long)data != 0;
 
             sql = string.Format("Select * From sqlite_master Where type = \"index\" AND tbl_name = \"{0}\"", tablename);
             DataTable idxDT = DataAccess.ExecuteDataTable(CurrentDB, sql, out returnCode);
@@ -240,15 +241,24 @@ namespace SQLiteWorkshop
             SQLiteCommand cmd = null;
 
             Dictionary<string, ColumnLayout> columns = DataAccess.SchemaDefinitions[CurrentDB].Tables[tablename].Columns;
-            Dictionary<string, ColumnLayout> newcolumns = new Dictionary<string, ColumnLayout>(); 
+            Dictionary<string, ColumnLayout> newcolumns = new Dictionary<string, ColumnLayout>();
 
+            ArrayList DateCols = new ArrayList();
             switch (ExecType)
             {
                 case SQLType.SQLRenameColumn:
-                    foreach (var col in columns) { newcolumns.Add(col.Key == txtColumn.Text ? txtNewColumn.Text : col.Key, col.Value); }
+                    foreach (var col in columns) 
+                    { 
+                        newcolumns.Add(col.Key == txtColumn.Text ? txtNewColumn.Text : col.Key, col.Value); 
+                    }
                     break;
                 case SQLType.SQLModifyColumn:
-                    foreach (var col in columns) { newcolumns.Add(col.Key, col.Key == txtColumn.Text ? BuildColumnLayout() : col.Value); }
+                    foreach (var col in columns) 
+                    { 
+                        newcolumns.Add(col.Key, col.Key == txtColumn.Text ? BuildColumnLayout() : col.Value);
+                        if (IsDate(newcolumns[col.Key].ColumnType) && !IsDate(col.Value.ColumnType))
+                            DateCols.Add(col.Key);
+                    }
                     break;
                 case SQLType.SQLDeleteColumn:
                     columns.Remove(txtColumn.Text);
@@ -258,10 +268,10 @@ namespace SQLiteWorkshop
                     return false;
             }
 
-            string tmptablename = Common.TempTableName();
+            string tmptablename = TempTableName();
             if (string.IsNullOrEmpty(tmptablename))
             {
-                Common.ShowMsg("Cannot build temporary table - terminating.");
+                ShowMsg("Cannot build temporary table - terminating.");
                 return false;
             }
             string CreateSQL = SqlFactory.CreateSQL(tmptablename, newcolumns);
@@ -269,70 +279,103 @@ namespace SQLiteWorkshop
 
             if (foreign_key_enabled) DataAccess.ExecuteNonQuery(CurrentDB, "Pragma foreign_keys=false", out returnCode);
 
-            bool rCode = DataAccess.OpenDB(CurrentDB, ref conn, ref cmd, out returnCode, false);
+            bool rCode = DataAccess.OpenDB(CurrentDB, ref conn, ref cmd, false);
             if (!rCode || returnCode != SQLiteErrorCode.Ok)
             {
-                Common.ShowMsg(String.Format(Common.ERR_SQL, DataAccess.LastError, returnCode));
+                ShowMsg(String.Format(ERR_SQL, DataAccess.LastError, returnCode));
                 return false;
             }
+
+            // Dates are a problematic to handle.  If any columns are being modified to a datetime format
+            // we will need to modify the current date values to the correct value;
+            Functions.BindFunction(conn, new Functions.ToDate());
 
             SQLiteTransaction sqlT;
             sqlT = conn.BeginTransaction();
 
             try
             {
+                this.Cursor = Cursors.WaitCursor;
+
+                // Changing a column to a date or datetime type is problematic.  The source value MUST
+                // be in the format YYYY-MM-DDTHH:MM:SS AM" so let's change them before starting
+                if (DateCols.Count > 0)
+                {
+                    cmd.CommandText = string.Format("UPDATE {0} SET {1} = ToDate({1})", tablename, DateCols[0]);
+                    long l = cmd.ExecuteNonQuery();
+                }
+
                 //Create the temp table
                 cmd.CommandText = CreateSQL;
-                var createRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
-                if (createRtnCode != 0) throw new Exception(String.Format("Cannot create Temp Table.\r\n{0}", DataAccess.LastError));
+                DataAccess.ExecuteNonQuery(cmd, out returnCode);
+                if (returnCode != SQLiteErrorCode.Ok) throw new Exception(String.Format("Cannot create Temp Table.\r\n{0}", DataAccess.LastError));
 
+                toolStripStatusLabel1.Text = "Copying Data to a temporary table.";
+                Application.DoEvents();
                 //Copy data from the current table to the temp table
                 string insertSQL = string.Format("Insert Into {0} {1}", tmptablename, SelectSQL);
                 cmd.CommandText = insertSQL;
                 var insertRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
-                if (insertRtnCode != 0) throw new Exception(String.Format("Cannot Copy Rows into Temp Table.\r\n{0}", DataAccess.LastError));
+                if (insertRtnCode < 0) throw new Exception(String.Format("Cannot Copy Rows into Temp Table.\r\n{0}", DataAccess.LastError));
 
+                toolStripStatusLabel1.Text = "Dropping table.";
+                Application.DoEvents();
                 //delete the current table
                 cmd.CommandText = SqlFactory.DropSql(tablename);
                 var deleteRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
-                if (deleteRtnCode != 0) throw new Exception(String.Format("Cannot Delete Original Table.\r\n{0}", DataAccess.LastError));
+                if (deleteRtnCode < 0) throw new Exception(String.Format("Cannot Delete Original Table.\r\n{0}", DataAccess.LastError));
 
+                toolStripStatusLabel1.Text = "Renaming table.";
+                Application.DoEvents();
                 //rename the temp table to the old table name
                 cmd.CommandText = string.Format("Alter Table {0} Rename To {1}", tmptablename, tablename);
                 var renameRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
-                if (renameRtnCode != 0) throw new Exception(String.Format("Cannot Rename Temp Table.\r\n{0}", DataAccess.LastError));
+                if (renameRtnCode < 0) throw new Exception(String.Format("Cannot Rename Temp Table.\r\n{0}", DataAccess.LastError));
 
+
+                toolStripStatusLabel1.Text = "Rebuilding Indexes.";
+                Application.DoEvents();
                 //Rebuild Indexes
                 foreach (DataRow dr in idxDT.Rows)
                 {
-                    cmd.CommandText = dr["sql"].ToString();
-                    var indexRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
-                    if (indexRtnCode != 0) throw new Exception(String.Format("Cannot Rebuild Indexes.\r\n{0}", DataAccess.LastError));
+                    // AutoIndex will not have SQL associated with it
+                    if (!string.IsNullOrEmpty(dr["sql"].ToString()))
+                    {
+                        cmd.CommandText = dr["sql"].ToString();
+                        var indexRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
+                        if (indexRtnCode < 0) throw new Exception(String.Format("Cannot Rebuild Indexes.\r\n{0}", DataAccess.LastError));
+                    }
                 }
-               
 
+
+                toolStripStatusLabel1.Text = "Rebuilding Triggers.";
+                Application.DoEvents();
                 //Rebuild Triggers
                 foreach (DataRow dr in trigDT.Rows)
                 {
                     cmd.CommandText = dr["sql"].ToString();
                     var triggerRtnCode = DataAccess.ExecuteNonQuery(cmd, out returnCode);
-                    if (triggerRtnCode != 0) throw new Exception(String.Format("Cannot Create Triggers.\r\n{0}", DataAccess.LastError));
+                    if (triggerRtnCode < 0) throw new Exception(String.Format("Cannot Create Triggers.\r\n{0}", DataAccess.LastError));
                 }
-
+                toolStripStatusLabel1.Text = "Committing Changes.";
+                Application.DoEvents();
                 sqlT.Commit();
             }
             catch (Exception ex)
             {
+                toolStripStatusLabel1.Text = "Rolling Back Changes.";
+                Application.DoEvents();
                 sqlT.Rollback();
-                Common.ShowMsg(String.Format(Common.ERR_SQL, ex.Message, returnCode));
+                ShowMsg(String.Format(ERR_SQL, ex.Message, returnCode));
                 return false;
             }
             finally
             {
                 DataAccess.CloseDB(conn);
                 if (foreign_key_enabled) DataAccess.ExecuteNonQuery(CurrentDB, "Pragma foreign_keys=true", out returnCode);
+                this.Cursor = Cursors.Default;
             }
-            MainForm.mInstance.AddTable(tablename);
+            MainForm.mInstance.AddTable(tablename, DatabaseName);
             return true;
         }
 
@@ -340,29 +383,36 @@ namespace SQLiteWorkshop
 
         private bool ShowWarning()
         {
-            ShowMsg sm = new ShowMsg();
-            sm.Message = "WARNING!!!.  This feature is not natively supported by SQLite.  It is implemented by copying the table with column changes, deleting the old table and renaming the copied table.  Once complete, YOU MUST MANUALLY CHANGE ANY INDEX, VIEW OR TRIGGER CONTAINING THIS COLUMN!!!. IF YOU DO NOT DO THIS YOU MAY LEAVE YOUR INDEX, VIEW OR TRIGGER IN AN INCONSISTENT STATE!!!\r\n\r\nPress 'Ok' to continue or 'Cancel' to exit.";
+            ShowMsg sm = new ShowMsg
+            {
+                Message = "WARNING!!!.  This feature is not natively supported by SQLite.  It is implemented by copying the table with column changes, deleting the old table and renaming the copied table.  Once complete, YOU MUST MANUALLY CHANGE ANY INDEX, VIEW OR TRIGGER CONTAINING THIS COLUMN!!!. IF YOU DO NOT DO THIS YOU MAY LEAVE YOUR INDEX, VIEW OR TRIGGER IN AN INCONSISTENT STATE!!!\r\n\r\nPress 'Ok' to continue or 'Cancel' to exit."
+            };
             sm.ShowDialog();
-            if (sm.DoNotShow) MainForm.cfg.SetSetting(Config.CFG_COLUMNEDITWARN, "true");
-            return sm.Result == DialogResult.Cancel ? false : true;
+            if (sm.DoNotShow) saveSetting(Config.CFG_COLUMNEDITWARN, "true");
+            return sm.Result != DialogResult.Cancel;
         }
 
 
         internal ColumnLayout BuildColumnLayout()
         {
-            ColumnLayout col = new ColumnLayout();
-            col.Check = string.Empty;
-            col.Collation = props.CollatingSequence;
-            col.ColumnType = BuildColumnType();
-            col.DefaultValue = props.DefaultValue;
-            col.ForeignKey = new ForeignKeyLayout();
-            col.ForeignKey.Table = props.ForeignKeyParent;
-            col.ForeignKey.To = props.ForeignKeyColumn;
-            col.ForeignKey.OnUpdate = props.ForeignKeyOnUpdate;
-            col.ForeignKey.OnDelete = props.ForeignKeyOnDelete;
-            col.NullType = props.AllowNull ? 0 : 1;
-            col.PrimaryKey = 0;
-            col.Unique = false;
+            ColumnLayout col = new ColumnLayout
+            {
+                Check = string.Empty,
+                Collation = props.CollatingSequence,
+                ColumnType = BuildColumnType(),
+                DefaultValue = props.DefaultValue,
+                ForeignKey = new ForeignKeyLayout()
+                {
+                    Table = props.ForeignKeyParent,
+                    To = props.ForeignKeyColumn,
+                    OnUpdate = props.ForeignKeyOnUpdate,
+                    OnDelete = props.ForeignKeyOnDelete
+                },
+                NullType = props.AllowNull ? 0 : 1,
+                PrimaryKey = 0,
+                Unique = false
+            };
+
             return col;
         }
 
@@ -370,64 +420,11 @@ namespace SQLiteWorkshop
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(props.Type);
-            if (Common.IsText(props.Type)) sb.AppendFormat("({0})", props.Size.ToString());
+            if (IsText(props.Type)) sb.AppendFormat("({0})", props.Size.ToString());
             return sb.ToString();
         }
 
         #endregion
-        #region ControlBox Handlers
-        private void pbClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void ControlBox_MouseEnter(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.White;
-        }
-
-        private void ControlBox_MouseLeave(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        private void ControlBox_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.Wheat;
-            ((PictureBox)sender).BorderStyle = BorderStyle.Fixed3D;
-        }
-
-        private void ControlBox_MouseUp(object sender, MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        #endregion
-
-        #region Form Dragging Event Handler
-
-        public const int WM_NCLBUTTONDOWN = 0xA1;
-        public const int HT_CAPTION = 0x2;
-
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern bool ReleaseCapture();
-
-        private void MainForm_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
-            }
-        }
-
-
-
-
-
-        #endregion
-
+       
     }
 }

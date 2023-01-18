@@ -1,0 +1,148 @@
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Definitions.txt
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Query\Column Profile.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Query\Select Duplicate Rows.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Query\Summary Counts.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Trigger\Last Update Date.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\SQLite Workshop.exe.config
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\SQLite Workshop.exe
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\SQLite Workshop.pdb
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\CsvHelper.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Data.SQLite.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\CsvHelper.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.AboutBox.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.DBEditorTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.SqlTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.TableEditorTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.ExecuteForm.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.GetPassword.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.ImportWiz.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.ShowSQL.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.Template.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.MainForm.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.Properties.Resources.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.csproj.GenerateResource.cache
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.csproj.CoreCompileInputs.cache
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.csproj.CopyComplete
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.exe
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.pdb
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Database\Database List.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Database\Vacuum.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Index\Rebuild Index.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Table\Index List.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\View\Drop View.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Index\Drop Index.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Table\Drop Table.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Trigger\Drop Trigger.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\View\Create View.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Index\Create Index.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Table\Create Table.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Trigger\Create Trigger.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Data.SQLite.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Data.SQLite.dll.config
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\View\Create Join.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\language\en.txt
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Buffers.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Memory.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Numerics.Vectors.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Runtime.CompilerServices.Unsafe.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Text.Encodings.Web.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Text.Json.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Threading.Tasks.Extensions.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.ValueTuple.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Microsoft.Bcl.AsyncInterfaces.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Buffers.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Memory.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Numerics.Vectors.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Runtime.CompilerServices.Unsafe.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Text.Encodings.Web.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Text.Json.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Threading.Tasks.Extensions.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.ValueTuple.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.RowEditTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.AttachDB.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Query\Select Into.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.DataSet.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.pdb
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.DataSet.pdb
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.DataSet.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.csproj.AssemblyReference.cache
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.DBRecover.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.Options.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.Mapping.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\language\en.txt
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Query\Select Into.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\View\Create View.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\View\Create Join.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\View\Drop View.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Definitions.txt
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Database\Database List.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Database\Vacuum.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Index\Create Index.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Index\Drop Index.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Index\Rebuild Index.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Query\Column Profile.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Query\Select Duplicate Rows.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Query\Summary Counts.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Table\Create Table.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Table\Drop Table.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Table\Index List.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Trigger\Create Trigger.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Trigger\Drop Trigger.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Templates\Trigger\Last Update Date.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\SQLite Workshop.exe.config
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\SQLite Workshop.exe
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\SQLite Workshop.pdb
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\CsvHelper.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.DataSet.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Microsoft.Bcl.AsyncInterfaces.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Buffers.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Data.SQLite.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Memory.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Numerics.Vectors.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Runtime.CompilerServices.Unsafe.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Text.Encodings.Web.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Text.Json.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Threading.Tasks.Extensions.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.ValueTuple.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\CsvHelper.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.DataSet.pdb
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\ExcelDataReader.DataSet.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\Microsoft.Bcl.AsyncInterfaces.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Buffers.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Data.SQLite.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Data.SQLite.dll.config
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Memory.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Numerics.Vectors.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Runtime.CompilerServices.Unsafe.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Text.Encodings.Web.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Text.Json.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.Threading.Tasks.Extensions.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\System.ValueTuple.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.csproj.AssemblyReference.cache
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.csproj.SuggestedBindingRedirects.cache
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.AboutBox.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.DBEditorTabControl.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.RowEditTabControl.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.SqlTabControl.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.TableEditorTabControl.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.AttachDB.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.DBRecover.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.ExecuteForm.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.ImportWiz.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.Options.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.ShowSQL.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.GetPassword.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.Mapping.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.Template.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.MainForm.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLiteWorkshop.Properties.Resources.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.csproj.GenerateResource.cache
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.csproj.CoreCompileInputs.cache
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.csproj.CopyComplete
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.exe
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Release\SQLite Workshop.pdb

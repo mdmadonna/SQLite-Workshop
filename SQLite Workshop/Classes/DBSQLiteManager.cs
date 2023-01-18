@@ -2,26 +2,30 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.Config;
+using static SQLiteWorkshop.DataAccess;
 
 namespace SQLiteWorkshop
 {
     class DBSQLiteManager : DBManager
     {
 
-        internal string DatabaseName { get; set; }
-
-        internal DBSQLiteManager(string DBName) : base(DBName)
+        // For future use. For the time being just execute the base constructor
+        internal DBSQLiteManager(string SourceDB, string TargetDB, string SourceServer=null, string SourceUserName=null, string SourcePassword=null) : base(SourceDB, TargetDB, SourceServer, SourceUserName, SourcePassword)
         {
-            DatabaseName = DBName;
+            ImportKey = CFG_IMPSQLITE;
         }
 
         ~DBSQLiteManager()
         {
         }
 
+        /// <summary>
+        /// Not applicable to SQLite
+        /// </summary>
+        /// <returns></returns>
         internal override DBDatabaseList GetDatabaseList()
         {
             throw new NotImplementedException();
@@ -29,31 +33,38 @@ namespace SQLiteWorkshop
 
         internal override DBSchema GetSchema()
         {
-
+            DBSchema schema = new DBSchema();
             Dictionary<string, DBTable> Tables = new Dictionary<string, DBTable>();
 
-            Dictionary<string, TableLayout> SQLiteTables = DataAccess.GetTables(DatabaseName);
-            
+            Dictionary<string, TableLayout> SQLiteTables = GetTables(SourceDB, SourcePassword);
+            if (SQLiteTables == null) return schema;
+
             foreach (var table in SQLiteTables)
             {
-                if (!Common.IsSystemTable(table.Key))
+                if (!IsSystemTable(table.Key))
                 {
                     DBTable dbt = new DBTable() { Name = table.Key };
                     Tables.Add(dbt.Name, dbt);
                 }
             }
 
-            DBSchema schema = new DBSchema();
             schema.Tables = Tables;
             return schema;
         }
 
         internal override Dictionary<string, DBColumn> GetColumns(string TableName)
         {
+            return base.GetColumns(TableName);
+            /*
             SQLiteErrorCode returnCode;
+            SQLiteConnection conn = null;
+            SQLiteCommand cmd = null;
 
-            string sql = string.Format("Pragma table_info(\"{0}\")", TableName);
-            DataTable dt = DataAccess.ExecuteDataTable(DatabaseName, sql, out returnCode);
+            if (!OpenDB(SourceDB, ref conn, ref cmd, false, SourcePassword)) return null;
+
+            cmd.CommandText =  string.Format("Pragma table_info(\"{0}\")", TableName);
+            DataTable dt = ExecuteDataTable(cmd, out returnCode);
+            CloseDB(conn);
 
             Dictionary<string, DBColumn> DBColumns = new Dictionary<string, DBColumn>();
 
@@ -62,57 +73,28 @@ namespace SQLiteWorkshop
             {
                 DBColumn dbc = new DBColumn() { Name = dr["name"].ToString() };
                 dbc.Type = dr["type"].ToString();
-                dbc.IsNullable = dr["notnull"].ToString() == "0" ? true : false;
+                dbc.IsNullable = dr["notnull"].ToString() == "0";
+                dbc.SqlType = dbc.Type;
                 DBColumns.Add(dbc.Name, dbc);
                 i++;
             }
 
             return DBColumns;
+            */
         }
 
         internal override bool Import(string SourceTable, string DestTable, Dictionary<string, DBColumn> columns = null)
         {
-
-            SQLiteErrorCode returnCode;
-            
-            SQLiteCommand cmd = DataAccess.AttachDatabase(MainForm.mInstance.CurrentDB, DatabaseName, "Import", out returnCode);
-            if (returnCode != SQLiteErrorCode.Ok)
-            {
-                Common.ShowMsg(String.Format("Could not attach {0}\r\n{1}", DatabaseName, DataAccess.LastError));
-                return false;
-            }
-
-            cmd.CommandText = string.Format("CREATE TABLE If Not Exists \"{0}\" AS SELECT * FROM Import.\"{1}\"", DestTable, SourceTable);
-            int count = DataAccess.ExecuteNonQuery(cmd, out returnCode);
-            if ( returnCode != SQLiteErrorCode.Ok)
-            {
-                Common.ShowMsg(String.Format("Could not create table {0}\r\n{1}", DestTable, DataAccess.LastError));
-                DataAccess.DetachDatabase(cmd, "Import", out returnCode);
-                return false;
-            }
-
-            cmd.CommandText = string.Format("Insert into \"{0}\" Select * From Import.\"{1}\"", DestTable,  SourceTable);
-            count = DataAccess.ExecuteNonQuery(cmd, out returnCode);
-            if (count < 0 || returnCode != SQLiteErrorCode.Ok)
-            {
-                Common.ShowMsg(String.Format("Import failed.\r\n{0}", DataAccess.LastError));
-                DataAccess.DetachDatabase(cmd, "Import", out returnCode);
-                return false;
-            }
-
-            DataAccess.DetachDatabase(cmd, "Import", out returnCode);
-            MainForm.mInstance.AddTable(DestTable);
-            FireStatusEvent(ImportStatus.Complete, count);
-            return true;
+            return base.Import(SourceTable, DestTable, columns);
         }
 
         internal override DataTable PreviewData(string TableName)
         {
             SQLiteErrorCode returnCode;
-            SQLiteCommand cmd = DataAccess.AttachDatabase(MainForm.mInstance.CurrentDB, DatabaseName, "Import", out returnCode);
+            SQLiteCommand cmd = DataAccess.AttachDatabase(TargetDB, SourceDB, "Import", out returnCode, SourcePassword);
             if (returnCode != SQLiteErrorCode.Ok)
             {
-                Common.ShowMsg(String.Format("Could not attach {0}\r\n{1}", DatabaseName, DataAccess.LastError));
+                ShowMsg(String.Format("Could not attach {0}\r\n{1}", SourceDB, DataAccess.LastError));
                 return null;
             }
             cmd.CommandText = string.Format("Select * FROM Import.\"{0}\" Limit 100", TableName);
@@ -120,7 +102,5 @@ namespace SQLiteWorkshop
             DataAccess.DetachDatabase(cmd, "Import", out returnCode);
             return dt;
         }
-
-
     }
 }

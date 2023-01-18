@@ -1,0 +1,6 @@
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQInstaller\bin\Debug\SQLiteWorkshop.msi
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQInstaller\bin\Debug\SQLiteWorkshop.wixpdb
+obj\Debug\Product.wixobj
+obj\Debug\SQInstaller.wixproj.BindContentsFileListnull.txt
+obj\Debug\SQInstaller.wixproj.BindOutputsFileListnull.txt
+obj\Debug\SQInstaller.wixproj.BindBuiltOutputsFileListnull.txt

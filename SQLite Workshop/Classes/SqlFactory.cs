@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
@@ -10,7 +10,7 @@ namespace SQLiteWorkshop
     {
 
 
-        static string SPACER = Environment.NewLine + "\t";
+        static readonly string SPACER = Environment.NewLine + "\t";
 
         /// <summary>
         /// Build an SQLite CREATE TABLE Sql Statement.
@@ -87,7 +87,7 @@ namespace SQLiteWorkshop
                 sb.Append(" Default ");
                 // If Column Type is a Text Type, wrap the default value in Quotes.
                 // Note that Default values that are functions must be preceeded by a "("
-                if (!column.DefaultValue.Trim().StartsWith("(") || Common.IsText(column.ColumnType))
+                if (!column.DefaultValue.Trim().StartsWith("(") || IsText(column.ColumnType))
                 { sb.Append("\"").Append(column.DefaultValue).Append("\""); }
                 else
                 { sb.Append(column.DefaultValue); }
@@ -188,6 +188,29 @@ namespace SQLiteWorkshop
             }
             sb.Append(SPACER).Append("FROM ").Append(ViewName);
             if (count > 0) sb.Append(SPACER).Append("LIMIT ").Append(count.ToString());
+
+            return sb.ToString();
+        }
+
+        internal static string InsertSql(string TableName, Dictionary<string, ColumnLayout> Columns)
+        {
+            StringBuilder sb = new StringBuilder();
+            int count = 0;
+
+            sb.Append(string.Format("INSERT INTO {0} (", TableName));
+            bool bComma = false;
+            foreach (var col in Columns)
+            {
+                sb.Append(SPACER).Append(bComma ? "," : string.Empty).Append("\"").Append(col.Key).Append("\"");
+                bComma = true;
+                count++;
+            }
+            sb.Append(SPACER).Append(") VALUES (?");
+            for (int i = 2; i <= count; i++)
+            {
+                sb.Append(", ?");
+            }
+            sb.Append(")");
 
             return sb.ToString();
         }
@@ -306,7 +329,7 @@ namespace SQLiteWorkshop
         }
 
         /// <summary>
-        /// Return an SQL Template for building an SQLite Viwe.
+        /// Return an SQL Template for building an SQLite View.
         /// </summary>
         internal static string ViewTemplate()
         {

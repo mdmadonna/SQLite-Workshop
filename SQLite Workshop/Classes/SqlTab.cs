@@ -1,46 +1,39 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
 
-    class SqlTab
+    class SqlTab : TabManager
     {
 
-        MainForm m;
         TabPage sTab;
-        int curtab;
+        readonly int curtab;
         SqlTabControl sqlTabControl;
         SchemaDefinition sd;
 
-        //static string SPACER = Environment.NewLine + "\t";
-
-        internal string DatabaseLocation { get; set; }
-        internal SqlTab()
+        internal SqlTab(string DbLocation)
         {
             m = MainForm.mInstance;
             m.tabMain.Visible = true;
             m.sqlTabTrack++;
             curtab = m.sqlTabTrack;
 
-            DatabaseLocation = MainForm.mInstance.CurrentDB;
+            DatabaseLocation = DbLocation;
             sd = DataAccess.SchemaDefinitions[DatabaseLocation];
             BuildTab(sd.DBLocation);
+            if (m.tabMain.TabPages.Count == 1) m.LoadConnectionProperties();
         }
 
         internal void BuildTab(FileInfo fi)
         {
             string filename = fi.FullName;
-            if (fi.Length > Common.MAX_SQL_FILESIZE)
+            if (fi.Length > MAX_SQL_FILESIZE)
             {
-                Common.ShowMsg(string.Format("Cannot open {0}\r\n{1}", filename, string.Format("File Exceeds {0} bytes.", Common.MAX_SQL_FILESIZE.ToString())));
+                ShowMsg(string.Format("Cannot open {0}\r\n{1}", filename, string.Format("File Exceeds {0} bytes.", MAX_SQL_FILESIZE.ToString())));
                 return;
             }
 
@@ -55,7 +48,7 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Cannot open {0}\r\n{1}", filename, ex.Message));
+                ShowMsg(string.Format("Cannot open {0}\r\n{1}", filename, ex.Message));
             }
 
         }
@@ -69,19 +62,21 @@ namespace SQLiteWorkshop
 
         private string FindSqlFile()
         {
-            OpenFileDialog openFile = new OpenFileDialog();
-            openFile.Title = "Open SQLite DB";
-            openFile.Filter = "All files (*.*)|*.*|Sql Files (*.sql)|*.sql";
-            openFile.FilterIndex = 2;
-            openFile.CheckFileExists = true;
-            openFile.AddExtension = true;
-            openFile.AutoUpgradeEnabled = true;
-            openFile.DefaultExt = "db";
-            openFile.InitialDirectory = MainForm.cfg.appsetting(Config.CFG_DFLTSQLDIR);
-            openFile.RestoreDirectory = true;
-            openFile.Multiselect = false;
-            openFile.ShowReadOnly = false;
-            openFile.ValidateNames = true;
+            OpenFileDialog openFile = new OpenFileDialog
+            {
+                Title = "Open File",
+                Filter = "All files (*.*)|*.*|Sql Files (*.sql)|*.sql",
+                FilterIndex = 2,
+                CheckFileExists = true,
+                AddExtension = true,
+                AutoUpgradeEnabled = true,
+                DefaultExt = "sql",
+                InitialDirectory = appSetting(Config.CFG_DFLTSQLDIR),
+                RestoreDirectory = true,
+                Multiselect = false,
+                ShowReadOnly = false,
+                ValidateNames = true
+            };
             if (openFile.ShowDialog() != DialogResult.OK) return string.Empty;
             return openFile.FileName;
         }
@@ -206,7 +201,7 @@ namespace SQLiteWorkshop
         {
 
             sTab = new TabPage();
-
+            sTab.Enter += new EventHandler(OnEnter);
             sqlTabControl = new SqlTabControl(dbName);
             sTab.Controls.Add(sqlTabControl);
             m.tabMain.TabPages.Add(sTab);

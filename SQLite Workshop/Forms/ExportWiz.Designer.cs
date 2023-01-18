@@ -32,28 +32,20 @@
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelTop = new System.Windows.Forms.Panel();
-            this.lblFormHeading = new System.Windows.Forms.Label();
-            this.pbIcon = new System.Windows.Forms.PictureBox();
-            this.panelControls = new System.Windows.Forms.Panel();
-            this.pbClose = new System.Windows.Forms.PictureBox();
             this.panelBottom = new System.Windows.Forms.Panel();
             this.btnExport = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.radioSQL = new System.Windows.Forms.RadioButton();
+            this.radioComma = new System.Windows.Forms.RadioButton();
             this.btnFindFile = new System.Windows.Forms.Button();
             this.txtFileDestination = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.checkBoxHeadings = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.listBoxTables = new System.Windows.Forms.ListBox();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.radioComma = new System.Windows.Forms.RadioButton();
-            this.radioSQL = new System.Windows.Forms.RadioButton();
             this.statusStrip1.SuspendLayout();
-            this.panelTop.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
-            this.panelControls.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbClose)).BeginInit();
             this.panelBottom.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -79,61 +71,11 @@
             // panelTop
             // 
             this.panelTop.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.panelTop.Controls.Add(this.lblFormHeading);
-            this.panelTop.Controls.Add(this.pbIcon);
-            this.panelTop.Controls.Add(this.panelControls);
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Location = new System.Drawing.Point(1, 1);
             this.panelTop.Name = "panelTop";
             this.panelTop.Size = new System.Drawing.Size(649, 28);
             this.panelTop.TabIndex = 1;
-            this.panelTop.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MainForm_MouseDown);
-            // 
-            // lblFormHeading
-            // 
-            this.lblFormHeading.AutoSize = true;
-            this.lblFormHeading.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblFormHeading.ForeColor = System.Drawing.Color.DimGray;
-            this.lblFormHeading.Location = new System.Drawing.Point(29, 7);
-            this.lblFormHeading.Name = "lblFormHeading";
-            this.lblFormHeading.Size = new System.Drawing.Size(121, 17);
-            this.lblFormHeading.TabIndex = 5;
-            this.lblFormHeading.Text = "lblFormHeading";
-            // 
-            // pbIcon
-            // 
-            this.pbIcon.Image = ((System.Drawing.Image)(resources.GetObject("pbIcon.Image")));
-            this.pbIcon.Location = new System.Drawing.Point(3, 3);
-            this.pbIcon.Name = "pbIcon";
-            this.pbIcon.Size = new System.Drawing.Size(24, 24);
-            this.pbIcon.TabIndex = 4;
-            this.pbIcon.TabStop = false;
-            // 
-            // panelControls
-            // 
-            this.panelControls.Controls.Add(this.pbClose);
-            this.panelControls.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panelControls.Location = new System.Drawing.Point(526, 0);
-            this.panelControls.Name = "panelControls";
-            this.panelControls.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
-            this.panelControls.Size = new System.Drawing.Size(123, 28);
-            this.panelControls.TabIndex = 3;
-            // 
-            // pbClose
-            // 
-            this.pbClose.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pbClose.Image = ((System.Drawing.Image)(resources.GetObject("pbClose.Image")));
-            this.pbClose.Location = new System.Drawing.Point(89, 0);
-            this.pbClose.Margin = new System.Windows.Forms.Padding(0);
-            this.pbClose.Name = "pbClose";
-            this.pbClose.Size = new System.Drawing.Size(24, 28);
-            this.pbClose.TabIndex = 11;
-            this.pbClose.TabStop = false;
-            this.pbClose.Click += new System.EventHandler(this.pbClose_Click);
-            this.pbClose.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ControlBox_MouseDown);
-            this.pbClose.MouseEnter += new System.EventHandler(this.ControlBox_MouseEnter);
-            this.pbClose.MouseLeave += new System.EventHandler(this.ControlBox_MouseLeave);
-            this.pbClose.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ControlBox_MouseUp);
             // 
             // panelBottom
             // 
@@ -182,6 +124,40 @@
             this.panel1.Size = new System.Drawing.Size(649, 295);
             this.panel1.TabIndex = 3;
             // 
+            // panel2
+            // 
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.radioSQL);
+            this.panel2.Controls.Add(this.radioComma);
+            this.panel2.Location = new System.Drawing.Point(230, 62);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(297, 30);
+            this.panel2.TabIndex = 6;
+            // 
+            // radioSQL
+            // 
+            this.radioSQL.AutoSize = true;
+            this.radioSQL.Location = new System.Drawing.Point(174, 4);
+            this.radioSQL.Name = "radioSQL";
+            this.radioSQL.Size = new System.Drawing.Size(46, 17);
+            this.radioSQL.TabIndex = 1;
+            this.radioSQL.Text = "SQL";
+            this.radioSQL.UseVisualStyleBackColor = true;
+            this.radioSQL.CheckedChanged += new System.EventHandler(this.radioSQL_CheckedChanged);
+            // 
+            // radioComma
+            // 
+            this.radioComma.AutoSize = true;
+            this.radioComma.Checked = true;
+            this.radioComma.Location = new System.Drawing.Point(16, 4);
+            this.radioComma.Name = "radioComma";
+            this.radioComma.Size = new System.Drawing.Size(68, 17);
+            this.radioComma.TabIndex = 0;
+            this.radioComma.TabStop = true;
+            this.radioComma.Text = "Delimited";
+            this.radioComma.UseVisualStyleBackColor = true;
+            this.radioComma.CheckedChanged += new System.EventHandler(this.radioComma_CheckedChanged);
+            // 
             // btnFindFile
             // 
             this.btnFindFile.Location = new System.Drawing.Point(539, 200);
@@ -215,9 +191,9 @@
             this.checkBoxHeadings.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxHeadings.Location = new System.Drawing.Point(227, 119);
             this.checkBoxHeadings.Name = "checkBoxHeadings";
-            this.checkBoxHeadings.Size = new System.Drawing.Size(165, 17);
+            this.checkBoxHeadings.Size = new System.Drawing.Size(167, 17);
             this.checkBoxHeadings.TabIndex = 2;
-            this.checkBoxHeadings.Text = "Include Headings in First Line";
+            this.checkBoxHeadings.Text = "Include Headings in First Row";
             this.checkBoxHeadings.UseVisualStyleBackColor = true;
             // 
             // label1
@@ -239,40 +215,6 @@
             this.listBoxTables.TabIndex = 0;
             this.listBoxTables.SelectedIndexChanged += new System.EventHandler(this.listBoxTables_SelectedIndexChanged);
             // 
-            // panel2
-            // 
-            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.radioSQL);
-            this.panel2.Controls.Add(this.radioComma);
-            this.panel2.Location = new System.Drawing.Point(230, 62);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(297, 30);
-            this.panel2.TabIndex = 6;
-            // 
-            // radioComma
-            // 
-            this.radioComma.AutoSize = true;
-            this.radioComma.Checked = true;
-            this.radioComma.Location = new System.Drawing.Point(16, 4);
-            this.radioComma.Name = "radioComma";
-            this.radioComma.Size = new System.Drawing.Size(106, 17);
-            this.radioComma.TabIndex = 0;
-            this.radioComma.TabStop = true;
-            this.radioComma.Text = "Delimited";
-            this.radioComma.UseVisualStyleBackColor = true;
-            this.radioComma.CheckedChanged += new System.EventHandler(this.radioComma_CheckedChanged);
-            // 
-            // radioSQL
-            // 
-            this.radioSQL.AutoSize = true;
-            this.radioSQL.Location = new System.Drawing.Point(174, 4);
-            this.radioSQL.Name = "radioSQL";
-            this.radioSQL.Size = new System.Drawing.Size(46, 17);
-            this.radioSQL.TabIndex = 1;
-            this.radioSQL.Text = "SQL";
-            this.radioSQL.UseVisualStyleBackColor = true;
-            this.radioSQL.CheckedChanged += new System.EventHandler(this.radioSQL_CheckedChanged);
-            // 
             // ExportWiz
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -284,18 +226,13 @@
             this.Controls.Add(this.panelTop);
             this.Controls.Add(this.statusStrip1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ExportWiz";
             this.Padding = new System.Windows.Forms.Padding(1);
             this.Text = "Export Wizard";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ExportWiz_FormClosed);
             this.Load += new System.EventHandler(this.ExportWiz_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.panelTop.ResumeLayout(false);
-            this.panelTop.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();
-            this.panelControls.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pbClose)).EndInit();
             this.panelBottom.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
@@ -310,10 +247,6 @@
 
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Panel panelTop;
-        private System.Windows.Forms.Panel panelControls;
-        private System.Windows.Forms.PictureBox pbClose;
-        private System.Windows.Forms.PictureBox pbIcon;
-        private System.Windows.Forms.Label lblFormHeading;
         private System.Windows.Forms.Panel panelBottom;
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Button btnExport;

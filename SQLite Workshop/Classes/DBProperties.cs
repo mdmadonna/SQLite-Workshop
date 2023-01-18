@@ -1,17 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
+using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
     internal class DBProperties
     {
 
-        private string[] dbPragmaList = new string[]
+        private readonly string[] dbPragmaList = new string[]
         {
             "encoding",
             "foreign_key_check",
@@ -23,7 +24,7 @@ namespace SQLiteWorkshop
             "user_version",
         };
 
-        private string[] pragmaList = new string[]
+        private readonly string[] pragmaList = new string[]
         {
             "application_id",
             "auto_vacuum",
@@ -96,44 +97,57 @@ namespace SQLiteWorkshop
         internal DBProperties()
         {
             DatabaseLocation = MainForm.mInstance.CurrentDB;
-            LoadDBProperties();
-            LoadPragmaProperties();
-            LoadRuntimeProperties();
+            if (LoadDBProperties())
+            {
+                LoadPragmaProperties();
+                LoadRuntimeProperties();
+            }
         }
         ~DBProperties()
         { }
 
-        protected void LoadDBProperties()
+        protected bool LoadDBProperties()
         {
             sd = DataAccess.GetSchema(DatabaseLocation);
-            dbprops = new DBPropertySettings();
+            dbprops = new DBPropertySettings
+            {
+                DbFileName = DatabaseLocation,
+                DbName = sd.DBName,
+                DbCreateDate = sd.CreateDate.ToString(),
+                DbTables = sd.Tables.Count.ToString(),
+                DbViews = sd.Views.Count.ToString()
+            };
+            FileInfo fi = new FileInfo(DatabaseLocation);
+            if (!fi.Exists)
+            {
+                dbprops.DbFileName = WARN_NOTFOUND;
+                dbprops.DbName = WARN_NOTFOUND;
+                return false;
+            }
+            dbprops.DbSize = fi.Length.ToString();
+            sd.DBSize = fi.Length;
+            dbprops.DbLastUpdate = fi.LastWriteTime.ToString();
+            sd.LastUpDate = fi.LastWriteTime;
+            sd.LastAccess = fi.LastAccessTime;
 
-            dbprops.DbFileName = DatabaseLocation;
-            dbprops.DbName = sd.DBName;
-            dbprops.DbSize = sd.DBSize.ToString();
-            dbprops.DbCreateDate = sd.CreateDate.ToString();
-            dbprops.DbLastUpdate = sd.LastUpDate.ToString();
-            dbprops.DbTables = sd.Tables.Count.ToString();
-            dbprops.DbViews = sd.Views.Count.ToString();
-            
             int idxCount = 0;
             foreach (var table in sd.Tables) { idxCount += table.Value.Indexes.Count; }
             dbprops.DbIndexes = idxCount.ToString();
             dbprops.DbTriggers = sd.Triggers.Count.ToString();
+            return true;
         }
 
         protected void LoadPragmaProperties()
         {
             string sql;
-            SQLiteErrorCode returnCode;
             DataTable dt;
 
             foreach (string option in dbPragmaList)
             {
                 sql = string.Format("Pragma {0}", option);
-                dt = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
+                dt = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out SQLiteErrorCode returnCode);
                 if (returnCode == SQLiteErrorCode.Ok) { InitProperty(option, dt); continue; }
-                Common.ShowMsg(String.Format("Error executing Pragma {0}.\r\n{1}", option, DataAccess.LastError));
+                ShowMsg(String.Format("Error executing Pragma {0}.\r\n{1}", option, DataAccess.LastError));
             }
         }
 
@@ -174,13 +188,12 @@ namespace SQLiteWorkshop
         {
             dbRT = new DBRuntimePropertySettings();
             string sql;
-            SQLiteErrorCode returnCode;
             DataTable dt;
 
             foreach (string option in pragmaList)
             {
                 sql = string.Format("Pragma {0}", option);
-                dt = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
+                dt = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out SQLiteErrorCode returnCode);
                 if (returnCode == SQLiteErrorCode.Ok) InitRuntimeProperty(option, dt);
             }
         }

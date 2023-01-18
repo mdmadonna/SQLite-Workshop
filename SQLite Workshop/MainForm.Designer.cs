@@ -39,10 +39,8 @@
             this.panelRight = new System.Windows.Forms.Panel();
             this.panelProperties = new System.Windows.Forms.Panel();
             this.tabProperties = new System.Windows.Forms.TabControl();
-            this.tabPageDB = new System.Windows.Forms.TabPage();
-            this.propertyGridDBProperties = new System.Windows.Forms.PropertyGrid();
-            this.tabPageRuntime = new System.Windows.Forms.TabPage();
-            this.propertyGridDBRuntime = new System.Windows.Forms.PropertyGrid();
+            this.tabPageConn = new System.Windows.Forms.TabPage();
+            this.propertyGridConnProperties = new System.Windows.Forms.PropertyGrid();
             this.panel2 = new System.Windows.Forms.Panel();
             this.label2 = new System.Windows.Forms.Label();
             this.spProp = new System.Windows.Forms.Splitter();
@@ -58,6 +56,9 @@
             this.toolStripImpExp = new System.Windows.Forms.ToolStrip();
             this.toolStripToolImport = new System.Windows.Forms.ToolStripButton();
             this.toolStripToolExport = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator10 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSQL = new System.Windows.Forms.ToolStripButton();
+            this.toolStripExecuteSql = new System.Windows.Forms.ToolStripButton();
             this.toolStripTb = new System.Windows.Forms.ToolStrip();
             this.toolStripTbCreateTable = new System.Windows.Forms.ToolStripButton();
             this.toolStripTbCreateView = new System.Windows.Forms.ToolStripButton();
@@ -108,6 +109,7 @@
             this.vacuumToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.integrityCheckToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.encryptDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.recoverDatabaseToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator9 = new System.Windows.Forms.ToolStripSeparator();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -127,8 +129,7 @@
             this.panelRight.SuspendLayout();
             this.panelProperties.SuspendLayout();
             this.tabProperties.SuspendLayout();
-            this.tabPageDB.SuspendLayout();
-            this.tabPageRuntime.SuspendLayout();
+            this.tabPageConn.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panelTemplates.SuspendLayout();
             this.panel1.SuspendLayout();
@@ -217,6 +218,7 @@
             this.tabMain.Size = new System.Drawing.Size(520, 296);
             this.tabMain.TabIndex = 4;
             this.tabMain.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.tabMain_DrawItem);
+            this.tabMain.SelectedIndexChanged += new System.EventHandler(this.tabMain_SelectedIndexChanged);
             this.tabMain.MouseDown += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseDown);
             this.tabMain.MouseEnter += new System.EventHandler(this.tabMain_MouseEnter);
             this.tabMain.MouseMove += new System.Windows.Forms.MouseEventHandler(this.tabMain_MouseMove);
@@ -254,8 +256,7 @@
             // 
             // tabProperties
             // 
-            this.tabProperties.Controls.Add(this.tabPageDB);
-            this.tabProperties.Controls.Add(this.tabPageRuntime);
+            this.tabProperties.Controls.Add(this.tabPageConn);
             this.tabProperties.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabProperties.Location = new System.Drawing.Point(0, 17);
             this.tabProperties.Name = "tabProperties";
@@ -263,47 +264,26 @@
             this.tabProperties.Size = new System.Drawing.Size(200, 176);
             this.tabProperties.TabIndex = 1;
             // 
-            // tabPageDB
+            // tabPageConn
             // 
-            this.tabPageDB.Controls.Add(this.propertyGridDBProperties);
-            this.tabPageDB.Location = new System.Drawing.Point(4, 22);
-            this.tabPageDB.Name = "tabPageDB";
-            this.tabPageDB.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageDB.Size = new System.Drawing.Size(192, 150);
-            this.tabPageDB.TabIndex = 0;
-            this.tabPageDB.Text = "DB";
-            this.tabPageDB.UseVisualStyleBackColor = true;
+            this.tabPageConn.Controls.Add(this.propertyGridConnProperties);
+            this.tabPageConn.Location = new System.Drawing.Point(4, 22);
+            this.tabPageConn.Name = "tabPageConn";
+            this.tabPageConn.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageConn.Size = new System.Drawing.Size(192, 150);
+            this.tabPageConn.TabIndex = 0;
+            this.tabPageConn.Text = "Current Connection";
+            this.tabPageConn.UseVisualStyleBackColor = true;
             // 
-            // propertyGridDBProperties
+            // propertyGridConnProperties
             // 
-            this.propertyGridDBProperties.DisabledItemForeColor = System.Drawing.SystemColors.ControlText;
-            this.propertyGridDBProperties.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGridDBProperties.Location = new System.Drawing.Point(3, 3);
-            this.propertyGridDBProperties.Name = "propertyGridDBProperties";
-            this.propertyGridDBProperties.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.propertyGridDBProperties.Size = new System.Drawing.Size(186, 144);
-            this.propertyGridDBProperties.TabIndex = 0;
-            // 
-            // tabPageRuntime
-            // 
-            this.tabPageRuntime.Controls.Add(this.propertyGridDBRuntime);
-            this.tabPageRuntime.Location = new System.Drawing.Point(4, 22);
-            this.tabPageRuntime.Name = "tabPageRuntime";
-            this.tabPageRuntime.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPageRuntime.Size = new System.Drawing.Size(192, 150);
-            this.tabPageRuntime.TabIndex = 1;
-            this.tabPageRuntime.Text = "Runtime";
-            this.tabPageRuntime.UseVisualStyleBackColor = true;
-            // 
-            // propertyGridDBRuntime
-            // 
-            this.propertyGridDBRuntime.DisabledItemForeColor = System.Drawing.SystemColors.ControlText;
-            this.propertyGridDBRuntime.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.propertyGridDBRuntime.Location = new System.Drawing.Point(3, 3);
-            this.propertyGridDBRuntime.Name = "propertyGridDBRuntime";
-            this.propertyGridDBRuntime.PropertySort = System.Windows.Forms.PropertySort.NoSort;
-            this.propertyGridDBRuntime.Size = new System.Drawing.Size(186, 144);
-            this.propertyGridDBRuntime.TabIndex = 0;
+            this.propertyGridConnProperties.DisabledItemForeColor = System.Drawing.SystemColors.ControlText;
+            this.propertyGridConnProperties.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.propertyGridConnProperties.Location = new System.Drawing.Point(3, 3);
+            this.propertyGridConnProperties.Name = "propertyGridConnProperties";
+            this.propertyGridConnProperties.PropertySort = System.Windows.Forms.PropertySort.NoSort;
+            this.propertyGridConnProperties.Size = new System.Drawing.Size(186, 144);
+            this.propertyGridConnProperties.TabIndex = 0;
             // 
             // panel2
             // 
@@ -322,9 +302,9 @@
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label2.Location = new System.Drawing.Point(7, 1);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(47, 12);
+            this.label2.Size = new System.Drawing.Size(96, 12);
             this.label2.TabIndex = 0;
-            this.label2.Text = "Properties";
+            this.label2.Text = "Connection Properties";
             // 
             // spProp
             // 
@@ -372,6 +352,7 @@
             this.imageListTreeView.Images.SetKeyName(6, "view.png");
             this.imageListTreeView.Images.SetKeyName(7, "Key.png");
             this.imageListTreeView.Images.SetKeyName(8, "Trigger.png");
+            this.imageListTreeView.Images.SetKeyName(9, "AttachDB.png");
             // 
             // panel1
             // 
@@ -413,6 +394,7 @@
             this.treeViewMain.Size = new System.Drawing.Size(121, 296);
             this.treeViewMain.TabIndex = 2;
             this.treeViewMain.BeforeSelect += new System.Windows.Forms.TreeViewCancelEventHandler(this.treeViewMain_BeforeSelect);
+            this.treeViewMain.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.treeViewMain_AfterSelect);
             this.treeViewMain.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.treeViewMain_NodeMouseClick);
             // 
             // panelTop
@@ -445,10 +427,13 @@
             this.toolStripImpExp.Dock = System.Windows.Forms.DockStyle.None;
             this.toolStripImpExp.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripToolImport,
-            this.toolStripToolExport});
+            this.toolStripToolExport,
+            this.toolStripSeparator10,
+            this.toolStripSQL,
+            this.toolStripExecuteSql});
             this.toolStripImpExp.Location = new System.Drawing.Point(696, 23);
             this.toolStripImpExp.Name = "toolStripImpExp";
-            this.toolStripImpExp.Size = new System.Drawing.Size(58, 25);
+            this.toolStripImpExp.Size = new System.Drawing.Size(110, 25);
             this.toolStripImpExp.TabIndex = 3;
             // 
             // toolStripToolImport
@@ -473,6 +458,32 @@
             this.toolStripToolExport.ToolTipText = "Export Data From the Current Database";
             this.toolStripToolExport.Click += new System.EventHandler(this.toolStripToolExport_Click);
             // 
+            // toolStripSeparator10
+            // 
+            this.toolStripSeparator10.Name = "toolStripSeparator10";
+            this.toolStripSeparator10.Size = new System.Drawing.Size(6, 25);
+            // 
+            // toolStripSQL
+            // 
+            this.toolStripSQL.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripSQL.Image = global::SQLiteWorkshop.Properties.Resources.sql;
+            this.toolStripSQL.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripSQL.Name = "toolStripSQL";
+            this.toolStripSQL.Size = new System.Drawing.Size(23, 22);
+            this.toolStripSQL.Text = "SQL";
+            this.toolStripSQL.ToolTipText = "Show SQL";
+            this.toolStripSQL.Click += new System.EventHandler(this.toolStripSQL_Click);
+            // 
+            // toolStripExecuteSql
+            // 
+            this.toolStripExecuteSql.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.toolStripExecuteSql.Image = global::SQLiteWorkshop.Properties.Resources.ExecuteSql;
+            this.toolStripExecuteSql.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripExecuteSql.Name = "toolStripExecuteSql";
+            this.toolStripExecuteSql.Size = new System.Drawing.Size(23, 22);
+            this.toolStripExecuteSql.Text = "ExecuteSql";
+            this.toolStripExecuteSql.Click += new System.EventHandler(this.toolStripExecuteSql_Click);
+            // 
             // toolStripTb
             // 
             this.toolStripTb.BackColor = System.Drawing.SystemColors.InactiveCaption;
@@ -486,7 +497,7 @@
             this.toolStripTbNewQryWin});
             this.toolStripTb.Location = new System.Drawing.Point(431, 23);
             this.toolStripTb.Name = "toolStripTb";
-            this.toolStripTb.Size = new System.Drawing.Size(196, 25);
+            this.toolStripTb.Size = new System.Drawing.Size(180, 25);
             this.toolStripTb.TabIndex = 2;
             // 
             // toolStripTbCreateTable
@@ -540,10 +551,9 @@
             // 
             // toolStripTbNewQryWin
             // 
-            this.toolStripTbNewQryWin.Image = global::SQLiteWorkshop.Properties.Resources.New_Query;
             this.toolStripTbNewQryWin.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripTbNewQryWin.Name = "toolStripTbNewQryWin";
-            this.toolStripTbNewQryWin.Size = new System.Drawing.Size(86, 22);
+            this.toolStripTbNewQryWin.Size = new System.Drawing.Size(70, 22);
             this.toolStripTbNewQryWin.Text = "New Query";
             this.toolStripTbNewQryWin.ToolTipText = "Open an Empty Query Tab\r\n";
             this.toolStripTbNewQryWin.Click += new System.EventHandler(this.toolStripTbNewQryWin_Click);
@@ -562,7 +572,7 @@
             this.toolStripOpsParse});
             this.toolStripOps.Location = new System.Drawing.Point(225, 23);
             this.toolStripOps.Name = "toolStripOps";
-            this.toolStripOps.Size = new System.Drawing.Size(183, 25);
+            this.toolStripOps.Size = new System.Drawing.Size(184, 25);
             this.toolStripOps.TabIndex = 2;
             // 
             // toolStripOpsExecute
@@ -570,7 +580,7 @@
             this.toolStripOpsExecute.Image = global::SQLiteWorkshop.Properties.Resources.Execute;
             this.toolStripOpsExecute.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripOpsExecute.Name = "toolStripOpsExecute";
-            this.toolStripOpsExecute.Size = new System.Drawing.Size(67, 22);
+            this.toolStripOpsExecute.Size = new System.Drawing.Size(68, 22);
             this.toolStripOpsExecute.Text = "Execute";
             this.toolStripOpsExecute.Click += new System.EventHandler(this.toolStripOpsExecute_Click);
             // 
@@ -583,6 +593,8 @@
             this.toolStripOpsCancel.Size = new System.Drawing.Size(23, 22);
             this.toolStripOpsCancel.Text = "Cancel Execution";
             this.toolStripOpsCancel.Click += new System.EventHandler(this.toolStripOpsCancel_Click);
+            this.toolStripOpsCancel.MouseEnter += new System.EventHandler(this.toolStripOpsCancel_MouseEnter);
+            this.toolStripOpsCancel.MouseLeave += new System.EventHandler(this.toolStripOpsCancel_MouseLeave);
             // 
             // toolStripSeparator5
             // 
@@ -815,6 +827,7 @@
             this.databaseToolStripMenuItem.Name = "databaseToolStripMenuItem";
             this.databaseToolStripMenuItem.Size = new System.Drawing.Size(159, 22);
             this.databaseToolStripMenuItem.Text = "Database";
+            this.databaseToolStripMenuItem.Click += new System.EventHandler(this.databaseToolStripMenuItem_Click);
             // 
             // sQLFileToolStripMenuItem
             // 
@@ -918,42 +931,50 @@
             this.vacuumToolStripMenuItem,
             this.integrityCheckToolStripMenuItem,
             this.encryptDatabaseToolStripMenuItem,
+            this.recoverDatabaseToolStripMenuItem,
             this.toolStripSeparator9,
             this.optionsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.toolsToolStripMenuItem.Text = "Tools";
             // 
             // vacuumToolStripMenuItem
             // 
             this.vacuumToolStripMenuItem.Name = "vacuumToolStripMenuItem";
-            this.vacuumToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.vacuumToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.vacuumToolStripMenuItem.Text = "Vacuum";
             this.vacuumToolStripMenuItem.Click += new System.EventHandler(this.toolStripDBCompress_Click);
             // 
             // integrityCheckToolStripMenuItem
             // 
             this.integrityCheckToolStripMenuItem.Name = "integrityCheckToolStripMenuItem";
-            this.integrityCheckToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.integrityCheckToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.integrityCheckToolStripMenuItem.Text = "Integrity Check";
             this.integrityCheckToolStripMenuItem.Click += new System.EventHandler(this.toolStripDBIntegrityCheck_Click);
             // 
             // encryptDatabaseToolStripMenuItem
             // 
             this.encryptDatabaseToolStripMenuItem.Name = "encryptDatabaseToolStripMenuItem";
-            this.encryptDatabaseToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.encryptDatabaseToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.encryptDatabaseToolStripMenuItem.Text = "Encrypt Database";
             this.encryptDatabaseToolStripMenuItem.Click += new System.EventHandler(this.toolStripDBEncrypt_Click);
+            // 
+            // recoverDatabaseToolStripMenuItem
+            // 
+            this.recoverDatabaseToolStripMenuItem.Name = "recoverDatabaseToolStripMenuItem";
+            this.recoverDatabaseToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.recoverDatabaseToolStripMenuItem.Text = "Recover Database";
+            this.recoverDatabaseToolStripMenuItem.Click += new System.EventHandler(this.toolStripDBRecover_Click);
             // 
             // toolStripSeparator9
             // 
             this.toolStripSeparator9.Name = "toolStripSeparator9";
-            this.toolStripSeparator9.Size = new System.Drawing.Size(162, 6);
+            this.toolStripSeparator9.Size = new System.Drawing.Size(164, 6);
             // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
             this.optionsToolStripMenuItem.Text = "Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
@@ -1125,8 +1146,7 @@
             this.panelRight.ResumeLayout(false);
             this.panelProperties.ResumeLayout(false);
             this.tabProperties.ResumeLayout(false);
-            this.tabPageDB.ResumeLayout(false);
-            this.tabPageRuntime.ResumeLayout(false);
+            this.tabPageConn.ResumeLayout(false);
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.panelTemplates.ResumeLayout(false);
@@ -1245,18 +1265,20 @@
         private System.Windows.Forms.ToolStripButton toolStripDBRefresh;
         private System.Windows.Forms.Panel panelRight;
         private System.Windows.Forms.Panel panelProperties;
-        private System.Windows.Forms.PropertyGrid propertyGridDBProperties;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Splitter spProp;
         private System.Windows.Forms.Panel panelTemplates;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TabControl tabProperties;
-        private System.Windows.Forms.TabPage tabPageDB;
-        private System.Windows.Forms.TabPage tabPageRuntime;
-        private System.Windows.Forms.PropertyGrid propertyGridDBRuntime;
         private System.Windows.Forms.ToolStripMenuItem saveAsTemplateToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator10;
+        private System.Windows.Forms.ToolStripButton toolStripSQL;
+        private System.Windows.Forms.ToolStripButton toolStripExecuteSql;
+        private System.Windows.Forms.TabControl tabProperties;
+        private System.Windows.Forms.TabPage tabPageConn;
+        private System.Windows.Forms.PropertyGrid propertyGridConnProperties;
+        private System.Windows.Forms.ToolStripMenuItem recoverDatabaseToolStripMenuItem;
     }
 }
 

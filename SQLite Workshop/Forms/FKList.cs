@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.GUIManager;
 
 namespace SQLiteWorkshop
 {
@@ -21,16 +19,17 @@ namespace SQLiteWorkshop
 
         private void FKList_Load(object sender, EventArgs e)
         {
-            lblFormHeading.Text = "Foreign Key List";
             lblName.Text = string.Format("Database: {0}", MainForm.mInstance.CurrentDB);
-
-            // Establish ToolTips for various controls.
             toolTip = new ToolTip();
-            toolTip.SetToolTip(pbClose, "Close");
+            HouseKeeping(this, "Foreign Key List");
             dgFKList.AutoGenerateColumns = true;
             LoadForeignKeys();
         }
 
+        private void FKList_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            FormClose(this);
+        }
 
         private void btnClose_Click(object sender, EventArgs e)
         {
@@ -67,7 +66,7 @@ namespace SQLiteWorkshop
                 if (dtGrid.Rows.Count == 0)
                 {
                     this.Close();
-                    Common.ShowMsg("No Foreign Keys were found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ShowMsg("No Foreign Keys were found.", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 dgFKList.Columns.Clear();
@@ -76,63 +75,9 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Unable to load Foreign Key List.\r\n {0}", ex.Message));
+                ShowMsg(string.Format("Unable to load Foreign Key List.\r\n {0}", ex.Message));
                 return;
             }
         }
-
-        #region ControlBox Handlers
-        private void pbClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void ControlBox_MouseEnter(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.White;
-        }
-
-        private void ControlBox_MouseLeave(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        private void ControlBox_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.Wheat;
-            ((PictureBox)sender).BorderStyle = BorderStyle.Fixed3D;
-        }
-
-        private void ControlBox_MouseUp(object sender, MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        #endregion
-
-        #region Form Dragging Event Handler
-
-        public const int WM_NCLBUTTONDOWN = 0xA1;
-        public const int HT_CAPTION = 0x2;
-
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern bool ReleaseCapture();
-
-        private void MainForm_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
-            }
-        }
-
-
-
-
-
-        #endregion
     }
 }

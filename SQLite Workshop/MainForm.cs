@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.Config;
 
 namespace SQLiteWorkshop
 {
@@ -20,18 +20,30 @@ namespace SQLiteWorkshop
         internal static MainForm mInstance;
         internal int sqlTabTrack;
         internal static Config cfg;
-        internal string CurrentDB;
+        private string mCurrentDB;
+        public string CurrentDB {
+            get 
+            { 
+                return mCurrentDB; 
+            }
+            set 
+            { 
+                mCurrentDB = value;
+                toolStripStatusMain.Text = mCurrentDB;
+            }
+        }
         internal TemplateManager tm;
 
 
         ToolTip toolTip;
-        ArrayList RecentDBs = new ArrayList();
+        readonly ArrayList RecentDBs = new ArrayList();
         internal struct RegisteredDB
         {
             internal string Name;
             internal string Password;
         }
-        Dictionary<string, RegisteredDB> RegisteredDBs = new Dictionary<string, RegisteredDB>();
+
+        readonly Dictionary<string, RegisteredDB> RegisteredDBs = new Dictionary<string, RegisteredDB>();
 
         //Context Menus
         ContextMenu dbContextMenu;
@@ -45,26 +57,34 @@ namespace SQLiteWorkshop
         ContextMenu idxContextMenu;
         ContextMenu triggersContextMenu;
         ContextMenu trContextMenu;
+        ContextMenu attachdbContextMenu;
+        ContextMenu adContextMenu;
 
         #region Program Initialization
         public MainForm()
         {
-            InitializeComponent();
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            //currentDomain.UnhandledException += new UnhandledExceptionEventHandler(ErrorHandler);
+
             cfg = new Config();
+            ApplicationStartUp();
+            InitializeComponent();
             this.MaximumSize = Screen.FromRectangle(this.Bounds).WorkingArea.Size;
             InitializeFormGUI();
             InitializeForm();
         }
 
+        
         internal void InitializeForm()
         {
+            Tester.tMain();
             mInstance = this;
             this.DoubleBuffered = true;
             this.SetStyle(ControlStyles.ResizeRedraw, true);
             tabMain.Visible = false;
             toolStripStatusMain.Text = string.Empty;
 
-            lblFormHeading.Text = Common.APPNAME;
+            lblFormHeading.Text = APPNAME;
             dbContextMenu = new ContextMenu();
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "New Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Backup Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
@@ -72,13 +92,13 @@ namespace SQLiteWorkshop
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Optimize Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Compress Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Encrypt Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
+            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Disconnect Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem("-"));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Analyze Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem("-"));
-            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Register", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null) { Name = "Register" });
-            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Attach", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
-            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Rebuild", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
-            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Restore", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
+            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Register Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null) { Name = "Register Database" });
+            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Attach Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
+            dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Restore Database", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem("-"));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Foreign Key List", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
             dbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.F5, "Refresh", dbContextMenu_Clicked, dbContextMenu_Popup, dbContextMenu_Selected, null));
@@ -108,7 +128,6 @@ namespace SQLiteWorkshop
             tblContextMenu.MenuItems.AddRange(new MenuItem[] 
             {
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "New Table", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
-                new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Design", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Select Top 1000 rows", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Edit Top 1000 rows", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
                 new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Edit Rows", tblContextMenu_Clicked, tblContextMenu_Popup, tblContextMenu_Selected, null),
@@ -182,6 +201,14 @@ namespace SQLiteWorkshop
             trContextMenu.MenuItems.Add(new MenuItem("-"));
             trContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Delete Trigger", trContextMenu_Clicked, trContextMenu_Popup, trContextMenu_Selected, null));
 
+            // Context Menu for AttachedDB Parent Entry
+            attachdbContextMenu = new ContextMenu();
+            attachdbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Attach Database", attachdbContextMenu_Clicked, attachdbContextMenu_Popup, attachdbContextMenu_Selected, null));
+            attachdbContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Detach All", attachdbContextMenu_Clicked, attachdbContextMenu_Popup, attachdbContextMenu_Selected, null));
+
+            // Context Menu for AttachedDB
+            adContextMenu = new ContextMenu();
+            adContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Detach", adContextMenu_Clicked, adContextMenu_Popup, adContextMenu_Selected, null));
 
             // Establish ToolTips for various controls.
             toolTip = new ToolTip();
@@ -189,35 +216,50 @@ namespace SQLiteWorkshop
             toolTip.SetToolTip(pbMax, "Maximize");
             toolTip.SetToolTip(pbClose, "Close");
             sqlTabTrack = 0;
+
+            bool.TryParse(appSetting(CFG_OPENLASTDB), out bool bOpenDB);
+            if (bOpenDB && RecentDBs.Count > 0)
+            {
+                LoadDB(RecentDBs[RecentDBs.Count - 1].ToString());
+            }
+            
+            string[] args = Environment.GetCommandLineArgs();
+
+            foreach (string arg in args)
+            {
+                if (File.Exists(arg)) LoadDB(arg);
+            }
         }
 
         #endregion
 
         #region Form Management
 
+        readonly internal int minWidth = 300;
+        readonly internal int minHeight = 200;
         /// <summary>
         /// Read key GUI cues to make the program appear the same as it did at last closing.
         /// </summary>
         private void InitializeFormGUI()
         {
-            if (Int32.TryParse(cfg.appsetting(Config.CFG_FTOP), out int parm)) this.Top = parm;
-            if (Int32.TryParse(cfg.appsetting(Config.CFG_FLEFT), out parm)) this.Left = parm;
-            if (Int32.TryParse(cfg.appsetting(Config.CFG_FHEIGHT), out parm)) this.Height = parm;
-            if (Int32.TryParse(cfg.appsetting(Config.CFG_FWIDTH), out parm)) this.Width = parm;
-            if (Int32.TryParse(cfg.appsetting(Config.CFG_VSPLITP), out parm)) vSplitter.SplitPosition = parm;
-            if (Int32.TryParse(cfg.appsetting(Config.CFG_TSPLITP), out parm)) spTemplate.SplitPosition = Math.Max(parm, 100);
-            if (Int32.TryParse(cfg.appsetting(Config.CFG_PSPLITP), out parm)) spProp.SplitPosition = parm;
+            // These are used for the DBEditor only so hide them on startup
+            this.toolStripExecuteSql.Visible = false;
+            this.toolStripSQL.Visible = false;
+
+            if (Int32.TryParse(appSetting(Config.CFG_FTOP), out int parm)) this.Top = Math.Max(parm, 0);
+            if (Int32.TryParse(appSetting(Config.CFG_FLEFT), out parm)) this.Left = Math.Max(parm, 0);
+            if (Int32.TryParse(appSetting(Config.CFG_FHEIGHT), out parm)) this.Height = Math.Max(parm, minHeight);
+            if (Int32.TryParse(appSetting(Config.CFG_FWIDTH), out parm)) this.Width = Math.Max(parm, minWidth);
+            if (Int32.TryParse(appSetting(Config.CFG_VSPLITP), out parm)) vSplitter.SplitPosition = parm;
+            if (Int32.TryParse(appSetting(Config.CFG_TSPLITP), out parm)) spTemplate.SplitPosition = Math.Max(parm, 100);
+            if (Int32.TryParse(appSetting(Config.CFG_PSPLITP), out parm)) spProp.SplitPosition = parm;
 
             // Setting the Right Panel Visibility
-#pragma warning disable IDE0018 // Inline variable declaration
-            bool b = true;
-#pragma warning restore IDE0018 // Inline variable declaration
-            templatesToolStripMenuItem.Checked = bool.TryParse(cfg.appsetting(Config.CFG_TEMPLATESVISIBLE), out b) ? true : b;
-            b = true;
-            propertiesToolStripMenuItem.Checked = bool.TryParse(cfg.appsetting(Config.CFG_PROPSVISIBLE), out b) ? true : b;
+            templatesToolStripMenuItem.Checked = bool.TryParse(appSetting(Config.CFG_TEMPLATESVISIBLE), out bool b) || b;
+            propertiesToolStripMenuItem.Checked = bool.TryParse(appSetting(Config.CFG_PROPSVISIBLE), out b) || b;
             SetRightPanelStatus();
 
-            string RecentDBList = cfg.appsetting(Config.CFG_RECENTDB);
+            string RecentDBList = appSetting(Config.CFG_RECENTDB);
             if (!string.IsNullOrEmpty(RecentDBList))
             {
                 string[] rDBs = RecentDBList.Split(new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries);
@@ -229,7 +271,10 @@ namespace SQLiteWorkshop
 
             }
 
-            Common.password = "SQLite Workshop";
+            // Initialize Connection PropertyGrid
+            propertyGridConnProperties.SelectedObject = new ConnectionPropertySettings();
+            propertyGridConnProperties.Refresh();
+            
             LoadTemplates();
             LoadRegisteredDBs();
         }
@@ -240,16 +285,16 @@ namespace SQLiteWorkshop
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            cfg.SetSetting(Config.CFG_FTOP, this.Top.ToString());
-            cfg.SetSetting(Config.CFG_FLEFT, this.Left.ToString());
-            cfg.SetSetting(Config.CFG_FHEIGHT, this.Height.ToString());
-            cfg.SetSetting(Config.CFG_FWIDTH, this.Width.ToString());
-            cfg.SetSetting(Config.CFG_VSPLITP, vSplitter.SplitPosition.ToString());
-            cfg.SetSetting(Config.CFG_TEMPLATESVISIBLE, panelTemplates.Visible.ToString());
-            cfg.SetSetting(Config.CFG_PROPSVISIBLE, panelProperties.Visible.ToString());
+            saveSetting(Config.CFG_FTOP, this.Top.ToString());
+            saveSetting(Config.CFG_FLEFT, this.Left.ToString());
+            saveSetting(Config.CFG_FHEIGHT, this.Height.ToString());
+            saveSetting(Config.CFG_FWIDTH, this.Width.ToString());
+            saveSetting(Config.CFG_VSPLITP, vSplitter.SplitPosition.ToString());
+            saveSetting(Config.CFG_TEMPLATESVISIBLE, panelTemplates.Visible.ToString());
+            saveSetting(Config.CFG_PROPSVISIBLE, panelProperties.Visible.ToString());
 
-            if (spTemplate.Visible) cfg.SetSetting(Config.CFG_TSPLITP, spTemplate.SplitPosition.ToString());
-            if (spProp.Visible) cfg.SetSetting(Config.CFG_PSPLITP, spProp.SplitPosition.ToString());
+            if (spTemplate.Visible) saveSetting(Config.CFG_TSPLITP, spTemplate.SplitPosition.ToString());
+            if (spProp.Visible) saveSetting(Config.CFG_PSPLITP, spProp.SplitPosition.ToString());
         }
 
         #endregion
@@ -273,10 +318,11 @@ namespace SQLiteWorkshop
 
         private void sQLFileToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
-            SqlTab st = new SqlTab();
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+            SqlTab st = new SqlTab(CurrentDB);
             st.BuildTab();
         }
+
 
         private void newQuerytoolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -298,7 +344,8 @@ namespace SQLiteWorkshop
 
         private void refreshToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (!string.IsNullOrEmpty(CurrentDB)) LoadDB(CurrentDB);
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+            LoadDB(CurrentDB, true);
         }
 
         private void saveAstoolStripMenuItem_Click(object sender, EventArgs e)
@@ -360,7 +407,8 @@ namespace SQLiteWorkshop
         }
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-
+            Options opt = new Options();
+            opt.ShowDialog();
         }
 
         private void templatesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -373,14 +421,14 @@ namespace SQLiteWorkshop
         {
             propertiesToolStripMenuItem.Checked = !propertiesToolStripMenuItem.Checked;
             SetRightPanelStatus();
-            if (string.IsNullOrEmpty(CurrentDB)) return;
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
             if (propertiesToolStripMenuItem.Checked)
             {
                 DBProperties p = new DBProperties();
-                propertyGridDBProperties.SelectedObject = p.dbprops;
-                propertyGridDBProperties.Refresh();
-                propertyGridDBRuntime.SelectedObject = p.dbRT;
-                propertyGridDBRuntime.Refresh();
+                propertyGridConnProperties.SelectedObject = p.dbprops;
+                propertyGridConnProperties.Refresh();
+                //propertyGridDBRuntime.SelectedObject = p.dbRT;
+                //propertyGridDBRuntime.Refresh();
             }
         }
 
@@ -411,7 +459,7 @@ namespace SQLiteWorkshop
 
         private void toolStripDBCompress_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
 
             ExecuteForm ef = new ExecuteForm
             {
@@ -424,7 +472,7 @@ namespace SQLiteWorkshop
 
         private void toolStripDBEncrypt_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
 
             ExecuteForm ef = new ExecuteForm
             {
@@ -435,25 +483,65 @@ namespace SQLiteWorkshop
             ef.ShowDialog();
         }
 
+        private void toolStripDBRecover_Click(object sender, EventArgs e)
+        {
+            DBRecover dBRecover = new DBRecover();
+            dBRecover.ShowDialog();
+        }
+
         private void toolStripDBIntegrityCheck_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
 
-            SqlTab st = new SqlTab();
+            SqlTab st = new SqlTab(CurrentDB);
             st.BuildTab(CurrentDB, SQLType.SQLIntegrityCheck);
         }
 
         private void toolStripDBAnalyze_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+
             DBAnalyze analyze = new DBAnalyze(CurrentDB);
             analyze.ShowDialog();
+        }
+
+        private void toolStripSQL_Click(object sender, EventArgs e)
+        {
+            if (tabMain.TabPages.Count == 0) return;
+            TabPage tb = tabMain.SelectedTab;
+            foreach (Control c in tb.Controls)
+            {
+                if (c.GetType().Equals(typeof(DBEditorTabControl)))
+                {
+                    ((DBEditorTabControl)c).ToggleSqlPanel();
+                }
+            }
+        }
+        private void sQLiteHomePageToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            System.Diagnostics.Process.Start("http://sqlite.org");
+        }
+
+        private void toolStripExecuteSql_Click(object sender, EventArgs e)
+        {
+            if (tabMain.TabPages.Count == 0) return;
+            TabPage tb = tabMain.SelectedTab;
+            foreach (Control c in tb.Controls)
+            {
+                if (c.GetType().Equals(typeof(DBEditorTabControl)))
+                {
+                    ((DBEditorTabControl)c).ExecuteSql();
+                }
+            }
         }
         #endregion
 
         #region Tool Strip Ops
         private void toolStripOpsExecute_Click(object sender, EventArgs e)
         {
-            if (tabMain.TabPages.Count == 0) return;
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+            if (tabMain.TabPages.Count == 0) { NoQuery(); return; }
+
             if (tabMain.SelectedTab == null) return;
             TabPage activeTab = tabMain.SelectedTab;
             if (activeTab == null) return;
@@ -477,7 +565,9 @@ namespace SQLiteWorkshop
 
         private void toolStripOpsCancel_Click(object sender, EventArgs e)
         {
-            if (tabMain.TabPages.Count == 0) return;
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+            if (tabMain.TabPages.Count == 0) { NoQuery(); return; }
+
             TabPage activeTab = tabMain.SelectedTab;
             foreach (Control c in activeTab.Controls)
             {
@@ -487,22 +577,35 @@ namespace SQLiteWorkshop
                     case "SQLiteWorkshop.SqlTabControl":
                         ((SqlTabControl)c).CancelExecution = true;
                         break;
+                    case "SQLiteWorkshop.DBEditorTabControl":
+                        ((DBEditorTabControl)c).CancelExecution = true;
+                        break;
                     default:
                         break;
                 }
             }
         }
 
+        private void toolStripOpsCancel_MouseEnter(object sender, EventArgs e)
+        {
+            toolStripOps.Cursor = Cursors.Default;
+            Cursor.Position = Cursor.Position;
+        }
+
+        private void toolStripOpsCancel_MouseLeave(object sender, EventArgs e)
+        {
+            toolStripOps.Cursor = this.Cursor;
+        }
+
         private void toolStripOpsExplain_Click(object sender, EventArgs e)
         {
-            const bool Explain = true;
-            const bool ExplainQueryPlan = false;
             bool ExplainType;
+            if(string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+            if (tabMain.TabPages.Count == 0) { NoQuery(); return; }
 
-            if (tabMain.TabPages.Count == 0) return;
             TabPage activeTab = tabMain.SelectedTab;
 
-            ExplainType = ((ToolStripButton)sender).Text.ToLower() == "explain" ? Explain : ExplainQueryPlan;
+            ExplainType = ((ToolStripButton)sender).Text.ToLower() == "explain";
             foreach (Control c in activeTab.Controls)
             {
                 string cType = c.GetType().ToString();
@@ -519,34 +622,53 @@ namespace SQLiteWorkshop
 
         private void toolStripOpsParse_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+            if (tabMain.TabPages.Count == 0) { NoQuery(); return; }
+            string szSQL = string.Empty;
+            foreach (Control c in tabMain.SelectedTab.Controls)
+            {
+                if (c is MainTabControl tc)
+                {
+                    szSQL = tc.SqlStatement;
+                    break;
+                }
 
+            }
+
+            bool rc = DataAccess.Parse(MainForm.mInstance.CurrentDB, szSQL, out _);
+            if (rc)
+            {
+                ShowMsg(OK_PARSE);
+                return;
+            }
+            ShowMsg(string.Format(ERR_PARSE, DataAccess.LastError));
         }
         #endregion
 
         #region Tool Strip Table
         private void toolStripTbNewQryWin_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
-            SqlTab st = new SqlTab();
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+            SqlTab st = new SqlTab(CurrentDB);
             st.BuildTab(SQLType.SQLNewQuery);
         }
         private void toolStripTbCreateTable_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
-            TableEditorTab tbt = new TableEditorTab();
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+            TableEditorTab tbt = new TableEditorTab(CurrentDB);
             tbt.BuildTab();
         }
 
         private void toolStripTbCreateView_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
-            SqlTab st = new SqlTab();
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+            SqlTab st = new SqlTab(CurrentDB);
             st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLCreateView);
         }
 
         private void toolStripTbCreateIndex_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
             BuildIndex bi = new BuildIndex();
 
             if (treeViewMain.SelectedNode != null)
@@ -567,8 +689,8 @@ namespace SQLiteWorkshop
 
         private void toolStripTbCreateTrigger_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
-            SqlTab st = new SqlTab();
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+            SqlTab st = new SqlTab(CurrentDB);
             st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLCreateTrigger);
         }
         #endregion
@@ -576,7 +698,7 @@ namespace SQLiteWorkshop
         #region Tool Strip Import/Export
         private void toolStripToolImport_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
             ImportWiz iWiz = new ImportWiz
             {
                 DatabaseLocation = CurrentDB,
@@ -587,7 +709,7 @@ namespace SQLiteWorkshop
 
         private void toolStripToolExport_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(CurrentDB)) return;
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
             ExportWiz eWiz = new ExportWiz
             {
                 DatabaseLocation = CurrentDB,
@@ -619,6 +741,7 @@ namespace SQLiteWorkshop
                     newToolStripMenuItem_Click(sender, e);
                     break;
                 case "backup database":
+                    if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
                     ef = new ExecuteForm
                     {
                         execType = SQLType.SQLBackup,
@@ -628,6 +751,7 @@ namespace SQLiteWorkshop
                     ef.ShowDialog();
                     break;
                 case "optimize database":
+                    if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
                     ef = new ExecuteForm
                     {
                         execType = SQLType.SQLOptimize,
@@ -637,6 +761,7 @@ namespace SQLiteWorkshop
                     ef.ShowDialog();
                     break;
                 case "clone database":
+                    if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
                     ef = new ExecuteForm
                     {
                         execType = SQLType.SQLClone,
@@ -651,6 +776,9 @@ namespace SQLiteWorkshop
                 case "encrypt database":
                     toolStripDBEncrypt_Click(sender, e);
                     break;
+                case "disconnect database":
+                    DisconnectDB(CurrentDB);
+                    break;
                 case "analyze database":
                     toolStripDBAnalyze_Click(sender, e);
                     break;
@@ -658,28 +786,35 @@ namespace SQLiteWorkshop
                     newToolStripMenuItem_Click(sender, e);
                     break;
                 case "delete":
-                    Common.ShowMsg(Common.NOTIMPLEMENTED);
+                    ShowMsg(NOTIMPLEMENTED);
                     break;
                 case "properties":
-                    propertiesToolStripMenuItem_Click(sender, e);
+                    DBProps dBProps = new DBProps(CurrentDB);
+                    dBProps.Show();
                     break;
                 case "refresh":
-                    LoadDB(CurrentDB);
+                    LoadDB(CurrentDB, true);
                     break;
-                case "register":
+                case "register database":
                     RegisterDB();
                     break;
-                case "unregister":
+                case "unregister database":
                     UnRegisterDB();
                     break;
-                case "rebuild":
-                    Common.ShowMsg(Common.NOTIMPLEMENTED);
+                case "attach database":
+                    if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+                    AttachDB ad = new AttachDB(CurrentDB);
+                    ad.ShowDialog();
                     break;
-                case "attach":
-                    Common.ShowMsg(Common.NOTIMPLEMENTED);
-                    break;
-                case "restore":
-                    Common.ShowMsg(Common.NOTIMPLEMENTED);
+                case "restore database":
+                    if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+                    ef = new ExecuteForm
+                    {
+                        execType = SQLType.SQLRestore,
+                        TargetNode = treeViewMain.SelectedNode,
+                        DatabaseLocation = CurrentDB
+                    };
+                    ef.ShowDialog();
                     break;
                 case "foreign key list":
                     FKList fk = new FKList();
@@ -715,48 +850,48 @@ namespace SQLiteWorkshop
                     toolStripToolImport_Click(sender, e);
                     break;
                 case "create":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenCreate);
                     break;
                 case "drop":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenDrop);
                     break;
                 case "drop and create":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenDropAndCreate);
                     break;
                 case "select":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenSelect);
                     break;
                 case "insert":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenInsert);
                     break;
                 case "update":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenUpdate);
                     break;
                 case "delete":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenDelete);
                     break;
 
                 case "select top 1000 rows":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLSelect1000);
                     break;
                 case "edit top 1000 rows":
                     if (DBEditInProgress(treeViewMain.SelectedNode)) return;
-                    dbEditor = new DBEditorTab();
+                    dbEditor = new DBEditorTab(CurrentDB);
                     dbEditor.BuildTab(treeViewMain.SelectedNode);
                     break;
                 case "edit rows":
                     if (RowEditInProgress(treeViewMain.SelectedNode)) return;
-                    RecordEditorTab RecEditor = new RecordEditorTab();
+                    RowEditorTab RowEditor = new RowEditorTab(CurrentDB);
                     this.Cursor = Cursors.WaitCursor;
-                    RecEditor.BuildTab(treeViewMain.SelectedNode);
+                    RowEditor.BuildTab(treeViewMain.SelectedNode);
                     this.Cursor = Cursors.Default;
                     break;
                 case "rename table":
@@ -770,7 +905,7 @@ namespace SQLiteWorkshop
                     {
                         DataAccess.RemoveTableFromSchema(CurrentDB, treeViewMain.SelectedNode.Text);
                         DataAccess.AddTableToSchema(CurrentDB, ef.NewTableName);
-                        TreeNode newNode = BuildTableNode(ef.NewTableName);
+                        TreeNode newNode = BuildTableNode(CurrentDB, ef.NewTableName);
                         TreeNode[] tblMainNodes = treeViewMain.Nodes.Find("Tables", true);
                         TreeNode tblNode = tblMainNodes[0].Nodes[treeViewMain.SelectedNode.Name];
                         int idx = tblMainNodes[0].Nodes.IndexOf(tblNode);
@@ -812,7 +947,7 @@ namespace SQLiteWorkshop
                     RefreshTables();
                     break;
                 case "refresh table":
-                    AddTable(treeViewMain.SelectedNode.Text);
+                    AddTable(treeViewMain.SelectedNode.Text, CurrentDB);
                     break;
                 default:
                     break;
@@ -835,7 +970,7 @@ namespace SQLiteWorkshop
             BuildColumn bc = new BuildColumn
             {
                 TargetNode = treeViewMain.SelectedNode,
-                DatabaseLocation = CurrentDB
+                DatabaseName = CurrentDB
             };
             switch (((MenuItem)sender).Text.ToLower())
             {
@@ -877,11 +1012,11 @@ namespace SQLiteWorkshop
             switch (((MenuItem)sender).Text.ToLower())
             {
                 case "script index":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenIndex);
                     break;
                 case "script all indexes":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenAllIndexes); break;
                 case "rebuild index":
                     ef = new ExecuteForm
@@ -933,10 +1068,68 @@ namespace SQLiteWorkshop
             }
         }
 
+        #region Attached DB Context Menu Handlers
+        private void attachdbContextMenu_Popup(object sender, EventArgs e)
+        {
+
+        }
+
+        private void attachdbContextMenu_Selected(object sender, EventArgs e)
+        {
+        }
+
+        private void attachdbContextMenu_Clicked(object sender, EventArgs e)
+        {
+
+            switch (((MenuItem)sender).Text.ToLower())
+            {
+                case "attach database":
+                    if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
+                    AttachDB ad = new AttachDB(CurrentDB);
+                    ad.ShowDialog();
+                    break;
+                case "detach all":
+                    TreeNode at = treeViewMain.SelectedNode;
+                    foreach (TreeNode t in at.Nodes)
+                    {
+                        DataAccess.DelAttachedDb(CurrentDB, t.Text);
+                    }
+                    RefreshAttachedDBs();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void adContextMenu_Popup(object sender, EventArgs e)
+        {
+
+        }
+
+        private void adContextMenu_Selected(object sender, EventArgs e)
+        {
+        }
+
+        private void adContextMenu_Clicked(object sender, EventArgs e)
+        {
+
+            switch (((MenuItem)sender).Text.ToLower())
+            {
+                case "detach":
+                    TreeNode t = treeViewMain.SelectedNode;
+                    DataAccess.DelAttachedDb(CurrentDB, t.Text);
+                    RefreshAttachedDBs();
+                    break;
+                default:
+                    break;
+            }
+        }
+        #endregion
+
         private void ReplaceTreeEntry()
         {
             string tableName = treeViewMain.SelectedNode.Text == "Indexes" ? treeViewMain.SelectedNode.Parent.Text : treeViewMain.SelectedNode.Parent.Parent.Text;
-            AddTable(tableName);
+            AddTable(tableName, CurrentDB);
         }
         #endregion
 
@@ -959,15 +1152,15 @@ namespace SQLiteWorkshop
             switch (((MenuItem)sender).Text.ToLower())
             {
                 case "script view":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenViewCreate);
                     break;
                 case "edit view":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLEditView);
                     break;
                 case "select top 1000 rows":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLSelect1000View); break;
                 case "new view":
                     toolStripTbCreateView_Click(sender, e);
@@ -1017,11 +1210,11 @@ namespace SQLiteWorkshop
             switch (((MenuItem)sender).Text.ToLower())
             {
                 case "script trigger":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLGenTriggerCreate);
                     break;
                 case "edit trigger":
-                    st = new SqlTab();
+                    st = new SqlTab(CurrentDB);
                     st.BuildTab(treeViewMain.SelectedNode, SQLType.SQLEditTrigger);
                     break;
                 case "new trigger":
@@ -1052,11 +1245,27 @@ namespace SQLiteWorkshop
             if (treeViewMain.SelectedNode != null) treeViewMain.SelectedNode.BackColor = Color.White;
         }
 
+        private void treeViewMain_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (treeViewMain.SelectedNode != null)
+            {
+                CurrentDB = FindDBName(treeViewMain.SelectedNode);
+            }
+        }
+
         private void treeViewMain_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
             ((TreeView)sender).SelectedNode = e.Node;
         }
 
+        private string FindDBName(TreeNode t)
+        {
+            while (t.Parent != null)
+            {
+                t = t.Parent;
+            }
+            return t.Name;
+        }
         #endregion
 
         #region Template Treeview Handlers
@@ -1071,16 +1280,16 @@ namespace SQLiteWorkshop
             TreeNode sqlNode = treeTemplates.SelectedNode;
             if (sqlNode == null) return;
             if (sqlNode.Tag == null) return;
-            if (string.IsNullOrEmpty(CurrentDB)) return;
+            if (string.IsNullOrEmpty(CurrentDB)) { NoDB(); return; }
 
             FileInfo fi = new FileInfo(sqlNode.Tag.ToString());
             if (!fi.Exists)
             {
-                Common.ShowMsg(string.Format("{0} sql is no longer available.", sqlNode.Text));
+                ShowMsg(string.Format("{0} sql is no longer available.", sqlNode.Text));
                 return;
             }
 
-            SqlTab st = new SqlTab();
+            SqlTab st = new SqlTab(CurrentDB);
             st.BuildTab(fi);
 
         }
@@ -1090,29 +1299,138 @@ namespace SQLiteWorkshop
             TreeNode t = treeTemplates.GetNodeAt(e.Location);
             if (t != null) treeTemplates.SelectedNode = t;
         }
-            
+
 
         #endregion
 
         #region Helpers
+
+        internal void LoadConnectionProperties()
+        {
+            if (tabMain.SelectedTab == null)
+            {
+                propertyGridConnProperties.SelectedObject = new ConnectionPropertySettings();
+                propertyGridConnProperties.Refresh();
+                return;
+            }
+
+            foreach (Control t in tabMain.SelectedTab.Controls)
+            {
+                if (t is MainTabControl mt)
+                {
+                    propertyGridConnProperties.SelectedObject = mt.ConnProps.connSettings;
+                    propertyGridConnProperties.Refresh();
+                    continue;
+                }
+            }
+        }
+        /// <summary>
+        /// Display or Hide buttons used for the DBEditor
+        /// </summary>
+        /// <param name="visible">true to show or false to hide</param>
+        internal void SQLButton(bool visible)
+        {
+            //reserved for future use - these will always be hidden
+            toolStripSQL.Visible = visible;
+            toolStripExecuteSql.Visible = visible;
+        }
+
+        /// <summary>
+        /// Display a messages indicating a Database must be selected before proceeding.
+        /// </summary>
+        private void NoDB()
+        {
+            ShowMsg(MB_SELECTDB);
+        }
+
+        /// <summary>
+        /// Display a messages indicating a Query Window must be selected before proceeding.
+        /// </summary>
+        private void NoQuery()
+        {
+            ShowMsg(MB_SELECTQRY);
+        }
+
+        /// <summary>
+        /// Remove a database from the TreeView and all associated tabs
+        /// </summary>
+        /// <param name="dbname">Fully qualified name of the database to disconnect</param>
+        /// <returns>true</returns>
+        private bool DisconnectDB(string dbname)
+        {
+            // Loop through all tabs and close them if they hold data related
+            // to the DB being disconnected
+            foreach (TabPage t in tabMain.TabPages)
+            {
+                foreach (Control c in t.Controls)
+                {
+
+                    if (c is MainTabControl tc )
+                    {
+                        if (tc.DatabaseName == dbname)
+                        {
+                            tabMain.TabPages.Remove(t);
+                            t.Dispose();
+                        }
+                    }
+
+                }
+            }
+
+            TreeNode tn = GetTopNode(dbname);
+            if (tn != null) treeViewMain.Nodes.Remove(tn);
+            DataAccess.RemoveSchema(dbname);
+
+            // Clear CurrentDB if the TreeView is empty
+            if (treeViewMain.Nodes.Count == 0)
+            { CurrentDB = string.Empty; }
+            else
+            {
+                CurrentDB = treeViewMain.Nodes[0].Name;
+                treeViewMain.SelectedNode = treeViewMain.Nodes[0];
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Find the Top Level Node for the database 
+        /// </summary>
+        /// <param name="DBLoc">Fully qualified name of the database to find</param>
+        /// <returns>Top level TreeNode of the database or null if not found</returns>
+        private TreeNode GetTopNode(string DBLoc)
+        {
+            // Find the top level TreeNode for the DB being disconnected and
+            // remove it
+            foreach (TreeNode t in treeViewMain.Nodes)
+            {
+                if (t.Name == DBLoc) return t;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Locate a database on disk
+        /// </summary>
+        /// <param name="bFileExists">If true, make sure the file exists.</param>
+        /// <returns>Fully qualified name of the database.</returns>
         private string FindDBFileLocation(bool bFileExists = true)
         {
             OpenFileDialog openFile = new OpenFileDialog
             {
-                Title = "Open SQLite DB",
+                Title = bFileExists ? "Open SQLite DB" : "New SQLite DB",
                 Filter = "All files (*.*)|*.*|Database Files (*.db)|*.db",
                 FilterIndex = 2,
                 CheckFileExists = bFileExists,
                 AddExtension = true,
                 AutoUpgradeEnabled = true,
                 DefaultExt = "db",
-                InitialDirectory = cfg.appsetting(Config.CFG_LASTOPEN),
+                InitialDirectory = appSetting(Config.CFG_LASTOPEN),
                 Multiselect = false,
                 ShowReadOnly = false,
                 ValidateNames = true
             };
             if (openFile.ShowDialog() != DialogResult.OK) return string.Empty;
-            cfg.SetSetting(Config.CFG_LASTOPEN, Path.GetDirectoryName(openFile.FileName));
+            saveSetting(Config.CFG_LASTOPEN, Path.GetDirectoryName(openFile.FileName));
             return openFile.FileName;
         }
 
@@ -1120,7 +1438,7 @@ namespace SQLiteWorkshop
         /// Determine if a table editor for a specific table is open and, if yes,
         /// display the corresponding tab.
         /// </summary>
-        /// <param name="tablename">Table being edited.</param>
+        /// <param name="tn">TreeNodeTable being edited.</param>
         /// <returns></returns>
         protected bool DBEditInProgress(TreeNode tn)
         {
@@ -1131,7 +1449,7 @@ namespace SQLiteWorkshop
                 {
                     if (c.GetType().Equals(typeof(DBEditorTabControl)))
                     {
-                        if (((DBEditorTabControl)c).TableName == tablename)
+                        if (((DBEditorTabControl)c).TableName == tablename && ((DBEditorTabControl)c).DatabaseName == CurrentDB)
                         {
                             tabMain.SelectedTab = tb;
                             return true;
@@ -1146,7 +1464,7 @@ namespace SQLiteWorkshop
         /// Determine if a Record editor for a specific table is open and, if yes,
         /// display the corresponding tab.
         /// </summary>
-        /// <param name="tablename">Table being edited.</param>
+        /// <param name="TreeNode">Node of Table Being Edited.</param>
         /// <returns></returns>
         protected bool RowEditInProgress(TreeNode tn)
         {
@@ -1155,9 +1473,9 @@ namespace SQLiteWorkshop
             {
                 foreach (Control c in tb.Controls)
                 {
-                    if (c.GetType().Equals(typeof(RecordEditTabControl)))
+                    if (c.GetType().Equals(typeof(RowEditTabControl)))
                     {
-                        if (((RecordEditTabControl)c).TableName == tablename)
+                        if (((RowEditTabControl)c).TableName == tablename && ((RowEditTabControl) c).DatabaseName == CurrentDB)
                         {
                             tabMain.SelectedTab = tb;
                             return true;
@@ -1172,17 +1490,26 @@ namespace SQLiteWorkshop
         /// Rebuild/Refresh the GridView
         /// </summary>
         /// <param name="DBLocation"></param>
-        private void LoadDB(string DBLocation)
+        internal void LoadDB(string DBLocation, bool bRefresh = false)
         {
-            if (DBLocation != CurrentDB)
+            if (!bRefresh)
             {
-                tabMain.TabPages.Clear();
-                tabMain.Visible = false;
+                foreach (TreeNode t in treeViewMain.Nodes)
+                {
+                    if (t.Name == DBLocation)
+                    {
+                        CurrentDB = DBLocation;
+                        treeViewMain.SelectedNode = t;
+                        return;
+                    }
+                }
             }
 
+            if (!BuildTreeView(DBLocation, bRefresh)) return;
+
+            if (bRefresh) return;
+
             CurrentDB = DBLocation;
-            toolStripStatusMain.Text = CurrentDB;
-            BuildTreeView(DBLocation);
             if (RecentDBs.Contains(DBLocation)) RecentDBs.Remove(DBLocation);
             RecentDBs.Add(DBLocation);
             if (RecentDBs.Count > 6) RecentDBs.RemoveAt(0);
@@ -1192,7 +1519,7 @@ namespace SQLiteWorkshop
         protected void SaveQSetting(ArrayList dbQ)
         {
             string RecentDBs = string.Join("|", dbQ.ToArray());
-            cfg.SetSetting(Config.CFG_RECENTDB, RecentDBs);
+            saveSetting(Config.CFG_RECENTDB, RecentDBs);
             InitToolStripOpenDropDown(dbQ);
         }
 
@@ -1242,24 +1569,24 @@ namespace SQLiteWorkshop
             }
         }
 
-        protected void BuildTreeView(string DBLocation)
+        protected bool BuildTreeView(string DBLocation, bool bRefresh)
         {
 
-            treeViewMain.Nodes.Clear();
-
-            SchemaDefinition sd = DataAccess.GetSchema(DBLocation);
+            SchemaDefinition sd = DataAccess.GetSchema(DBLocation, bRefresh);
             if (sd.LoadStatus != 0)
             {
-                Common.ShowMsg(string.Format("The database {0} cannot be loaded.\r\n{1}", CurrentDB, DataAccess.LastError));
-                return;
+                ShowMsg(string.Format("The database {0} cannot be loaded.\r\n{1}", DBLocation, DataAccess.LastError));
+                return false;
             }
 
             TreeNode topNode = new TreeNode(sd.DBName, 0, 0)
             {
-                ContextMenu = dbContextMenu
+                ContextMenu = dbContextMenu,
+                Name = DBLocation
             };
-            MenuItem mi = topNode.ContextMenu.MenuItems["Register"];
-            mi.Text = RegisteredDBs.Keys.Contains(DBLocation) ? "Unregister" : "Register";
+
+            MenuItem mi = topNode.ContextMenu.MenuItems["Register Database"];
+            mi.Text = RegisteredDBs.Keys.Contains(DBLocation) ? "Unregister Database" : "Register Database";
 
             // Add System Tables & Tables to Treeview
             TreeNode systablesNode = new TreeNode("System Tables", 2, 2)
@@ -1288,36 +1615,46 @@ namespace SQLiteWorkshop
 
             // Add views to TreeView
 
-            TreeNode viewsNode = BuildViewNode();
-            TreeNode triggersNode = BuildTriggerNode();
+            TreeNode viewsNode = BuildViewNode(DBLocation);
+            TreeNode triggersNode = BuildTriggerNode(DBLocation);
+            TreeNode attachdbNode = BuildAttachDBNode(DBLocation);
 
             topNode.Nodes.Add(systablesNode);
             topNode.Nodes.Add(tablesNode);
             topNode.Nodes.Add(viewsNode);
             topNode.Nodes.Add(triggersNode);
+            topNode.Nodes.Add(attachdbNode);
 
             tablesNode.Expand();
             viewsNode.Expand();
             triggersNode.Expand();
             topNode.Expand();
-            treeViewMain.Nodes.Add(topNode);
 
-            DBProperties p = new DBProperties();
-            propertyGridDBProperties.SelectedObject = p.dbprops;
-            propertyGridDBProperties.Refresh();
-            propertyGridDBRuntime.SelectedObject = p.dbRT;
-            propertyGridDBRuntime.Refresh();
+            TreeNode t = GetTopNode(DBLocation);
+            if (t == null)
+            {
+                treeViewMain.Nodes.Add(topNode);
+            }
+            else
+            {
+                int idx = treeViewMain.Nodes.IndexOf(t);
+                treeViewMain.Nodes.RemoveAt(idx);
+                treeViewMain.Nodes.Insert(idx, topNode);
+            }
+            treeViewMain.SelectedNode = topNode;
 
+            return true;
         }
 
-        internal void AddTable(string table)
-        {
-            if (!DataAccess.AddTableToSchema(CurrentDB, table)) return;
 
-            TreeNode mainNode = treeViewMain.Nodes[0];
+        internal void AddTable(string table, string DBName)
+        {
+            if (!DataAccess.AddTableToSchema(DBName, table)) return;
+
+            TreeNode mainNode = GetTopNode(DBName);
             TreeNode[] tblMainNodes = mainNode.Nodes.Find("Tables", false);
             TreeNode[] tblNodes = tblMainNodes[0].Nodes.Find(table, false);
-            TreeNode newNode = BuildTableNode(table);
+            TreeNode newNode = BuildTableNode(mainNode.Name,table);
             if (tblNodes.Count() == 0)
             {
                 tblMainNodes[0].Nodes.Add(newNode);
@@ -1332,9 +1669,9 @@ namespace SQLiteWorkshop
         }
 
         
-        internal TreeNode BuildTableNode(string table)
+        internal TreeNode BuildTableNode(string DBLocation, string table)
         {
-            SchemaDefinition sd = DataAccess.SchemaDefinitions[CurrentDB];
+            SchemaDefinition sd = DataAccess.SchemaDefinitions[DBLocation];
             TableLayout tl = sd.Tables[table];
             if (tl.Equals(null)) return null;
             return BuildTableNode(table, tl);
@@ -1437,7 +1774,8 @@ namespace SQLiteWorkshop
             TreeNode tablesNode = BuildTablesNode();
             if (tablesNode == null) return;
 
-            TreeNode[] tblMainNodes = treeViewMain.Nodes.Find("Tables", true);
+            TreeNode mainNode = GetTopNode(CurrentDB);
+            TreeNode[] tblMainNodes = mainNode.Nodes.Find("Tables", true);
             TreeNode parentNode = tblMainNodes[0].Parent;
             int idx = parentNode.Nodes.IndexOf(tblMainNodes[0]);
             parentNode.Nodes.RemoveAt(idx);
@@ -1451,7 +1789,7 @@ namespace SQLiteWorkshop
             SchemaDefinition sd = DataAccess.GetSchema(CurrentDB);
             if (sd.LoadStatus != 0)
             {
-                Common.ShowMsg(string.Format("The database {0} cannot be loaded.\r\n{1}", CurrentDB, DataAccess.LastError));
+                ShowMsg(string.Format("The database {0} cannot be loaded.\r\n{1}", CurrentDB, DataAccess.LastError));
                 return null;
             }
 
@@ -1477,8 +1815,10 @@ namespace SQLiteWorkshop
         protected void RefreshViews()
         {
             DataAccess.ReloadViews(CurrentDB);
-            TreeNode viewsNode = BuildViewNode();
-            TreeNode[] tblMainNodes = treeViewMain.Nodes.Find("Views", true);
+            TreeNode viewsNode = BuildViewNode(CurrentDB);
+
+            TreeNode mainNode = GetTopNode(CurrentDB);
+            TreeNode[] tblMainNodes = mainNode.Nodes.Find("Views", true);
             TreeNode parentNode = tblMainNodes[0].Parent;
             int idx = parentNode.Nodes.IndexOf(tblMainNodes[0]);
             parentNode.Nodes.RemoveAt(idx);
@@ -1487,9 +1827,9 @@ namespace SQLiteWorkshop
             viewsNode.Expand();
         }
 
-        protected TreeNode BuildViewNode()
+        protected TreeNode BuildViewNode(string DBLocation)
         {
-            SchemaDefinition sd = DataAccess.GetSchema(CurrentDB);
+            SchemaDefinition sd = DataAccess.GetSchema(DBLocation);
             TreeNode viewsNode = new TreeNode("Views", 2, 2)
             {
                 Name = "Views",
@@ -1527,9 +1867,11 @@ namespace SQLiteWorkshop
 
         protected void RefreshTriggers()
         {
-            //DataAccess.AddTableToSchema(CurrentDB, ef.NewTableName);
-            TreeNode triggersNode = BuildTriggerNode();
-            TreeNode[] tblMainNodes = treeViewMain.Nodes.Find("Triggers", true);
+            DataAccess.ReloadTriggers(CurrentDB);
+            TreeNode triggersNode = BuildTriggerNode(CurrentDB);
+
+            TreeNode mainNode = GetTopNode(CurrentDB);
+            TreeNode[] tblMainNodes = mainNode.Nodes.Find("Triggers", true);
             TreeNode parentNode = tblMainNodes[0].Parent;
             int idx = parentNode.Nodes.IndexOf(tblMainNodes[0]);
             parentNode.Nodes.RemoveAt(idx);
@@ -1538,9 +1880,9 @@ namespace SQLiteWorkshop
             triggersNode.Expand();
         }
 
-        protected TreeNode BuildTriggerNode()
+        protected TreeNode BuildTriggerNode(string DBLocation)
         {
-            SchemaDefinition sd = DataAccess.GetSchema(CurrentDB);
+            SchemaDefinition sd = DataAccess.GetSchema(DBLocation);
             TreeNode triggersNode = new TreeNode("Triggers", 2, 2)
             {
                 Name = "Triggers",
@@ -1550,16 +1892,48 @@ namespace SQLiteWorkshop
             {
                 foreach (var trigger in sd.Triggers)
                 {
-                    TreeNode trNode = new TreeNode(trigger.Key, 8, 8)
-                    {
-                        ContextMenu = trContextMenu
-                    };
                     triggersNode.Nodes.Add(new TreeNode(trigger.Key, 8, 8) { ContextMenu = trContextMenu });
                 }
             }
             return triggersNode;
         }
 
+        protected TreeNode BuildAttachDBNode(string DBLocation)
+        {
+            SchemaDefinition sd = DataAccess.GetSchema(DBLocation);
+            TreeNode attachdbNode = new TreeNode("Attached Databases", 2, 2)
+            {
+                Name = "Attached Databases",
+                ContextMenu = attachdbContextMenu
+            };
+            if (sd.AttachDbs.Count > 0)
+            {
+                foreach (var attacheddb in sd.AttachDbs)
+                {
+                    TreeNode attachMain = new TreeNode(attacheddb.Key, 9, 9) { ContextMenu = adContextMenu };
+                    TreeNode schemaNode = new TreeNode(attacheddb.Value.SchemaName, 9, 9);
+                    TreeNode locationNode = new TreeNode(attacheddb.Value.DbLocation, 9, 9);
+                    attachMain.Nodes.Add(schemaNode);
+                    attachMain.Nodes.Add(locationNode);
+                    attachdbNode.Nodes.Add(attachMain);
+                }
+            }
+            return attachdbNode;
+        }
+
+        internal void RefreshAttachedDBs()
+        {
+            TreeNode AttacheddbNode = BuildAttachDBNode(CurrentDB);
+
+            TreeNode mainNode = GetTopNode(CurrentDB);
+            TreeNode[] tblMainNodes = mainNode.Nodes.Find("Attached Databases", true);
+            TreeNode parentNode = tblMainNodes[0].Parent;
+            int idx = parentNode.Nodes.IndexOf(tblMainNodes[0]);
+            parentNode.Nodes.RemoveAt(idx);
+            parentNode.Nodes.Insert(idx, AttacheddbNode);
+            treeViewMain.SelectedNode = AttacheddbNode;
+            AttacheddbNode.Expand();
+        }
 
         /// <summary>
         /// Place a message on the status bar
@@ -1613,23 +1987,23 @@ namespace SQLiteWorkshop
             foreach (var rDB in dbQ)
             {
                 string token = string.Format("{0}|{1}|{2}", rDB.Key, rDB.Value.Name, rDB.Value.Password);
-                sb.Append(comma).Append(Common.Encrypt(token));
+                sb.Append(comma).Append(Encrypt(token));
                 comma = ";";
             }
-            cfg.SetSetting(Config.CFG_REGISTEREDDBS, sb.ToString());
+            saveSetting(Config.CFG_REGISTEREDDBS, sb.ToString());
             InitToolStripRegisteredDBDropDown(dbQ);
         }
 
         internal void LoadRegisteredDBs()
         {
             RegisteredDBs.Clear();
-            string rDBList = cfg.appsetting(Config.CFG_REGISTEREDDBS);
+            string rDBList = appSetting(Config.CFG_REGISTEREDDBS);
             if (string.IsNullOrEmpty(rDBList)) return;
 
             string[] rDBs = rDBList.Split(';');
             foreach (string r in rDBs)
             {
-                string token = Common.Decrypt(r);
+                string token = Decrypt(r);
                 string[] tokens = token.Split('|');
                 RegisteredDB rDB = new RegisteredDB
                 {
@@ -1659,13 +2033,11 @@ namespace SQLiteWorkshop
             }
         }
 
-#endregion
+        #endregion
 
-#region Form Sizing and Control
+        #region Form Sizing and Control
 
         bool grabbed = false;
-        int minWidth = 500;
-        int minHeight = 200;
         
         private void sp_MouseDown(object sender, MouseEventArgs e)
         {
@@ -1715,7 +2087,7 @@ namespace SQLiteWorkshop
            }
         }
 
-#region Form Dragging Event Handler
+        #region Form Dragging Event Handler
 
         public const int WM_NCLBUTTONDOWN = 0xA1;
         public const int HT_CAPTION = 0x2;
@@ -1734,11 +2106,16 @@ namespace SQLiteWorkshop
             }
         }
 
-#endregion
+        #endregion
 
-#endregion
+        #endregion
 
-#region Main Tab Control
+        #region Main Tab Control
+
+        private void tabMain_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            LoadConnectionProperties();
+        }
 
         internal void SetTabHeader()
         {
@@ -1816,7 +2193,7 @@ namespace SQLiteWorkshop
 
 #endregion
 
-#region ControlBox Handlers
+        #region ControlBox Handlers
         private void pbClose_Click(object sender, EventArgs e)
         {
             this.Close();
@@ -1867,11 +2244,8 @@ namespace SQLiteWorkshop
         }
 
 
+
         #endregion
 
-        private void sQLiteHomePageToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            System.Diagnostics.Process.Start("http://sqlite.org");
-        }
     }
 }

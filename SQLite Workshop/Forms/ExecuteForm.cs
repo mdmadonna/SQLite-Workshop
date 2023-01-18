@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.GUIManager;
 
 namespace SQLiteWorkshop
 {
@@ -17,52 +17,14 @@ namespace SQLiteWorkshop
     {
         internal SQLType execType;
         internal TreeNode TargetNode;
-        MainForm m;
+
+        Label lblFormHeading = null;
 
         internal string DatabaseLocation { get; set; }
-        SchemaDefinition sd;
         internal string NewTableName { get; private set; }
 
         bool bActionApproved;
         internal bool bActionComplete;
-
-        #region Messages
-        #region Form Header
-        const string TITLE_TRUNCATE             = "Truncate Table";
-        const string TITLE_DROP                 = "Drop Table";
-        const string TITLE_RENAME               = "Rename Table";
-        const string TITLE_COMPRESS             = "Compress Database";
-        const string TITLE_ENCRYPT              = "Encrypt Database";
-        const string TITLE_BACKUP               = "Backup Database";
-        const string TITLE_OPTIMIZE             = "Optimize Database";
-        const string TITLE_CLONE                = "Clone Database";
-        const string TITLE_DELETEINDEX          = "Delete Index";
-        const string TITLE_DELETEINDEXES        = "Delete All Indexes";
-        const string TITLE_DELETEVIEW           = "Delete View";
-        const string TITLE_REBUILDINDEX         = "Rebuild Index";
-        const string TITLE_REBUILDALLINDEXES    = "Rebuild All Indexes";
-        const string TITLE_DELETETRIGGER        = "Delete Trigger";
-        #endregion
-
-        #region Info Messages
-        const string TRUNCATEWARNING        = "WARNING!!  This action will delete all rows from {0} in Database {1}.  Once deleted, these rows cannot be recovered.";
-        const string DROPWARNING            = "WARNING!!  This action will delete Table {0} from Database {1}.  Once deleted, this table cannot be recovered.";
-        const string RENAMEWARNING          = "WARNING!!  This action will rename Table {0} in Database {1}. Any Views that refer to this table will need to be recreated after the table is renamed.  Additionally, any Triggers that execute statements that refer to this table may need to be recreated.";
-        const string COMPRESSWARNING        = "WARNING!!  This action will compress (vacuum) Database {0} to reorganize and recover unused space. Depending on the size of the database, this may take a long time.";
-        const string ENCRYPTWARNING         = "WARNING!!  This action will Encrypt Database {0}. Encryption may not be supported on all platforms or by all interfaces - use it at your own risk. Enter blanks to remove encryption.";
-        const string BACKUPWARNING          = "WARNING!!  This action will Backup {0}. Depending on the size of your database, this may take some time.";
-        const string OPTIMIZEWARNING        = "WARNING!!  This action will attempt to optimize {0}. This process generally runs quickly.";
-        const string CLONEWARNING           = "WARNING!!  This action will Clone {0}. The cloned database will contain all data structures found in this database but no data will be copied.";
-        const string DELALLINDEXWARNING     = "WARNING!!  This action will Delete all indexes on table {0}. ";
-        const string DELINDEXWARNING        = "WARNING!!  This action will Delete index {0}.";
-        const string DELVIEWWARNING         = "WARNING!!  This action will Delete View {0}. Once deleted, this view cannot be recovered.";
-        const string REINDEXWARNING         = "WARNING!!  This action will Rebuild index {0}.";
-        const string REINDEXALLWARNING      = "WARNING!!  This action will Rebuild all indexes for table {0}.";
-        const string DELTRIGGERWARNING      = "WARNING!!  This action will Delete Trigger {0}. Once deleted, this trigger cannot be recovered.";
-
-        const string EXECCONTINUE           = "Press Yes to continue or Cancel to terminate.";
-        #endregion
-        #endregion
 
         public ExecuteForm()
         {
@@ -71,20 +33,24 @@ namespace SQLiteWorkshop
             toolStripExecutionStatus.Text = string.Empty;
             lblTxtInfo.Text = string.Empty;
             txtInfo.Visible = false;
-            m = MainForm.mInstance;
+            btnGetFile.Visible = false;
         }
 
         private void ExecuteForm_Load(object sender, EventArgs e)
         {
             DatabaseLocation = MainForm.mInstance.CurrentDB;
-            sd = DataAccess.SchemaDefinitions[DatabaseLocation];
-
-            lblFormHeading.Text = string.Empty;
+            HouseKeeping(this, string.Empty);
+            lblFormHeading = this.Controls.Find("lblFormHeading", true).FirstOrDefault() as Label;
             lblError.Text = string.Empty;
             bActionApproved = false;
             bActionComplete = false;
             statusStrip.ShowItemToolTips = true;
             ExecuteCommand();
+        }
+
+        private void ExecuteForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            FormClose(this);
         }
 
         private void btnExecute_Click(object sender, EventArgs e)
@@ -159,6 +125,10 @@ namespace SQLiteWorkshop
                     lblFormHeading.Text = TITLE_DELETETRIGGER;
                     DeleteTrigger();
                     break;
+                case SQLType.SQLRestore:
+                    lblFormHeading.Text = TITLE_RESTOREDB;
+                    RestoreDB();
+                    break;
                 default:
                     break;
             }
@@ -174,8 +144,8 @@ namespace SQLiteWorkshop
             }
 
             string SqlStatement = string.Format("DELETE FROM \"{0}\";", TargetNode.Text);
-            string SuccessMessage = string.Format(Common.OK_RECORDSAFFECTED, "%count%");
-            string ErrorMessage = Common.ERR_SQL;
+            string SuccessMessage = string.Format(OK_RECORDSAFFECTED, "%count%");
+            string ErrorMessage = ERR_SQL;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
         }
@@ -191,8 +161,8 @@ namespace SQLiteWorkshop
             }
 
             string SqlStatement = string.Format("DROP TABLE \"{0}\";", TargetNode.Text);
-            string SuccessMessage = string.Format(Common.OK_TBLDELETE, TargetNode.Text);
-            string ErrorMessage = Common.ERR_SQL;
+            string SuccessMessage = string.Format(OK_TBLDELETE, TargetNode.Text);
+            string ErrorMessage = ERR_SQL;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
         }
@@ -219,8 +189,8 @@ namespace SQLiteWorkshop
             }
 
             string SqlStatement = string.Format("ALTER TABLE \"{0}\" RENAME TO \"{1}\";", TargetNode.Text, txtInfo.Text);
-            string SuccessMessage = string.Format(Common.OK_RENAME, TargetNode.Text);
-            string ErrorMessage = Common.ERR_RENAMEFAIL;
+            string SuccessMessage = string.Format(OK_RENAME, TargetNode.Text);
+            string ErrorMessage = ERR_RENAMEFAIL;
             NewTableName = txtInfo.Text;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
@@ -242,8 +212,8 @@ namespace SQLiteWorkshop
 
             this.Cursor = Cursors.WaitCursor;
             string SqlStatement = "Vacuum";
-            string SuccessMessage = string.Format(Common.OK_VACUUM, DatabaseLocation);
-            string ErrorMessage = Common.ERR_VACUUMFAIL;
+            string SuccessMessage = string.Format(OK_VACUUM, DatabaseLocation);
+            string ErrorMessage = ERR_VACUUMFAIL;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
 
             // A database Vacuum may cause rowids to change under some circumstances.  If any
@@ -277,13 +247,15 @@ namespace SQLiteWorkshop
                 DisplayWarning(string.Format(ENCRYPTWARNING, DatabaseLocation));
                 txtInfo.Visible = true;
                 lblTxtInfo.Text = "Password:";
+                txtInfo.PasswordChar = '*';
                 txtInfo.Focus();
                 return;
             }
 
+            txtInfo.Text = txtInfo.Text.Trim();
             string SqlStatement = string.Empty;
-            string SuccessMessage = string.Format(Common.OK_ENCRYPT, DatabaseLocation);
-            string ErrorMessage = Common.ERR_ENCRYPTFAILED;
+            string SuccessMessage = string.IsNullOrEmpty(txtInfo.Text) ? string.Format(OK_DECRYPT, DatabaseLocation) : string.Format(OK_ENCRYPT, DatabaseLocation);
+            string ErrorMessage = ERR_ENCRYPTFAILED;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;           
         }
@@ -297,65 +269,28 @@ namespace SQLiteWorkshop
                 DisplayWarning(string.Format(BACKUPWARNING, DatabaseLocation));
                 txtInfo.Visible = true;
                 lblTxtInfo.Text = "Backup File:";
-                txtInfo.Width -= 40;
-                Button btnFileDialog = new Button();
-                btnFileDialog.Text = "...";
-                btnFileDialog.Height = txtInfo.Height;
-                btnFileDialog.Width = 30;
-                panelFill.Controls.Add(btnFileDialog);
-                btnFileDialog.Top = txtInfo.Top;
-                btnFileDialog.Left = txtInfo.Left + txtInfo.Width + 10;
-                btnFileDialog.Click += btnFileFind_Click;
+                txtInfo.Width -= (btnGetFile.Width + 10);
+                btnGetFile.Visible = true;
                 txtInfo.Focus();
                 return;
             }
 
-            if (!ValidateBackup()) return;
+            if (!ValNoOverwrite(DatabaseLocation, txtInfo.Text, out string errmsg))
+            {
+                if (string.IsNullOrEmpty(errmsg)) return;
+                lblError.Text = errmsg;
+                txtInfo.Focus();
+                return;
+            }
 
             string SqlStatement = txtInfo.Text;
-            string SuccessMessage = string.Format(Common.OK_BACKUP, DatabaseLocation, txtInfo.Text);
-            string ErrorMessage = Common.ERR_BACKUPFAILED;
+            string SuccessMessage = string.Format(OK_BACKUP, DatabaseLocation, txtInfo.Text);
+            string ErrorMessage = ERR_BACKUPFAILED;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
         }
 
-        protected bool ValidateBackup()
-        {
-            string BackupFile = txtInfo.Text;
-
-            if (string.IsNullOrEmpty(BackupFile))
-            {
-                lblError.Text = Common.ERR_FILEENTRY;
-                txtInfo.Focus();
-                return false;
-            }
-
-            FileInfo f = new FileInfo(BackupFile);
-            if (!f.Exists) return true;
-
-            // Let's make sure it's OK to overwrite and let's insure we're writing on top of the same file
-            string UNCSource;
-            string UNCTarget;
-
-            Uri uriDB = new Uri(DatabaseLocation);
-            UNCSource = uriDB.IsUnc ? DatabaseLocation : Common.GetUniversalName(DatabaseLocation);
-            if (string.IsNullOrEmpty(UNCSource)) UNCSource = DatabaseLocation;
-            uriDB = new Uri(txtInfo.Text);
-            UNCTarget = uriDB.IsUnc ? txtInfo.Text : Common.GetUniversalName(txtInfo.Text);
-            if (string.IsNullOrEmpty(UNCTarget)) UNCTarget = txtInfo.Text;
-
-            if (UNCSource.ToLower() == UNCTarget.ToLower())
-            {
-                Common.ShowMsg(Common.ERR_BACKUPSAMEFILE);
-                return false;
-            }
-
-            DialogResult result = Common.ShowMsg(Common.MSG_FILEEXISTS, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (result == DialogResult.Yes) { f.Delete(); }
-            else { return false; }
-            
-            return true;
-        }
+        
         #endregion
 
         #region Optimize Database
@@ -368,8 +303,8 @@ namespace SQLiteWorkshop
             }
 
             string SqlStatement = "Pragma optimize";
-            string SuccessMessage = string.Format(Common.OK_OPTIMIZE, DatabaseLocation);
-            string ErrorMessage = string.Format(Common.OK_OPTIMIZE, DatabaseLocation);      //always succeeds
+            string SuccessMessage = string.Format(OK_OPTIMIZE, DatabaseLocation);
+            string ErrorMessage = string.Format(OK_OPTIMIZE, DatabaseLocation);      //always succeeds
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
         }
@@ -386,129 +321,88 @@ namespace SQLiteWorkshop
                 DisplayWarning(string.Format(CLONEWARNING, DatabaseLocation));
                 txtInfo.Visible = true;
                 lblTxtInfo.Text = "Cloned File:";
-                txtInfo.Width -= 40;
-                Button btnFileDialog = new Button();
-                btnFileDialog.Text = "...";
-                btnFileDialog.Height = txtInfo.Height;
-                btnFileDialog.Width = 30;
-                panelFill.Controls.Add(btnFileDialog);
-                btnFileDialog.Top = txtInfo.Top;
-                btnFileDialog.Left = txtInfo.Left + txtInfo.Width + 10;
-                btnFileDialog.Click += btnFileFind_Click;
+                txtInfo.Width -= (btnGetFile.Width + 10);
+                btnGetFile.Visible = true;
                 txtInfo.Focus();
                 return;
             }
 
-           
-            if (!ValidateClone()) return;
+            if (!ValNoOverwrite(DatabaseLocation, txtInfo.Text, out string errmsg))
+            {
+                if (string.IsNullOrEmpty(errmsg)) return;
+                lblError.Text = errmsg;
+                txtInfo.Focus();
+                return;
+            }
 
             btnExecute.Enabled = false;
-            SQLiteErrorCode returnCode;
-
             bool bresult = DataAccess.CreateDB(txtInfo.Text);
             if (!bresult)
             {
-                GenerateErrorMessage(Common.ERR_CLONEFAILED,  0);
+                GenerateErrorMessage(ERR_CLONEFAILED,  0);
                 return;
             }
 
+            // Load a list of existing tables
             string SqlStatement = "Select * FROM sqlite_master Where Type = \"table\"";
-            DataTable dtMaster = DataAccess.ExecuteDataTable(DatabaseLocation, SqlStatement, out returnCode);
+            DataTable dtMaster = DataAccess.ExecuteDataTable(DatabaseLocation, SqlStatement, out SQLiteErrorCode returnCode);
             if (returnCode != SQLiteErrorCode.Ok)
             {
                 KillFile(txtInfo.Text);
-                GenerateErrorMessage(Common.ERR_CLONEFAILED, returnCode);
+                GenerateErrorMessage(ERR_CLONEFAILED, returnCode);
                 return;
             }
 
+            // Turn off Foreign Key check
+            DataAccess.ExecuteNonQuery(txtInfo.Text, "PRAGMA foreign_keys = OFF;", out returnCode);
+
+            // Create all non-system tables
             ArrayList sqlSave = new ArrayList();
             foreach (DataRow dr in dtMaster.Rows)
             {
-                if (!Common.IsSystemTable(dr["tbl_name"].ToString()))
+                if (!IsSystemTable(dr["tbl_name"].ToString()))
                 {
-                    int iresult = DataAccess.ExecuteNonQuery(txtInfo.Text, dr["sql"].ToString(), out returnCode);
+                    long iresult = DataAccess.ExecuteNonQuery(txtInfo.Text, dr["sql"].ToString(), out returnCode);
                     if (iresult < 0 || returnCode != SQLiteErrorCode.Ok) sqlSave.Add(dr["sql"].ToString());
                 }
             }
 
+            // This second pass is not needed at this time.  It's here for future consideration
             foreach (string szSql in sqlSave)
             {
-                int iresult = DataAccess.ExecuteNonQuery(txtInfo.Text, szSql, out returnCode);
+                long iresult = DataAccess.ExecuteNonQuery(txtInfo.Text, szSql, out returnCode);
                 {
-                    GenerateErrorMessage(Common.ERR_CLONEFAILED, returnCode);
+                    GenerateErrorMessage(ERR_CLONEFAILED, returnCode);
                     KillFile(txtInfo.Text);
                     return;
                 }
             }
 
+            // Now that all tables are created, create indexes, views and triggers
             SqlStatement = "Select * FROM sqlite_master Where Type != \"table\"";
             dtMaster = DataAccess.ExecuteDataTable(DatabaseLocation, SqlStatement, out returnCode);
             if (returnCode != SQLiteErrorCode.Ok)
             {
-                GenerateErrorMessage(Common.ERR_CLONEFAILED, returnCode);
+                GenerateErrorMessage(ERR_CLONEFAILED, returnCode);
                 KillFile(txtInfo.Text);
                 return;
             }
 
             foreach (DataRow dr in dtMaster.Rows)
             {
-                int iresult = DataAccess.ExecuteNonQuery(txtInfo.Text, dr["sql"].ToString(), out returnCode);
+                long iresult = DataAccess.ExecuteNonQuery(txtInfo.Text, dr["sql"].ToString(), out returnCode);
                 if (iresult < 0 || returnCode != SQLiteErrorCode.Ok)
                 {
-                    GenerateErrorMessage(Common.ERR_CLONEFAILED, returnCode);
+                    GenerateErrorMessage(ERR_CLONEFAILED, returnCode);
                     KillFile(txtInfo.Text);
                     return;
                 }
             }
 
             toolStripExecutionStatus.Text = "Clone Ok";
-            toolStripExecutionStatus.ToolTipText = string.Format(Common.OK_CLONE, DatabaseLocation, txtInfo.Text);
+            toolStripExecutionStatus.ToolTipText = string.Format(OK_CLONE, DatabaseLocation, txtInfo.Text);
             btnCancel.Text = "Close";
             bActionComplete = true;
-        }
-
-        protected bool ValidateClone()
-        {
-            string ClonedFile = txtInfo.Text;
-
-            if (string.IsNullOrEmpty(ClonedFile))
-            {
-                lblError.Text = Common.ERR_FILEENTRY;
-                txtInfo.Focus();
-                return false;
-            }
-
-            FileInfo f = new FileInfo(ClonedFile);
-            if (!f.Exists) return true;
-
-            // Let's make sure it's OK to overwrite and let's insure we're writing on top of the same file
-            string UNCSource;
-            string UNCTarget;
-
-            Uri uriDB = new Uri(DatabaseLocation);
-            UNCSource = uriDB.IsUnc ? DatabaseLocation : Common.GetUniversalName(DatabaseLocation);
-            if (string.IsNullOrEmpty(UNCSource)) UNCSource = DatabaseLocation;
-            uriDB = new Uri(txtInfo.Text);
-            UNCTarget = uriDB.IsUnc ? txtInfo.Text : Common.GetUniversalName(txtInfo.Text);
-            if (string.IsNullOrEmpty(UNCTarget)) UNCTarget = txtInfo.Text;
-
-            if (UNCSource.ToLower() == UNCTarget.ToLower())
-            {
-                Common.ShowMsg(Common.ERR_BACKUPSAMEFILE);
-                return false;
-            }
-
-            DialogResult result = Common.ShowMsg(Common.MSG_FILEEXISTS, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-            if (result == DialogResult.Yes) { f.Delete(); }
-            else { return false; }
-
-            return true;
-        }
-
-        private void KillFile(string szFile)
-        {
-            FileInfo f = new FileInfo(szFile);
-            try { f.Delete(); } catch { }
         }
 
         #endregion
@@ -523,8 +417,8 @@ namespace SQLiteWorkshop
             }
 
             string SqlStatement = string.Format("REINDEX \"{0}\";", TargetNode.Tag);
-            string SuccessMessage = string.Format(Common.OK_REINDEX, TargetNode.Tag);
-            string ErrorMessage = Common.ERR_SQL;
+            string SuccessMessage = string.Format(OK_REINDEX, TargetNode.Tag);
+            string ErrorMessage = ERR_SQL;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
         }
@@ -540,9 +434,9 @@ namespace SQLiteWorkshop
                 return;
             }
 
-            string SqlStatement = string.Empty;
-            string SuccessMessage = string.Format(Common.OK_REINDEXALL, tablename);
-            string ErrorMessage = Common.ERR_SQL;
+            string SqlStatement;
+            string SuccessMessage = string.Format(OK_REINDEXALL, tablename);
+            string ErrorMessage = ERR_SQL;
 
             foreach (TreeNode idxNode in TargetNode.Nodes)
             {
@@ -563,8 +457,8 @@ namespace SQLiteWorkshop
             }
 
             string SqlStatement = string.Format("DROP INDEX \"{0}\";", TargetNode.Tag);
-            string SuccessMessage = string.Format(Common.OK_DELINDEX, TargetNode.Tag);
-            string ErrorMessage = Common.ERR_SQL;
+            string SuccessMessage = string.Format(OK_DELINDEX, TargetNode.Tag);
+            string ErrorMessage = ERR_SQL;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
         }
@@ -580,13 +474,12 @@ namespace SQLiteWorkshop
                 return;
             }
 
-            string SqlStatement = string.Empty;
-            string SuccessMessage = string.Format(Common.OK_DELALLINDEXES, tablename);
-            string ErrorMessage = Common.ERR_SQL;
+            string SuccessMessage = string.Format(OK_DELALLINDEXES, tablename);
+            string ErrorMessage = ERR_SQL;
 
             foreach (TreeNode idxNode in TargetNode.Nodes)
             {
-                SqlStatement = string.Format("DROP INDEX \"{0}\";", idxNode.Tag);
+                string SqlStatement = string.Format("DROP INDEX \"{0}\";", idxNode.Tag);
                 if (!ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage)) break;
             }
             return;
@@ -603,8 +496,8 @@ namespace SQLiteWorkshop
             }
 
             string SqlStatement = string.Format("DROP VIEW \"{0}\";", TargetNode.Text);
-            string SuccessMessage = string.Format(Common.OK_DELVIEW, TargetNode.Text);
-            string ErrorMessage = Common.ERR_SQL;
+            string SuccessMessage = string.Format(OK_DELVIEW, TargetNode.Text);
+            string ErrorMessage = ERR_SQL;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
             return;
         }
@@ -620,9 +513,92 @@ namespace SQLiteWorkshop
             }
 
             string SqlStatement = string.Format("DROP TRIGGER \"{0}\";", TargetNode.Text);
-            string SuccessMessage = string.Format(Common.OK_DELTRIGGER, TargetNode.Text);
-            string ErrorMessage = Common.ERR_SQL;
+            string SuccessMessage = string.Format(OK_DELTRIGGER, TargetNode.Text);
+            string ErrorMessage = ERR_SQL;
             ExecuteAction(SqlStatement, SuccessMessage, ErrorMessage);
+            return;
+        }
+        #endregion
+
+        #region Restore Database
+        /// <summary>
+        /// Restore a database.  This simply renames the current db and copies a backup
+        /// to the current location.
+        /// </summary>
+        private void RestoreDB()
+        {
+            if (!bActionApproved)
+            {
+                DisplayWarning(string.Format(RESTOREDBWARNING, DatabaseLocation));
+                txtInfo.Visible = true;
+                txtInfo.Width -= (btnGetFile.Width + 10);
+                btnGetFile.Visible = true;
+                lblTxtInfo.Text = "Backup DB:";
+                txtInfo.Focus();
+                return;
+            }
+
+            if (string.IsNullOrEmpty(txtInfo.Text))
+            {
+                txtInfo.Focus();
+                toolStripExecutionStatus.Text = ERR_VALIDDBBKP;
+                return;
+            }
+
+            // Make sure the backup exists
+            FileInfo fi = new FileInfo(txtInfo.Text);
+            if (!fi.Exists)
+            {
+                txtInfo.Focus();
+                toolStripExecutionStatus.Text = ERR_VALIDDBBKP;
+            }
+
+            // Insure the source and dest are not the same file.
+            if (!ValNoOverwrite(DatabaseLocation, txtInfo.Text, out string errmsg, true))
+            {
+                if (string.IsNullOrEmpty(errmsg)) return;
+                toolStripExecutionStatus.Text = errmsg;
+                txtInfo.Focus();
+                return;
+            }
+
+            // Determine if the backup is a valid SQLite database.
+            if (!DataAccess.IsValidDB(txtInfo.Text, null, out _))
+            {
+                if (ShowMsg(string.Format(WARN_NOTADB, txtInfo.Text), MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No) 
+                    return;
+            }
+
+            if (!RenameFile(DatabaseLocation, out string newname, out string message))
+            {
+                ShowMsg(string.Format(ERR_CANTRENAME, DatabaseLocation, message));
+                return;
+            }
+
+            toolStripExecutionStatus.Text = WORKING;
+            Cursor = Cursors.WaitCursor;
+            MainForm.mInstance.Cursor = Cursors.WaitCursor;
+            Application.DoEvents();
+            try
+            {
+                Cursor = Cursors.WaitCursor;
+                fi.CopyTo(DatabaseLocation);
+            }
+            catch (Exception ex)
+            {
+                KillFile(DatabaseLocation);
+                RenameFile(newname, DatabaseLocation, out _);
+                toolStripExecutionStatus.Text = string.Format(ERR_RESTOREFAIL, string.Empty);
+                ShowMsg(string.Format(ERR_RESTOREFAIL, ex.Message));
+                return;
+            }
+            finally
+            {
+                MainForm.mInstance.Cursor = Cursors.Default;
+                Cursor = Cursors.Default;
+            }
+            MainForm.mInstance.LoadDB(DatabaseLocation, true);
+            toolStripExecutionStatus.Text = string.Format(OK_RESTORE, Path.GetFileName(DatabaseLocation));
             return;
         }
         #endregion
@@ -644,7 +620,7 @@ namespace SQLiteWorkshop
 
         private bool ExecuteAction(string sql, string SuccessMessage, string ErrorMessage)
         {
-            int count = 0;
+            long count = 0;
             bool result;
             SQLiteErrorCode returnCode;
             btnExecute.Enabled = false;
@@ -653,7 +629,7 @@ namespace SQLiteWorkshop
 
             Cursor = Cursors.WaitCursor;
             MainForm.mInstance.Cursor = Cursors.WaitCursor;
-            toolStripExecutionStatus.ToolTipText = "Working...";
+            toolStripExecutionStatus.Text = WORKING;
             Application.DoEvents();
             switch (execType)
             {
@@ -665,14 +641,14 @@ namespace SQLiteWorkshop
                     break;
                 default:
                     count = DataAccess.ExecuteNonQuery(DatabaseLocation, sql, out returnCode);
-                    result = count < 0 ? false : true;
+                    result = count >= 0;
                     break;
             }
             Cursor = Cursors.Default;
             MainForm.mInstance.Cursor = Cursors.Default;
             if (!result || returnCode != SQLiteErrorCode.Ok)
             {
-                //Common.ShowMsg(string.Format(ErrorMessage, DataAccess.LastError, returnCode.ToString()));
+                //ShowMsg(string.Format(ErrorMessage, DataAccess.LastError, returnCode.ToString()));
                 string eMsg = string.Format(ErrorMessage, DataAccess.LastError, returnCode.ToString());
                 toolStripExecutionStatus.Text = eMsg.IndexOf(":") > 0 ? eMsg.Substring(0, eMsg.IndexOf(":")) : eMsg.Substring(0, 18);
                 toolStripExecutionStatus.ToolTipText = eMsg;
@@ -701,81 +677,49 @@ namespace SQLiteWorkshop
             toolStripExecutionStatus.ToolTipText = eMsg;
             btnExecute.Enabled = true;
         }
-
-        private void btnFileFind_Click(object sender, EventArgs e)
+        private void btnGetFile_Click(object sender, EventArgs e)
         {
-            txtInfo.Text = FindBackupLocation(false);
-        }
-
-        private string FindBackupLocation(bool bFileExists = true)
-        {
-            OpenFileDialog openFile = new OpenFileDialog();
-            openFile.Title = "Select Database Backup File";
-            openFile.Filter = "All files (*.*)|*.*|Database Files (*.db)|*.db";
-            openFile.FilterIndex = 2;
-            openFile.CheckFileExists = bFileExists;
-            openFile.AddExtension = true;
-            openFile.AutoUpgradeEnabled = true;
-            openFile.DefaultExt = "db";
-            openFile.InitialDirectory = MainForm.cfg.appsetting(Config.CFG_LASTBKPOPEN);
-            openFile.Multiselect = false;
-            openFile.ShowReadOnly = false;
-            openFile.ValidateNames = true;
-            if (openFile.ShowDialog() != DialogResult.OK) return string.Empty;
-            MainForm.cfg.SetSetting(Config.CFG_LASTBKPOPEN, Path.GetDirectoryName(openFile.FileName));
-            return openFile.FileName;
-
-        }
-
-        #endregion
-
-        #region ControlBox Handlers
-        private void pbClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void ControlBox_MouseEnter(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.White;
-        }
-
-        private void ControlBox_MouseLeave(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        private void ControlBox_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.Wheat;
-            ((PictureBox)sender).BorderStyle = BorderStyle.Fixed3D;
-        }
-
-        private void ControlBox_MouseUp(object sender, MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        #endregion
-
-        #region Form Management
-
-        public const int WM_NCLBUTTONDOWN = 0xA1;
-        public const int HT_CAPTION = 0x2;
-
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern bool ReleaseCapture();
-
-        private void MainForm_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
+            string caption = string.Empty;
+            switch (execType)
             {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+                case SQLType.SQLBackup:
+                    caption = EXEC_SELECTDB;
+                    break;
+                case SQLType.SQLClone:
+                    caption = EXEC_SELECTCLONE;
+                    break;
+                case SQLType.SQLRestore:
+                    caption = EXEC_SELECTDB;
+                    break;
+                case SQLType.SQLAttach:
+                    caption = EXEC_ATTACHDB;
+                    break;
+                default:                    
+                    break;
             }
+            txtInfo.Text = FindFileLocation(caption, false);
         }
+
+
+        private string FindFileLocation(string Title, bool bFileExists = true)
+        {
+            FileDialogInfo fi = new FileDialogInfo()
+            {
+                Title = Title,
+                Filter = "All files (*.*)|*.*|Database Files (*.db)|*.db",
+                FilterIndex = 2,
+                CheckFileExists = bFileExists,
+                DefaultExt = "db",
+                InitialDirectory = appSetting(Config.CFG_LASTBKPOPEN)
+            };
+            string fileName = GetFileName(fi);
+            if (!string.IsNullOrEmpty(fileName))
+                saveSetting(Config.CFG_LASTBKPOPEN, Path.GetDirectoryName(fileName));
+            return fileName;
+        }
+
+       
         #endregion
+
     }
 }

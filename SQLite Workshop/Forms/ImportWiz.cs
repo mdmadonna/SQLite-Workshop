@@ -1,15 +1,16 @@
-﻿using System;
+﻿using CsvHelper;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Data.SQLite;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Text.Json;
 using System.Windows.Forms;
 
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.Config;
+using static SQLiteWorkshop.GUIManager;
 
 namespace SQLiteWorkshop
 {
@@ -20,8 +21,12 @@ namespace SQLiteWorkshop
         ImportSource SourceType;
         DBSchema schema;
         DBManager db = null;
-
+        string textmsg;
+        string CatalogDB = string.Empty;
+        bool bSaveImp;
+        int maxTokens = 0;
         Dictionary <string, ImportWizTextPropertySettings> ColumnSettings;
+        Dictionary<string, List<ImportData>> ImportHistory = new Dictionary<string, List<ImportData>>();
 
         public string DatabaseLocation { get; set; }
 
@@ -44,15 +49,24 @@ namespace SQLiteWorkshop
 
         private void ImportWiz_Load(object sender, EventArgs e)
         {
-            lblFormHeading.Text = "Import Wizard";
-
-            // Establish ToolTips for various controls.
             toolTip = new ToolTip();
-            toolTip.SetToolTip(pbClose, "Close");
+            HouseKeeping(this, string.Format("Import Wizard {0}", DatabaseLocation));
+            bool.TryParse(appSetting(CFG_SAVEIMPORT), out bSaveImp);
 
             toolStripStatusMsg.Text = string.Empty;
             btnPrevious.Enabled = false;
 
+            //Load Import History
+            string impHist = Decrypt(appSetting(CFG_IMPHISTORY));
+            if (!string.IsNullOrEmpty(impHist)) ImportHistory = JsonSerializer.Deserialize<Dictionary<string, List<ImportData>>>(impHist);
+            maxTokens = 6;
+
+            this.Width = 650;
+            this.Height = 390;
+            lblWrkSheet.Top = 40;
+            cmbWrkSheet.Top = 37;
+
+            panelWizDBTop.Dock = DockStyle.Top;
             panelWizMain.Dock = DockStyle.Fill;
             panelWizMainDB.Dock = DockStyle.Fill;
             panelWizMainDB.Visible = false;
@@ -61,13 +75,28 @@ namespace SQLiteWorkshop
             panelWizMainMySql.Dock = DockStyle.Fill;
             panelWizText.Dock = DockStyle.Fill;
             panelWizDB.Dock = DockStyle.Fill;
-            
+            panelWizStatus.Dock = DockStyle.Fill;
+            txtStatusMsg.Dock = DockStyle.Fill;
+            dgvTables.Dock = DockStyle.Fill;
 
             panelWizMain.Visible = true;
             panelWizText.Visible = false;
             panelWizDB.Visible = false;
+            panelWizStatus.Visible = false;
+            panelWizSummary.Visible = false;
             cmbSourceDB.SelectedIndex = 0;
+
             LoadTableNames(cmbDestinationTable);
+        }
+
+        private void ImportWiz_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            FormClose(this);
+        }
+
+        private void txtStatusMsg_TextChanged(object sender, EventArgs e)
+        {
+            txtStatusMsg.SelectionLength = 0;
         }
 
         /// <summary>
@@ -81,6 +110,108 @@ namespace SQLiteWorkshop
             if (panelWizMain.Visible) { ProcessPanelMain(false); return; }
             if (panelWizText.Visible) { ProcessPanelText(false); return; }
             if (panelWizDB.Visible) { ProcessPanelDB(false); return; }
+
+            if (panelWizStatus.Visible)
+            {
+                panelWizStatus.Visible = false;
+                txtStatusMsg.Text = string.Empty;
+                switch (SourceType)
+                {
+                    case ImportSource.Text:
+                        panelWizText.Visible = true;
+                        break;
+                    default:
+                        panelWizDB.Visible = true;
+                        break;
+                }
+            }
+        }
+        private void comboBoxOdbcDataSource_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            comboBoxOdbcDataSource_Leave(sender, e);
+        }
+
+        private void comboBoxOdbcDataSource_Leave(object sender, EventArgs e)
+        {
+            if (comboBoxOdbcDataSource.Text.ToLower() != CatalogDB)
+            {
+                db = null;
+                
+                if (string.IsNullOrEmpty(comboBoxOdbcDataSource.Text)) return;
+                // See if pw is available
+                if (!ImportHistory.ContainsKey(CFG_IMPODBC)) return;
+                List<ImportData> li = ImportHistory[CFG_IMPODBC];
+                string dbname = comboBoxOdbcDataSource.Text.ToLower();
+                for (int i = 0; i < li.Count; i++)
+                {
+                    if (li[i].name == dbname)
+                    {
+                        txtMySqlUserName.Text = li[i].userid;
+                        txtMySqlPassword.Text = li[i].password;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void cmbMySqlServer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbMySqlServer_Leave(sender, e);
+        }
+
+        private void cmbMySqlServer_Leave(object sender, EventArgs e)
+        {
+            if (cmbMySqlServer.Text.ToLower() != CatalogDB)
+            {
+                db = null;
+                comboBoxMySqlDatabaseList.Items.Clear();
+
+                if (string.IsNullOrEmpty(cmbMySqlServer.Text)) return;
+                // See if pw is available
+                if (!ImportHistory.ContainsKey(CFG_IMPMYSQL)) return;
+                List<ImportData> li = ImportHistory[CFG_IMPMYSQL];
+                string dbname = cmbMySqlServer.Text.ToLower();
+                for (int i = 0; i < li.Count; i++)
+                {
+                    if (li[i].name == dbname)
+                    {
+                        txtMySqlUserName.Text = li[i].userid;
+                        txtMySqlPassword.Text = li[i].password;
+                        return;
+                    }
+                }
+            }
+        }
+
+        private void cmbServer_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbServer_Leave(sender, e);
+        }
+
+        private void cmbServer_Leave(object sender, EventArgs e)
+        {
+            if (cmbServer.Text.ToLower() != CatalogDB)
+            {
+                db = null;
+                comboBoxDatabaseList.Items.Clear();
+
+                if (string.IsNullOrEmpty(cmbServer.Text)) return;
+                // See if pw is available
+                if (!ImportHistory.ContainsKey(CFG_IMPSQLSERVER)) return;
+                List<ImportData> li = ImportHistory[CFG_IMPSQLSERVER];
+                string dbname = cmbServer.Text.ToLower();
+                for (int i = 0; i < li.Count; i++)
+                {
+                    if (li[i].name == dbname)
+                    {
+                        txtDbUserName.Text = li[i].userid;
+                        txtDbPassword.Text = li[i].password;
+                        radioWinAuth.Checked = Convert.ToBoolean(li[i].authtype);
+                        radioSqlServerAuth.Checked = !radioWinAuth.Checked;
+                        return;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -91,7 +222,15 @@ namespace SQLiteWorkshop
         private void btnNext_Click(object sender, EventArgs e)
         {
             toolStripStatusMsg.Text = string.Empty;
-            if (panelWizMain.Visible) { ProcessPanelMain(true); return; }
+
+            if (btnNext.Text == "Finish")
+            {
+                this.Close();
+                return;
+            }
+
+            if (panelWizMain.Visible) { ProcessPanelMain(true); btnNext.Enabled = true; return; }
+
             if (panelWizText.Visible) { ProcessPanelText(true); return; }
             if (panelWizDB.Visible) { ProcessPanelDB(true); return; }
         }
@@ -113,8 +252,8 @@ namespace SQLiteWorkshop
         /// <param name="e"></param>
         private void btnFileSearch_Click(object sender, EventArgs e)
         {
-            txtFileName.Text = FindFile();
-            if (string.IsNullOrEmpty(txtFileName.Text)) return;
+            cmbFileName.Text = FindFile();
+            if (string.IsNullOrEmpty(cmbFileName.Text)) return;
 
             //LoadSourceTableNames();
             return;
@@ -126,22 +265,23 @@ namespace SQLiteWorkshop
         /// <returns></returns>
         private string FindFile()
         {
-            OpenFileDialog openFile = new OpenFileDialog();
-            openFile.CheckFileExists = true;
-            openFile.AddExtension = true;
-            openFile.AutoUpgradeEnabled = true;
             GetDefaultFileData(out string Title, out string DefaultExt, out string Filter);
-            openFile.Title = Title;
-            openFile.DefaultExt = DefaultExt;
-            openFile.Filter = Filter;
-            openFile.FilterIndex = 2;
-            openFile.RestoreDirectory = true;
+            FileDialogInfo fi = new FileDialogInfo()
+            {
+                CheckFileExists = true,
+                AddExtension = true,
+                AutoUpgradeEnabled = true,
+                Title = Title,
+                DefaultExt = DefaultExt,
+                Filter = Filter,
+                FilterIndex = 2,
+                RestoreDirectory = true,
+                Multiselect = false,
+                ShowReadOnly = false,
+                ValidateNames = true
+            };
             //openFile.InitialDirectory = cfg.appsetting(Config.CFG_LASTOPEN);
-            openFile.Multiselect = false;
-            openFile.ShowReadOnly = false;
-            openFile.ValidateNames = true;
-            if (openFile.ShowDialog() != DialogResult.OK) return string.Empty;
-            return openFile.FileName;
+            return GetFileName(fi);
         }
 
         /// <summary>
@@ -170,16 +310,11 @@ namespace SQLiteWorkshop
             {
                 case ImportSource.Text:
                     if (!ValidateTextPanel()) return;
-                    panelWizMain.Visible = false;
-                    panelWizText.Visible = true;
-                    panelWizText.Dock = DockStyle.Fill;
-                    panelWizDB.Visible = false;
-                    btnPrevious.Enabled = true;
-                    lblFileName.Text = txtFileName.Text;
-                    tabText.SelectedTab = tabTextGeneral;
-                    db = new DBTextManager(txtFileName.Text);
-                    cmbDestinationTable.Text = Path.GetFileNameWithoutExtension(txtFileName.Text);
-                    InitializeTextColumns();
+                    ImportFromText();
+                    break;
+                case ImportSource.Excel:
+                    if (!ValidateTextPanel()) return;
+                    ImportFromText();
                     break;
                 case ImportSource.SQL:
                     if (!ValidateTextPanel()) return;
@@ -206,18 +341,78 @@ namespace SQLiteWorkshop
                     ImportFromDB();
                     break;
                 default:
-                    Common.ShowMsg("This Feature is not yet implemented.", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    ShowMsg(NOTIMPLEMENTED, MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     break;
             }
         }
 
+        #region Import From Text or Excel
+        /// <summary>
+        /// Setup UI to Import from a Text file or Excel Spreadsheet
+        /// </summary>
+        protected void ImportFromText()
+        {
+            MainForm.mInstance.Cursor = Cursors.WaitCursor;
+            lblFileName.Text = cmbFileName.Text;
+            tabText.SelectedTab = tabTextGeneral;
+            cmbDestinationTable.Text = Path.GetFileNameWithoutExtension(cmbFileName.Text);
+
+            // Set up type specific inputs
+            bool bTextType = SourceType == ImportSource.Text;
+            if (bTextType)
+            { db = new DBTextManager(cmbFileName.Text, DatabaseLocation); }
+            else
+            { db = new DBExcelManager(cmbFileName.Text, DatabaseLocation); LoadSheets(); }
+            
+            label7.Text = bTextType ? "Text Import" : "Excel Import"; 
+            lblWrkSheet.Visible = !bTextType;
+            cmbWrkSheet.Visible = !bTextType;
+            lblTextQualifier.Visible = bTextType;
+            comboBoxTextQualifier.Visible = bTextType;
+            groupBoxDelimiter.Visible = bTextType;
+
+            ColumnSettings = null;
+            InitializeTextColumns();
+            panelWizMain.Visible = false;
+            panelWizText.Visible = true;
+            panelWizText.Dock = DockStyle.Fill;
+            panelWizDB.Visible = false;
+            btnPrevious.Enabled = true;
+            MainForm.mInstance.Cursor = Cursors.Default;
+        }
+
+        protected void LoadSheets()
+        {
+            DBDatabaseList SheetList = db.GetDatabaseList();
+            if (SheetList.Databases.Count == 0) return;
+            cmbWrkSheet.Items.Clear();
+            foreach (KeyValuePair<string, DBInfo> ky in SheetList.Databases)
+            {
+                cmbWrkSheet.Items.Add(ky.Key);
+            }
+            cmbWrkSheet.SelectedIndex = 0;
+        }
+
+        #endregion
+
         #region Import from SQL
         protected void ImportFromSQL()
         {
-            db = new DBSqlManager(txtFileName.Text);
+            btnNext.Enabled = false;
+            btnClose.Enabled = false;
+            this.Cursor = Cursors.WaitCursor;
+            db = new DBSqlManager(cmbFileName.Text, DatabaseLocation);
             db.StatusReport += StatusReport;
-            db.Import(txtFileName.Text, null, null);
+            bool rc = db.Import(cmbFileName.Text, null, null);
             db.StatusReport -= StatusReport;
+            btnNext.Text = "Finish";
+            btnNext.Enabled = true;
+            btnClose.Enabled = true;
+            MainForm.mInstance.LoadDB(DatabaseLocation, true);
+
+            // Finallly update the historical list of impoprted files.
+            if (rc) SaveHistory(db.ImportKey, cmbFileName.Text);
+            this.Cursor = Cursors.Default;
         }
         #endregion
 
@@ -227,42 +422,37 @@ namespace SQLiteWorkshop
         #region Import from Database
 
         /// <summary>
-        /// Initialize first panel displayed when importing from a database.
+        /// Instantiate the appropriate DNManager class and initialize
+        /// the first panel displayed when importing from a database.
         /// </summary>
         private void ImportFromDB()
         {
             switch (SourceType)
             {
                 case ImportSource.SQLite:
-                    lblDBName.Text = string.Format("(SQLite) {0}", txtFileName.Text);
-                    db = new DBSQLiteManager(txtFileName.Text);
+                    lblDBName.Text = string.Format("(SQLite) {0}", cmbFileName.Text);
+                    db = new DBSQLiteManager(cmbFileName.Text, DatabaseLocation, cmbFileName.Text, null, txtPassword.Text);
                     InitializeTablesPanel();
                     break;
                 case ImportSource.MSAccess:
-                    lblDBName.Text = string.Format("(MS Access) {0}", txtFileName.Text);
-                    db = new DBMSAccessManager(txtFileName.Text);
+                    lblDBName.Text = string.Format("(MS Access) {0}", cmbFileName.Text);
+                    db = new DBMSAccessManager(cmbFileName.Text, DatabaseLocation, cmbFileName.Text, null, txtPassword.Text);
                     InitializeTablesPanel();
                     break;
                 case ImportSource.SQLServer:
-                    lblDBName.Text = string.Format("(SQL Server) {0}:{1}", txtServer.Text,comboBoxDatabaseList.Text);
-                    if (db == null) db = new DBMSAccessManager(txtServer.Text);
-                    ((DBSqlServerManager)db).DatabaseUserName = txtDbUserName.Text;
-                    ((DBSqlServerManager)db).DatabasePassword = txtDbPassword.Text;
-                    ((DBSqlServerManager)db).DatabaseName = comboBoxDatabaseList.Text;
+                    lblDBName.Text = string.Format("(SQL Server) {0}:{1}", cmbServer.Text,comboBoxDatabaseList.Text);
+                    if (db == null) db = new DBSqlServerManager(comboBoxDatabaseList.Text, DatabaseLocation, cmbServer.Text, txtDbUserName.Text, txtDbPassword.Text);
                     ((DBSqlServerManager)db).UseWindowsAuthentication = radioWinAuth.Checked;
                     InitializeTablesPanel();
                     break;
                 case ImportSource.ODBC:
                     lblDBName.Text = string.Format("(ODBC) {0}", comboBoxOdbcDataSource.Text);
-                    if (db == null) db = new DBMSAccessManager(comboBoxOdbcDataSource.Text);
+                    if (db == null) db = new DBOdbcManager(comboBoxOdbcDataSource.Text, DatabaseLocation);
                     InitializeTablesPanel();
                     break;
                 case ImportSource.MySql:
-                    lblDBName.Text = string.Format("(MySql) {0}:{1}", txtMySqlServer.Text, comboBoxMySqlDatabaseList.Text);
-                    if (db == null) db = new DBMSAccessManager(txtMySqlServer.Text);
-                    ((DBMySqlManager)db).DatabaseUserName = txtMySqlUserName.Text;
-                    ((DBMySqlManager)db).DatabasePassword = txtMySqlPassword.Text;
-                    ((DBMySqlManager)db).DatabaseName = comboBoxMySqlDatabaseList.Text;
+                    lblDBName.Text = string.Format("(MySql) {0}:{1}", cmbMySqlServer.Text, comboBoxMySqlDatabaseList.Text);
+                    if (db == null) db = new DBMySqlManager(cmbMySqlServer.Text, DatabaseLocation, comboBoxMySqlDatabaseList.Text, txtMySqlUserName.Text, txtMySqlPassword.Text);
                     InitializeTablesPanel();
                     break;
                 default:
@@ -285,7 +475,10 @@ namespace SQLiteWorkshop
             switch (tabText.SelectedTab.Name.ToLower())
             {
                 case "tabtextgeneral":
-                    if (bNext) { tabText.SelectedTab = tabTextColumns; }
+                    if (bNext) 
+                    { 
+                        tabText.SelectedTab = tabTextColumns;
+                    }
                     else
                     {
                         btnPrevious.Enabled = false;
@@ -295,10 +488,42 @@ namespace SQLiteWorkshop
                     break;
 
                 case "tabtextcolumns":
-                    if (bNext) { tabText.SelectedTab = tabTextPreview; } else { tabText.SelectedTab = tabTextGeneral; }
+                    if (bNext) 
+                    { 
+                        tabText.SelectedTab = tabTextPreview; 
+                    } 
+                    else 
+                    {
+                        panelWizText.Visible = true;
+                        panelWizStatus.Visible = false;
+                        tabText.SelectedTab = tabTextGeneral; 
+                    }
                     break;
                 case "tabtextpreview":
-                    if (bNext) { ImportText(); } else { tabText.SelectedTab = tabTextColumns;  }
+                    if (bNext) 
+                    {
+                        panelWizText.Visible = false;
+                        panelWizStatus.Visible = true;
+                        btnNext.Enabled = false;
+                        btnPrevious.Enabled = false;
+                        txtStatusMsg.Text = IMP_START;
+                        if (ImportText())
+                        {
+                            btnNext.Text = "Finish";
+                            txtStatusMsg.Text += IMP_COMPLETE;
+                            txtStatusMsg.SelectionLength = 0;
+                        }
+                        else
+                        {
+                            btnPrevious.Enabled = true;
+
+                        }
+                        btnNext.Enabled = true;
+                    } 
+                    else 
+                    { 
+                        tabText.SelectedTab = tabTextColumns;  
+                    }
                     break;
             }
         }
@@ -313,7 +538,7 @@ namespace SQLiteWorkshop
             switch (tabText.SelectedTab.Name.ToLower())
             {
                 case "tabtextgeneral":
-                    lblFileName.Text = txtFileName.Text;
+                    lblFileName.Text = cmbFileName.Text;
                     break;
                 case "tabtextcolumns":
                     InitializeTextColumns();
@@ -324,23 +549,25 @@ namespace SQLiteWorkshop
             }
         }
 
+
         /// <summary>
         /// Set up the ListBox showing columns found in the Text or Excel file
         /// being imported.
         /// </summary>
         protected void InitializeTextColumns()
         {
-            UpdateTextManager();
-            if (ColumnSettings != null) return;
+            UpdateTextManager(out bool DelimiterChanged);
+            if (ColumnSettings != null && !DelimiterChanged) return;
 
-            if (!InitTextListBox()) return; ;
+            if (!InitTextListBox()) return; 
             PopulatePropertyGrid();
         }
 
         protected bool InitTextListBox()
         {
             listBoxColumns.Items.Clear();
-            textColumns = db.GetColumns(txtFileName.Text);
+            if (SourceType == ImportSource.Excel) ((DBExcelManager)db).WorkSheet = cmbWrkSheet.Text;
+            textColumns = db.GetColumns(cmbFileName.Text);
             if (textColumns.Count == 0) return false;
 
             foreach (var textColumn in textColumns)
@@ -360,7 +587,7 @@ namespace SQLiteWorkshop
         {
             if (ColumnSettings == null) return;
             int idx = listBoxColumns.SelectedIndex;
-            UpdateTextManager();
+            UpdateTextManager(out _);
             if (!InitTextListBox()) return;
             if (idx < listBoxColumns.Items.Count) listBoxColumns.SelectedIndex = idx;
             for (int i = 0; i < listBoxColumns.Items.Count; i++)
@@ -395,11 +622,24 @@ namespace SQLiteWorkshop
         /// <summary>
         /// Insure Import routines have current user selections.
         /// </summary>
-        private void UpdateTextManager()
+        private void UpdateTextManager(out bool newDelimiter)
         {
-            ((DBTextManager)db).FirstRowHasHeadings = checkBoxFirstRowContainsHeadings.Checked;
-            ((DBTextManager)db).Delimiter = GetSeparator();
-            ((DBTextManager)db).TextQualifier = GetDelimiter();
+            newDelimiter = false;
+            switch (SourceType)
+            {
+                case ImportSource.Text:
+                    ((DBTextManager)db).FirstRowHasHeadings = checkBoxFirstRowContainsHeadings.Checked;
+                    char delimiter = GetSeparator();
+                    newDelimiter = delimiter != ((DBTextManager)db).Delimiter;
+                    ((DBTextManager)db).Delimiter = delimiter;
+                    ((DBTextManager)db).TextQualifier = GetDelimiter();
+                    break;
+                case ImportSource.Excel:
+                    ((DBExcelManager)db).FirstRowHasHeadings = checkBoxFirstRowContainsHeadings.Checked;
+                    break;
+                default:
+                    break;
+            }
         }
 
         /// <summary>
@@ -417,10 +657,10 @@ namespace SQLiteWorkshop
                 ips.ColumnWidth = 255;
                 ips.Type = "varchar";
                 ips.Exclude = false;
+                ips.AllowNulls = true;
                 ColumnSettings.Add(key, ips);
             }
 
-            if (column == null) column = listBoxColumns.Items[0].ToString();
             listBoxColumns.SelectedIndex = 0;
             propertyGridColumns.SelectedObject = ColumnSettings[string.Format("col{0}", listBoxColumns.SelectedIndex.ToString().PadLeft(3, '0'))];
         }
@@ -430,40 +670,13 @@ namespace SQLiteWorkshop
         /// </summary>
         protected void InitializeTextPreview()
         {
-            StreamReader sr;
-            DataTable dt;
-
-            try
-            {
-                sr = new StreamReader(txtFileName.Text);
-            }
-            catch (Exception ex)
-            {
-                Common.ShowMsg(string.Format("Cannot Open File {0}\r\nError: {1}", txtFileName.Text, ex.Message));
-                return;
-            }
-
-            dt = new DataTable();
-            foreach (var cs in ColumnSettings)
-            {
-                DataColumn dc = new DataColumn(cs.Key);
-                dc.ColumnName = cs.Value.Name;
-                dt.Columns.Add(dc);
-            }
-
-            int count = 0;
-            char delimiter = GetSeparator();
-            string line;
-
-            if (checkBoxFirstRowContainsHeadings.Checked) sr.ReadLine();
-            while ((line = sr.ReadLine()) != null)
-            {
-                string[] cols = ((DBTextManager)db).SplitLine(line, dt.Columns.Count, delimiter, comboBoxTextQualifier.Text);
-                if (cols.Length > listBoxColumns.Items.Count) Array.Copy(cols, cols, listBoxColumns.Items.Count);
-                dt.Rows.Add(cols);
-                count++;
-                if (count >= 100) break;
-            }
+            UpdateTextManager(out _);
+            if (SourceType == ImportSource.Text)
+            { ((DBTextManager)db).ColumnSettings = ColumnSettings; }
+            else
+            { ((DBExcelManager)db).ColumnSettings = ColumnSettings; }
+            DataTable dt = db.PreviewData(string.Empty);
+            if (dt == null) return;
             dataGridViewText.DataSource = dt;
             lblRowCount.Text = string.Format("Preview Rows 1-{0}", dataGridViewText.Rows.Count);
         }
@@ -485,7 +698,7 @@ namespace SQLiteWorkshop
             iw.SetReadOnly("Exclude", false);
             iw.SetReadOnly("PrimaryKey", false);
             iw.SetReadOnly("Unique", false);
-            iw.SetReadOnly("AllowNulls", false);
+            iw.SetReadOnly("AllowNulls", true);
             switch (p.PropertyDescriptor.Name)
             {
                 case "Name":
@@ -500,14 +713,14 @@ namespace SQLiteWorkshop
 
                 case "Type":
                     string newType = iw.Type;
-                    if (Common.IsNumber(newType))
+                    if (IsNumber(newType))
                     {
                         iw.SetReadOnly("PrimaryKey", false);
                         iw.ColumnWidth = 0;
                         iw.SetReadOnly("ColumnWidth", true);
                         break;
                     }
-                    if (Common.IsText(newType))
+                    if (IsText(newType))
                     {
                         iw.SetReadOnly("ColumnWidth", false);
                     }
@@ -546,7 +759,21 @@ namespace SQLiteWorkshop
         {
             if (bNext)
             {
-                ImportDB();
+                panelWizDB.Visible = false;
+                panelWizStatus.Visible = true;
+                btnNext.Enabled = false;
+                btnPrevious.Enabled = false;
+                txtStatusMsg.Text = IMP_START;
+                if (ImportDB())
+                {
+                    btnNext.Text = "Finish";
+                }
+                else
+                {
+                    btnPrevious.Enabled = true;
+                }
+                btnNext.Enabled = true;
+                txtStatusMsg.Text += IMP_COMPLETE;
             }
             else
             {
@@ -589,6 +816,7 @@ namespace SQLiteWorkshop
 
 
             schema = db.GetSchema();
+            if (schema.Tables == null) return;
             foreach (var table in schema.Tables)
             {
                 DataGridViewRow dgvr = new DataGridViewRow();
@@ -639,7 +867,7 @@ namespace SQLiteWorkshop
             cmb.Value = newTable;
             foreach (var table in sd.Tables)
             {
-                if (!Common.IsSystemTable(table.Key)) cmb.Items.Add(table.Key);
+                if (!IsSystemTable(table.Key)) cmb.Items.Add(table.Key);
             }
         }
 
@@ -673,7 +901,7 @@ namespace SQLiteWorkshop
                 switch (buttonText)
                 {
                     case "map":
-                        dgvTables_Map(dgv.Rows[e.RowIndex].Cells[1].Value.ToString());
+                        dgvTables_Map(dgv.Rows[e.RowIndex].Cells[1].Value.ToString(), dgv.Rows[e.RowIndex].Cells[2].Value.ToString());
                         break;
                     case "preview":
                         dgvTables_Preview(dgv.Rows[e.RowIndex].Cells[1].Value.ToString());
@@ -684,25 +912,37 @@ namespace SQLiteWorkshop
             }
         }
 
-        private void dgvTables_Map(string tableName)
+        private void dgvTables_Map(string tableName, string newTableName)
         {
-            Common.ShowMsg("This feature is not yet implemented");
+            Mapping mp = new Mapping(tableName, newTableName)
+            {
+                db = db
+            };
+            mp.ShowDialog();
         }
 
 
         private void dgvTables_Preview(string tableName)
         {
+            Preview p;
             this.Cursor = Cursors.WaitCursor;
-            DataTable dt = db.PreviewData(tableName);
-            if (dt == null)
+            try
             {
-                Common.ShowMsg(string.Format("Cannot read Table {0}\r\nError: {1}", tableName, db.LastError));
-                return;
+                DataTable dt = db.PreviewData(tableName);
+                if (dt == null)
+                {
+                    ShowMsg(string.Format("Cannot read Table {0}\r\nError: {1}", tableName, db.LastError));
+                    return;
+                }
+                p = new Preview();
+                p.setPreview(tableName, dt);
+                this.Cursor = Cursors.Default;
+                p.Show();
             }
-            Preview p = new Preview();
-            p.setPreview(tableName, dt);
-            this.Cursor = Cursors.Default;
-            p.Show();
+            finally
+            {
+                this.Cursor = Cursors.Default;
+            }
         }
 
 
@@ -715,9 +955,7 @@ namespace SQLiteWorkshop
 
         private void LoadCatalogs()
         {
-            db = new DBSqlServerManager(txtServer.Text);
-            ((DBSqlServerManager)db).DatabaseUserName = txtDbUserName.Text;
-            ((DBSqlServerManager)db).DatabasePassword = txtDbPassword.Text;
+            db = new DBSqlServerManager(null, DatabaseLocation, cmbServer.Text, txtDbUserName.Text, txtDbPassword.Text);
             ((DBSqlServerManager)db).UseWindowsAuthentication = radioWinAuth.Checked;
             DBDatabaseList DbDl;
 
@@ -727,7 +965,7 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Cannot retrieve Database list: \r\n{0}", ex.Message));
+                ShowMsg(string.Format("Cannot retrieve Database list: \r\n{0}", ex.Message));
                 return;
             }
 
@@ -736,19 +974,20 @@ namespace SQLiteWorkshop
             {
                 comboBoxDatabaseList.Items.Add(db.Key);
             }
-
+            CatalogDB = cmbServer.Text.ToLower();
         }
 
         private void comboBoxDatabaseList_DropDown(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(txtServer.Text)) LoadCatalogs();
+            if (!string.IsNullOrWhiteSpace(cmbServer.Text)) 
+                if (comboBoxDatabaseList.Items.Count == 0 || cmbServer.Text.ToLower() != CatalogDB) LoadCatalogs();
         }
         #endregion
 
         #region ODBC
         private void LoadOdbcDataSources()
         {
-            db = new DBOdbcManager(string.Empty);
+            db = new DBOdbcManager(string.Empty, DatabaseLocation);
             DBDatabaseList DbDl = db.GetDatabaseList();
 
             comboBoxOdbcDataSource.Items.Clear();
@@ -764,10 +1003,7 @@ namespace SQLiteWorkshop
 
         private void LoadMySqlCatalogs()
         {
-            db = new DBMySqlManager(txtMySqlServer.Text);
-            ((DBMySqlManager)db).DatabaseUserName = txtMySqlUserName.Text;
-            ((DBMySqlManager)db).DatabasePassword = txtMySqlPassword.Text;
-            ((DBMySqlManager)db).DatabaseServer = txtMySqlServer.Text;
+            db = new DBMySqlManager(null, DatabaseLocation, cmbMySqlServer.Text, txtMySqlUserName.Text, txtMySqlPassword.Text);
             DBDatabaseList DbDl;
 
             try
@@ -776,7 +1012,7 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Cannot retrieve Database list: \r\n{0}", ex.Message));
+                ShowMsg(string.Format("Cannot retrieve Database list: \r\n{0}", ex.Message));
                 return;
             }
 
@@ -785,12 +1021,13 @@ namespace SQLiteWorkshop
             {
                 comboBoxMySqlDatabaseList.Items.Add(db.Key);
             }
-
+            CatalogDB = cmbMySqlServer.Text.ToLower();
         }
 
         private void comboBoxMySqlDatabaseList_DropDown(object sender, EventArgs e)
         {
-            if (!string.IsNullOrWhiteSpace(txtMySqlServer.Text)) LoadMySqlCatalogs();
+            if (!string.IsNullOrWhiteSpace(cmbMySqlServer.Text)) 
+                if (comboBoxMySqlDatabaseList.Items.Count == 0 || cmbMySqlServer.Text.ToLower() != CatalogDB) LoadMySqlCatalogs();
         }
         #endregion
 
@@ -801,18 +1038,18 @@ namespace SQLiteWorkshop
 
         protected bool ValidateTextPanel()
         {
-            if (string.IsNullOrEmpty(txtFileName.Text))
+            if (string.IsNullOrEmpty(cmbFileName.Text))
             {
-                Common.ShowMsg("Please enter a file to import.");
-                txtFileName.Focus();
+                ShowMsg("Please enter a file to import.");
+                cmbFileName.Focus();
                 return false;
             }
 
-            FileInfo f = new FileInfo(txtFileName.Text);
+            FileInfo f = new FileInfo(cmbFileName.Text);
             if (!f.Exists)
             {
-                Common.ShowMsg(string.Format("File {0} does not exist.", txtFileName.Text));
-                txtFileName.Focus();
+                ShowMsg(string.Format("File {0} does not exist.", cmbFileName.Text));
+                cmbFileName.Focus();
                 return false;
             }
 
@@ -821,10 +1058,10 @@ namespace SQLiteWorkshop
 
         protected bool ValidateSQLServerPanel()
         {
-            if (string.IsNullOrEmpty(txtServer.Text))
+            if (string.IsNullOrEmpty(cmbServer.Text))
             {
-                Common.ShowMsg("Please enter a server name.");
-                txtServer.Focus();
+                ShowMsg("Please enter a server name.");
+                cmbServer.Focus();
                 return false;
             }
 
@@ -832,23 +1069,44 @@ namespace SQLiteWorkshop
             {
                 if (string.IsNullOrEmpty(txtDbUserName.Text))
                 {
-                    Common.ShowMsg("Please enter your User Name.");
+                    ShowMsg("Please enter your User Name.");
                     txtDbUserName.Focus();
                     return false;
                 }
                 if (string.IsNullOrEmpty(txtDbPassword.Text))
                 {
-                    Common.ShowMsg("Please enter your password.");
+                    ShowMsg("Please enter your password.");
                     txtDbPassword.Focus();
                     return false;
                 }
-                if (string.IsNullOrEmpty(comboBoxDatabaseList.Text))
-                {
-                    Common.ShowMsg("Please select a database.");
-                    comboBoxDatabaseList.Focus();
-                    return false;
-                }
             }
+            if (string.IsNullOrEmpty(comboBoxDatabaseList.Text))
+            {
+                ShowMsg("Please select a database.");
+                comboBoxDatabaseList.Focus();
+                return false;
+            }
+
+            if (db == null)
+            {
+                db = new DBSqlServerManager(comboBoxDatabaseList.Text, DatabaseLocation, cmbServer.Text, txtDbUserName.Text, txtDbPassword.Text);
+            }
+            else
+            {
+                db.SourceDB = comboBoxDatabaseList.Text;
+            }
+
+            try
+            {
+                db.TestConnection();
+            }
+            catch (Exception ex)
+            {
+                ShowMsg(string.Format("Cannot connect to this Database.\r\n{0}", ex.Message));
+                comboBoxDatabaseList.Focus();
+                return false;
+            }
+
 
             return true;
         }
@@ -857,20 +1115,18 @@ namespace SQLiteWorkshop
         {
             if (string.IsNullOrEmpty(comboBoxOdbcDataSource.Text))
             {
-                Common.ShowMsg("Please select an ODBC Data Source.");
+                ShowMsg("Please select an ODBC Data Source.");
                 comboBoxOdbcDataSource.Focus();
                 return false;
             }
-            db = new DBOdbcManager(comboBoxOdbcDataSource.Text);
-            ((DBOdbcManager)db).DatabaseUserName = txtOdbcUserName.Text;
-            ((DBOdbcManager)db).DatabasePassword = txtOdbcPassword.Text;
+            db = new DBOdbcManager(comboBoxOdbcDataSource.Text, DatabaseLocation, null, txtOdbcUserName.Text, txtOdbcPassword.Text);
             try
             {
-                ((DBOdbcManager)db).TestOdbcConnection();
+                db.TestConnection();
             }
             catch (Exception ex)
             { 
-                Common.ShowMsg(string.Format("Cannot connect to this Data Source.\r\n{0}", ex.Message));
+                ShowMsg(string.Format("Cannot connect to this Data Source.\r\n{0}", ex.Message));
                 comboBoxOdbcDataSource.Focus();
                 return false;
             }
@@ -879,43 +1135,49 @@ namespace SQLiteWorkshop
 
         protected bool ValidateMySqlPanel()
         {
-            if (string.IsNullOrEmpty(txtMySqlServer.Text))
+            if (string.IsNullOrEmpty(cmbMySqlServer.Text))
             {
-                Common.ShowMsg("Please enter a server name.");
-                txtServer.Focus();
+                ShowMsg("Please enter a server name.");
+                cmbMySqlServer.Focus();
                 return false;
             }
 
             if (string.IsNullOrEmpty(txtMySqlUserName.Text))
             {
-                Common.ShowMsg("Please enter your User Name.");
+                ShowMsg("Please enter your User Name.");
                 txtMySqlUserName.Focus();
                 return false;
             }
             if (string.IsNullOrEmpty(txtMySqlPassword.Text))
             {
-                Common.ShowMsg("Please enter your password.");
+                ShowMsg("Please enter your password.");
                 txtMySqlPassword.Focus();
                 return false;
             }
             if (string.IsNullOrEmpty(comboBoxMySqlDatabaseList.Text))
             {
-                Common.ShowMsg("Please select a database.");
+                ShowMsg("Please select a database.");
                 comboBoxMySqlDatabaseList.Focus();
                 return false;
             }
 
-            db = new DBMySqlManager(txtMySqlServer.Text);
-            ((DBMySqlManager)db).DatabaseUserName = txtMySqlUserName.Text;
-            ((DBMySqlManager)db).DatabasePassword = txtMySqlPassword.Text;
+            if (db == null)
+            {
+                db = new DBMySqlManager(comboBoxMySqlDatabaseList.Text, DatabaseLocation, cmbMySqlServer.Text, txtMySqlUserName.Text, txtMySqlPassword.Text);
+            }
+            else
+            {
+                db.SourceDB = comboBoxMySqlDatabaseList.Text;
+            }
+
             try
             {
-                ((DBMySqlManager)db).TestMySqlConnection();
+                db.TestConnection();
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Cannot connect to this Database.\r\n{0}", ex.Message));
-                comboBoxOdbcDataSource.Focus();
+                ShowMsg(string.Format("Cannot connect to this Database.\r\n{0}", ex.Message));
+                comboBoxMySqlDatabaseList.Focus();
                 return false;
             }
             return true;
@@ -925,17 +1187,17 @@ namespace SQLiteWorkshop
         {
             if (string.IsNullOrWhiteSpace(ColName))
             {
-                Common.ShowMsg("Please enter a valid column name.");
+                ShowMsg("Please enter a valid column name.");
                 return false;
             }
-            if (Common.IsKeyword(ColName))
+            if (IsKeyword(ColName))
             {
-                Common.ShowMsg(string.Format("{0} is an SQLite reserved word.  Please enter a different column name.", ColName));
+                ShowMsg(string.Format("{0} is an SQLite reserved word.  Please enter a different column name.", ColName));
                 return false;
             }
-            if (Common.HasInvalidChars(ColName, out string chars))
+            if (HasInvalidChars(ColName, out string chars))
             {
-                Common.ShowMsg(string.Format("Please do not use any of these characters in your column name - \"{0}\".", chars));
+                ShowMsg(string.Format("Please do not use any of these characters in your column name - \"{0}\".", chars));
                 return false;
             }
             int useCount = 0;
@@ -945,7 +1207,7 @@ namespace SQLiteWorkshop
             }
             if (useCount> 1)
             {
-                Common.ShowMsg("This column name is already in use. Please enter another column name.");
+                ShowMsg("This column name is already in use. Please enter another column name.");
                 return false;
             }
             return true;
@@ -962,66 +1224,99 @@ namespace SQLiteWorkshop
         /// <param name="e"></param>
         internal void StatusReport(object sender, StatusEventArgs e)
         {
-            string msg = SourceType == ImportSource.SQL ? "statements executed." : "rows imported.";           
-            toolStripStatusMsg.Text = string.Format("{0}{1} {2}", e.Status == ImportStatus.Complete ? "Import Complete. " : string.Empty, e.RowCount.ToString(), msg);
+            string msg = SourceType == ImportSource.SQL ? "stmts" : "rows";
+            switch (e.Status)
+            {
+                case ImportStatus.Starting:
+                    textmsg = txtStatusMsg.Text;
+                    break;
+                case ImportStatus.InProgress:
+                    // Causes too much flicker - I may come back to this later
+                    //txtStatusMsg.Text = string.Format("{0}{1}", textmsg, e.RowCount.ToString());
+                    toolStripStatusMsg.Text = string.Format("{0}{1} {2}", string.Empty, e.RowCount.ToString(), msg);
+                    break;
+                case ImportStatus.Failed:
+                    txtStatusMsg.Text = string.Format("{0}{1}", textmsg, IMP_FAILED);
+                    toolStripStatusMsg.Text = IMP_FAILED;
+                    break;
+                case ImportStatus.Complete:
+                    txtStatusMsg.Text = string.Format("{0}{1} {2}{3}", textmsg, e.RowCount.ToString(), msg, Environment.NewLine);
+                    toolStripStatusMsg.Text = string.Format("Import Complete. {0} {1}", e.RowCount.ToString(), msg);
+                    break;
+            }
+            txtStatusMsg.SelectionLength = 0;
             Application.DoEvents();
         }
 
-        #region Import Text
-        private void ImportText()
+        #region Import Text/Excel
+        /// <summary>
+        /// Import a Text/Excel File
+        /// </summary>
+        /// <returns></returns>
+        private bool ImportText()
         {
+            // Create List Of Columns
             Dictionary<string, DBColumn> Columns = new Dictionary<string, DBColumn>();
             foreach (var columnSetting in ColumnSettings)
             {
 
                 if (string.IsNullOrEmpty(columnSetting.Value.Name)) break;
 
-                DBColumn column = new DBColumn();
-                column.Name = columnSetting.Value.Name;
-                column.DefaultValue = string.Empty;
-                column.HasDefault = false;
-                column.IsKey = false;
-                column.IsNullable = columnSetting.Value.AllowNulls;
-                column.IsUnique = columnSetting.Value.Unique;
-                column.IncludeInImport = !columnSetting.Value.Exclude;
-                column.Type = Common.IsText(columnSetting.Value.Type) ? string.Format("{0}({1})", columnSetting.Value.Type, columnSetting.Value.ColumnWidth.ToString()) : columnSetting.Value.Type;
+                DBColumn column = new DBColumn
+                {
+                    Name = columnSetting.Value.Name,
+                    DefaultValue = string.Empty,
+                    HasDefault = false,
+                    IsKey = false,
+                    IsNullable = columnSetting.Value.AllowNulls,
+                    IsUnique = columnSetting.Value.Unique,
+                    IncludeInImport = !columnSetting.Value.Exclude,
+                    Type = IsText(columnSetting.Value.Type) ? string.Format("{0}({1})", columnSetting.Value.Type, columnSetting.Value.ColumnWidth.ToString()) : columnSetting.Value.Type
+                };
                 column.DefaultValue = string.Empty;
                 column.PrimaryKey = columnSetting.Value.PrimaryKey;
                 Columns.Add(columnSetting.Value.Name, column);
             }
+
+            // Import the Text File
+            toolStripStatusMsg.Text = string.Format("Importing {0}.", cmbFileName.Text);
+            txtStatusMsg.Text += string.Format("Importing {0}", cmbDestinationTable.Text.PadRight(50, ' '));
             db.StatusReport += StatusReport;
-            db.Import(txtFileName.Text, cmbDestinationTable.Text, Columns);
+            bool rc = db.Import(cmbFileName.Text, cmbDestinationTable.Text, Columns);
             db.StatusReport -= StatusReport;
+
+            // Finallly update the historical list of imported files.
+            if (rc) SaveHistory(db.ImportKey, cmbFileName.Text);
+            return rc;
         }
         #endregion
 
         #region ImportDB
 
-        protected void ImportDB()
+        protected bool ImportDB()
         {
-            switch (SourceType)
+            try
             {
-                case ImportSource.SQLite:
-                    Import_SQLite();
-                    break;
-                case ImportSource.MSAccess:
-                    Import_MSAccess();
-                    break;
-                case ImportSource.SQLServer:
-                    Import_SqlServer();
-                    break;
-                case ImportSource.ODBC:
-                    Import_SqlServer();
-                    break;
-                case ImportSource.MySql:
-                    Import_SqlServer();
-                    break;
-                default:
-                    Common.ShowMsg("Not yet implemented");
-                    break;
+                switch (SourceType)
+                {
+                    case ImportSource.SQLite:
+                        return Import_SQLite();
+                    case ImportSource.MSAccess:
+                        return Import_MSAccess();
+                    case ImportSource.SQLServer:
+                        return Import_SqlServer();
+                    case ImportSource.ODBC:
+                        return Import_ODBC();
+                    case ImportSource.MySql:
+                        return Import_MySql();
+                    default:
+                        ShowMsg("Not yet implemented");
+                        return false;
+                }
             }
+            finally { txtStatusMsg.SelectionLength = 0; }
         }
-        private void Import_SQLite()
+        private bool Import_SQLite()
         {
             this.Cursor = Cursors.WaitCursor;
             db.StatusReport += StatusReport;
@@ -1033,6 +1328,7 @@ namespace SQLiteWorkshop
                     if (dgvr.Cells[0].Value != null && (bool)dgvr.Cells[0].Value == true)
                     {
                         toolStripStatusMsg.Text = string.Format("Importing {0}.", dgvr.Cells[1].Value.ToString());
+                        txtStatusMsg.Text += string.Format("Importing {0}", dgvr.Cells[1].Value.ToString().PadRight(50, ' '));
                         db.Import(dgvr.Cells[1].Value.ToString(), dgvr.Cells[2].Value.ToString());
                     }
                 }
@@ -1040,34 +1336,107 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Import Failed: {0}", ex.Message));
+                ShowMsg(string.Format("Import Failed: {0}", ex.Message));
                 toolStripStatusMsg.Text = "Import Failed.";
+                txtStatusMsg.Text += string.Format("{0}{1}{2}", textmsg, "Import Failed", Environment.NewLine);
+                return false;
             }
             finally
             {
                 db.StatusReport -= StatusReport;
                 this.Cursor = Cursors.Default;
             }
+
+            SaveHistory(db.ImportKey,  db.SourceServer, db.SourceUserName, db.SourcePassword, db.UseWindowsAuthentication.ToString());
+            return true;
         }
 
-        private void Import_MSAccess()
+        private bool Import_MSAccess()
         {
-            Import_SQLite();
+            return Import_SQLite();
         }
 
-        private void Import_SqlServer()
+        private bool Import_SqlServer()
         {
-            Import_SQLite();
+            return Import_SQLite();
+        }
+
+        private bool Import_ODBC()
+        {
+            return Import_SQLite();
+        }
+
+        private bool Import_MySql()
+        {
+            return Import_SQLite();
         }
 
         #endregion
         #endregion
 
         #region helpers
+
+        /// <summary>
+        /// Load most recently used list of files or dbs.
+        /// </summary>
+        /// <param name="iType">Name of Key holding the import history.</param>
+        /// <param name="cmb">ComboBox to load</param>
+        /// <param name="impdata">Selected ComboBox Item</param>
+        private void LoadHistory(string iType, ComboBox cmb)
+        {
+            cmb.Items.Clear();
+            if (!bSaveImp) return;
+            if (!ImportHistory.ContainsKey(iType)) return;
+            List<ImportData> li = ImportHistory[iType];
+            foreach (ImportData id in li)
+            {
+                cmb.Items.Add(id.name);
+            }
+        }
+        private void SaveHistory(string iType, string Name, string UserID = null, string Password = null, string Auth = null)
+        {
+            ImportData id = new ImportData()
+            {
+                lastuse = DateTime.Now,
+                name = Name.ToLower(),
+                userid = UserID?.ToLower(),
+                password = Password,
+                authtype = Auth
+            };
+
+            int i;
+            if (ImportHistory.ContainsKey(iType))
+            {
+                List<ImportData> li = ImportHistory[iType];
+                for (i = 0; i < li.Count; i++)
+                {
+                    if (li[i].name == id.name)
+                    {
+                        li[i] = id;
+                        break;
+                    }
+                }
+                if (i == li.Count) li.Add(id);
+                li = li.OrderByDescending(s => s.lastuse).ToList(); 
+                while (li.Count > maxTokens) { li.RemoveAt(maxTokens); }
+                ImportHistory[iType] = li;
+            }
+            else
+            {
+                List<ImportData> l = new List<ImportData>
+                {
+                    id
+                };
+                ImportHistory.Add(iType, l);
+            }
+            string iHist = JsonSerializer.Serialize<Dictionary<string, List<ImportData>>>(ImportHistory);
+            saveSetting(CFG_IMPHISTORY, Encrypt(iHist));
+        }
+
         private void cmbSourceDB_SelectedIndexChanged(object sender, EventArgs e)
         {
             ComboBox c = (ComboBox)sender;
-
+            
             switch (c.Text)
             {
                 case "MS Access Database":
@@ -1079,6 +1448,7 @@ namespace SQLiteWorkshop
                     panelWizMainText.Dock = DockStyle.Fill;
                     lblPassword.Visible = true;
                     txtPassword.Visible = true;
+                    LoadHistory(CFG_IMPMSACCESS, cmbFileName);
                     break;
 
                 case "SQLite Database":
@@ -1089,6 +1459,7 @@ namespace SQLiteWorkshop
                     panelWizMainMySql.Visible = false;
                     lblPassword.Visible = true;
                     txtPassword.Visible = true;
+                    LoadHistory(CFG_IMPSQLITE, cmbFileName);
                     break;
 
                 case "Delimited Text File":
@@ -1099,6 +1470,7 @@ namespace SQLiteWorkshop
                     panelWizMainMySql.Visible = false;
                     lblPassword.Visible = false;
                     txtPassword.Visible = false;
+                    LoadHistory(CFG_IMPTEXT, cmbFileName);
                     break;
 
                 case "Excel":
@@ -1109,6 +1481,7 @@ namespace SQLiteWorkshop
                     panelWizMainMySql.Visible = false;
                     lblPassword.Visible = false;
                     txtPassword.Visible = false;
+                    LoadHistory(CFG_IMPEXCEL, cmbFileName);
                     break;
 
                 case "SQL Server":
@@ -1117,6 +1490,7 @@ namespace SQLiteWorkshop
                     panelWizMainText.Visible = false;
                     panelWizMainODBC.Visible = false;
                     panelWizMainMySql.Visible = false;
+                    LoadHistory(CFG_IMPSQLSERVER, cmbServer);
                     break;
 
                 case "ODBC":
@@ -1126,6 +1500,7 @@ namespace SQLiteWorkshop
                     panelWizMainODBC.Visible = true;
                     panelWizMainMySql.Visible = false;
                     LoadOdbcDataSources();
+                    LoadHistory(CFG_IMPODBC, cmbFileName);
                     break;
 
                 case "MySQL":
@@ -1134,6 +1509,7 @@ namespace SQLiteWorkshop
                     panelWizMainText.Visible = false;
                     panelWizMainDB.Visible = false;
                     panelWizMainODBC.Visible = false;
+                    LoadHistory(CFG_IMPMYSQL, cmbMySqlServer);
                     break;
 
                 case "SQL":
@@ -1144,6 +1520,7 @@ namespace SQLiteWorkshop
                     panelWizMainMySql.Visible = false;
                     lblPassword.Visible = false;
                     txtPassword.Visible = false;
+                    LoadHistory(CFG_IMPSQL, cmbFileName);
                     break;
 
                 default:
@@ -1151,11 +1528,54 @@ namespace SQLiteWorkshop
             }
         }
 
+
+        private void cmbFileName_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbFileName_Leave(sender, e);
+        }
+        /// <summary>
+        /// The input has been changed. If importing from SQLite or MSAccess, look for 
+        /// password in History
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void cmbFileName_Leave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(cmbFileName.Text)) return;
+            if (SourceType == ImportSource.SQLite || SourceType == ImportSource.MSAccess)
+            {
+                // See if pw is available
+                string impkey = SourceType == ImportSource.SQLite ? CFG_IMPSQLITE : CFG_IMPMSACCESS;
+                if (!ImportHistory.ContainsKey(impkey)) return;
+                List<ImportData> li = ImportHistory[impkey];
+                string db = cmbFileName.Text.ToLower();
+                for (int i = 0; i < li.Count; i++)
+                {
+                    if (li[i].name == db)
+                    {
+                        txtPassword.Text = li[i].password;
+                        return;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Common routine used to re-initialize text file columns when the delimiter
+        /// is changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void radioButton_Click(object sender, EventArgs e)
         {
             InitializeTextColumns();
         }
 
+        /// <summary>
+        /// Delimiter separating values in text/csv file has changed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void txtOtherDelimiter_TextChanged(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(txtOtherDelimiter.Text))
@@ -1169,6 +1589,10 @@ namespace SQLiteWorkshop
             InitializeTextColumns();
         }
 
+        /// <summary>
+        /// Enable/Disable Text File Delimiter buttons
+        /// </summary>
+        /// <param name="enabled"></param>
         private void setRadioButtons(bool enabled)
         {
             radioButtonComma.Enabled = enabled;
@@ -1186,10 +1610,10 @@ namespace SQLiteWorkshop
             switch (SourceType)
             {
                 case ImportSource.SQLite:
-                    db = new DBSQLiteManager(txtFileName.Text);
+                    db = new DBSQLiteManager(cmbFileName.Text, DatabaseLocation, cmbFileName.Text, null, txtPassword.Text);
                     break;
                 case ImportSource.MSAccess:
-                    db = new DBMSAccessManager(txtFileName.Text);
+                    db = new DBMSAccessManager(cmbFileName.Text, DatabaseLocation, cmbFileName.Text, null, txtPassword.Text);
                     break;
                 default:
                     break;
@@ -1200,7 +1624,7 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(ex.Message);
+                ShowMsg(ex.Message);
                 return;
             }
 
@@ -1261,66 +1685,9 @@ namespace SQLiteWorkshop
             }
             return;
         }
-        #endregion
-
-        #region ControlBox Handlers
-        private void pbClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void ControlBox_MouseEnter(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.White;
-        }
-
-        private void ControlBox_MouseLeave(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        private void ControlBox_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.Wheat;
-            ((PictureBox)sender).BorderStyle = BorderStyle.Fixed3D;
-        }
-
-        private void ControlBox_MouseUp(object sender, MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        #endregion
-
-        #region Form Dragging Event Handler
-
-        public const int WM_NCLBUTTONDOWN = 0xA1;
-        public const int HT_CAPTION = 0x2;
-
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern bool ReleaseCapture();
-
-        private void MainForm_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
-            }
-        }
-
-
-
-
-
-
-
 
 
         #endregion
-
 
     }
 }

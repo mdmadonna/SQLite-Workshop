@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
@@ -13,8 +11,10 @@ namespace SQLiteWorkshop
     {
         delegate void BuildTreeCallback();
 
+#pragma warning disable IDE0044 // Add readonly modifier
         TreeView treeTemplates;
         string templatesDirectory = string.Empty;
+#pragma warning restore IDE0044 // Add readonly modifier
         FileSystemWatcher watcher;
 
         public TemplateManager(TreeView t)
@@ -56,9 +56,11 @@ namespace SQLiteWorkshop
                 string[] files = Directory.GetFiles(dir, "*.sql");
                 foreach (string file in files)
                 {
-                    TreeNode sqlNode = new TreeNode(Path.GetFileNameWithoutExtension(file), 3, 3);
-                    sqlNode.Tag = file;
-                    sqlNode.ContextMenu = tmpContextMenu;
+                    TreeNode sqlNode = new TreeNode(Path.GetFileNameWithoutExtension(file), 3, 3)
+                    {
+                        Tag = file,
+                        ContextMenu = tmpContextMenu
+                    };
                     dirNode.Nodes.Add(sqlNode);
                 }
                 topNode.Nodes.Add(dirNode);
@@ -102,17 +104,19 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Cannot delete {0}.{1}{2}.", fileName, Environment.NewLine, ex.Message));
+                ShowMsg(string.Format("Cannot delete {0}.{1}{2}.", fileName, Environment.NewLine, ex.Message));
             }
         }
 
         internal void StartTemplateWatch()
         {
-            watcher = new FileSystemWatcher();
-            watcher.Path = templatesDirectory;
-            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-            watcher.Filter = "*.*";
-            watcher.IncludeSubdirectories = true;
+            watcher = new FileSystemWatcher
+            {
+                Path = templatesDirectory,
+                NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName,
+                Filter = "*.*",
+                IncludeSubdirectories = true
+            };
             watcher.Created += new FileSystemEventHandler(OnTemplateDirChanged);
             watcher.Changed += new FileSystemEventHandler(OnTemplateDirChanged);
             watcher.Deleted += new FileSystemEventHandler(OnTemplateDirChanged);
@@ -146,13 +150,13 @@ namespace SQLiteWorkshop
                 filename = GetFile(filename);
                 if (string.IsNullOrEmpty(filename)) return;
                 if (ValidateTemplateDirectory(filename)) break;
-                Common.ShowMsg(string.Format("Templates must be placed in a sub-folder{0}of the Templates Folder located at{0}{1}", Environment.NewLine, templatesDirectory));
+                ShowMsg(string.Format("Templates must be placed in a sub-folder{0}of the Templates Folder located at{0}{1}", Environment.NewLine, templatesDirectory));
             } while (true);
 
             FileInfo fi = new FileInfo(filename);
             if (fi.Exists)
             {
-                DialogResult dr = Common.ShowMsg(string.Format("{0} already exists.\r\nDo you want to replace it?", filename), MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                DialogResult dr = ShowMsg(string.Format("{0} already exists.\r\nDo you want to replace it?", filename), MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                 if (dr != DialogResult.Yes) return;
             }
 
@@ -165,7 +169,7 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("An error occurred while writing {0}.\r\n{1}", filename, ex.Message));
+                ShowMsg(string.Format("An error occurred while writing {0}.\r\n{1}", filename, ex.Message));
             }
             tc.SqlFileName = filename;
             ((TabPage)c).Text = string.Format("  {0}          ", Path.GetFileName(filename)); ;
@@ -176,18 +180,20 @@ namespace SQLiteWorkshop
         {
             string path = templatesDirectory;
 
-            SaveFileDialog saveFile = new SaveFileDialog();
-            saveFile.Title = "Select Destination File";
-            saveFile.Filter = "All files (*.*)|*.*|Sql Files (*.sql)|*.sql";
-            saveFile.FilterIndex = 2;
-            saveFile.AddExtension = true;
-            saveFile.AutoUpgradeEnabled = true;
-            saveFile.DefaultExt = "sql";
-            saveFile.InitialDirectory = path;
-            saveFile.RestoreDirectory = true;
-            saveFile.ValidateNames = true;
-            saveFile.OverwritePrompt = false;
-            saveFile.FileName = filename;
+            SaveFileDialog saveFile = new SaveFileDialog
+            {
+                Title = "Select Destination File",
+                Filter = "All files (*.*)|*.*|Sql Files (*.sql)|*.sql",
+                FilterIndex = 2,
+                AddExtension = true,
+                AutoUpgradeEnabled = true,
+                DefaultExt = "sql",
+                InitialDirectory = path,
+                RestoreDirectory = true,
+                ValidateNames = true,
+                OverwritePrompt = false,
+                FileName = filename
+            };
 
             if (saveFile.ShowDialog() != DialogResult.OK) return string.Empty;
             return saveFile.FileName;

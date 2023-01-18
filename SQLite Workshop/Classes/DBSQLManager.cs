@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.Config;
 
 namespace SQLiteWorkshop
 {
@@ -13,22 +11,34 @@ namespace SQLiteWorkshop
     {
         
         internal string FileName { get; set; }
+        public bool useTransaction { get; set; }
+        
+        long sqlCount;
 
-        internal DBSqlManager(string fileName) : base(fileName)
+        internal DBSqlManager(string fileName, string DBLoc) : base(fileName, DBLoc)
         {
+            ImportKey = CFG_IMPSQL;
             FileName = fileName;
+            // default to performing inserts wrapped in a transaction
+            // Note that when the sql file being read has a 'BEGIN' stmt in it 
+            // and useTransaction is true, an error will be generated.
+            useTransaction = false;
         }
 
         ~DBSqlManager()
         { }
 
+        /// <summary>
+        /// Does not apply to SQL statements
+        /// </summary>
+        /// <returns></returns>
         internal override DBDatabaseList GetDatabaseList()
         {
             throw new NotImplementedException();
         }
 
         /// <summary>
-        /// Not valid for Text Files.
+        /// Does not apply to SQL statements
         /// </summary>
         /// <returns></returns>
         internal override DBSchema GetSchema()
@@ -37,7 +47,7 @@ namespace SQLiteWorkshop
         }
 
         /// <summary>
-        /// Return column names for text files
+        /// Does not apply to SQL statements
         /// </summary>
         /// <param name="FileName">Name of the text file being imported</param>
         /// <returns></returns>
@@ -46,75 +56,43 @@ namespace SQLiteWorkshop
             throw new NotImplementedException();
         }
 
-        internal override bool Import(string SourceFile, string DestTable, Dictionary<string, DBColumn> columns)
+        /// <summary>
+        /// Run the Import by reading a file of SQL statements and executing
+        /// them.
+        /// </summary>
+        /// <param name="SourceFile">Name of the DQL File.</param>
+        /// <param name="DestTable">null</param>
+        /// <param name="columns">null</param>
+        /// <returns>true if successful, otherwise false</returns>
+        internal override bool Import(string Source, string DestTable, Dictionary<string, DBColumn> columns)
         {
-            bool rCode;
-            int recCount = 0;
-
-            SQLiteTransaction sqlT = null;
-            StreamReader sr = null; ;
-
-            SQLiteErrorCode returnCode;
-
-            SQLiteConnection SQConn = new SQLiteConnection();
-            SQLiteCommand SQCmd = new SQLiteCommand();
-
-            rCode = DataAccess.OpenDB(MainForm.mInstance.CurrentDB, ref SQConn, ref SQCmd, out returnCode);
-            if (!rCode || returnCode != SQLiteErrorCode.Ok)
-            {
-                Common.ShowMsg(String.Format(Common.ERR_SQL, DataAccess.LastError, returnCode));
-                return false;
-            }
-
+            
+            SqlLoader sl = new SqlLoader(useTransaction);
+            sl.LoadSqlStatusReport += LoadSqlStatusReport;
             try
             {
-                sr = new StreamReader(SourceFile);
-                string line;
-                string sql;
-                int idx;
-
-                sqlT = SQConn.BeginTransaction();
-
-                while ((line = sr.ReadLine()) != null)
-                {
-                    sql = string.Empty;
-                    idx = line.LastIndexOf(";");
-                    while (idx < 0)
-                    {
-                        string nextline = sr.ReadLine();
-                        if (nextline == null) break;
-                        line += nextline;
-                        if (line == null) break;
-                        idx = line.LastIndexOf(";");
-                    }
-                    sql = idx > 0 ? line.Substring(0, idx) : line;
-                    line = idx < line.Length ? line.Substring(idx + 1) : string.Empty;
-                    SQCmd.CommandText = sql;
-                    SQCmd.ExecuteNonQuery();
-                    recCount++;
-                    if (recCount % 100 == 0) FireStatusEvent(ImportStatus.InProgress, recCount);
-                }
-                sr.Close();
-                sqlT.Commit();
+                sl.LoadSql(Source, TargetDB);
             }
             catch (Exception ex)
             {
-                sqlT.Rollback();
-                try { if (sr != null) sr.Close(); } catch { }
-                Common.ShowMsg(string.Format(Common.ERR_SQL, ex.Message, SQLiteErrorCode.Ok));
+                FireStatusEvent(ImportStatus.Failed, 0);
+                ShowMsg(string.Format(ERR_SQLLOADERR, ex.Message));
                 return false;
             }
-            finally
-            {
-                DataAccess.CloseDB(SQConn);
-            }
-            MainForm.mInstance.AddTable(string.Empty);
-            try { FireStatusEvent(ImportStatus.Complete, recCount); } catch { }
+            finally { sl.LoadSqlStatusReport -= LoadSqlStatusReport; }
+            try { FireStatusEvent(ImportStatus.Complete, sqlCount); } catch { }
             return true;
         }
 
+        internal void LoadSqlStatusReport(object sender, LoadSqlEventArgs e)
+        {
+            sqlCount = e.StmtCount;
+            FireStatusEvent(ImportStatus.InProgress, e.StmtCount);
+        }
+
+
         /// <summary>
-        /// Should never be called
+        /// Does not apply to SQL statements
         /// </summary>
         /// <param name="TableName"></param>
         /// <returns></returns>

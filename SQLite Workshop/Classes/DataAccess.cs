@@ -4,10 +4,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
@@ -21,7 +19,6 @@ namespace SQLiteWorkshop
     internal struct SchemaDefinition
     {
         internal int LoadStatus;
-        internal SQLiteErrorCode LoadError;
         internal string DBName;
         internal string DBLocation;
         internal long DBSize;
@@ -32,6 +29,7 @@ namespace SQLiteWorkshop
         internal Dictionary<string, TableLayout> Tables;
         internal Dictionary<string, ViewLayout> Views;
         internal Dictionary<string, TriggerLayout> Triggers;
+        internal Dictionary<string, AttachDbLayout> AttachDbs;
     }
     internal struct TableLayout
     {
@@ -102,9 +100,23 @@ namespace SQLiteWorkshop
         internal string CreateSQL;
     }
 
+    internal struct AttachDbLayout
+    {
+        internal string DbLocation;
+        internal string SchemaName;
+    }
+
+    internal struct BuiltInFunction
+    {
+        internal string Name;
+        internal bool LoadOnOpen;
+        internal string Category;
+        internal string Description;
+        internal Type Function;
+    }
+
     abstract class DataAccess
     {
-        public static string DatabaseName;
 
         public static event EventHandler<ProgressEventArgs> ProgressReport = delegate { };
         public static void ProgressEventHandler(object sender, ProgressEventArgs e)
@@ -112,8 +124,10 @@ namespace SQLiteWorkshop
             ProgressReport(sender, e);
         }
 
+        internal static List<BuiltInFunction> FunctionList = new List<BuiltInFunction>();
         internal static Dictionary<string, SchemaDefinition> SchemaDefinitions = new Dictionary<string, SchemaDefinition>();
 
+        internal static bool CancelAction = false;
         internal static string LastError { get; private set; } = null;
         internal static int FormatErrorCount { get; private set; } = 0;
         internal static ArrayList FormatErrors { get; private set; } = null;
@@ -129,21 +143,25 @@ namespace SQLiteWorkshop
         const string QRY_INDEXDETAIL = "PRAGMA index_list(\"{0}\")";
         const string QRY_FOREIGNKEYS = "PRAGMA foreign_key_list(\"{0}\")";
 
-        internal static SchemaDefinition GetSchema(string DBLocation)
+        internal static SchemaDefinition GetSchema(string DBLocation, bool bRefresh = false)
         {
-            DatabaseName = DBLocation;
+            Dictionary<string, AttachDbLayout> AttachDbLayouts = new Dictionary<string, AttachDbLayout>();
+            if (bRefresh) 
+                if (SchemaDefinitions.ContainsKey(DBLocation))
+                {
+                    AttachDbLayouts = SchemaDefinitions[DBLocation].AttachDbs;
+                    SchemaDefinitions.Remove(DBLocation);
+                }
+
+            if (SchemaDefinitions.ContainsKey(DBLocation)) return SchemaDefinitions[DBLocation];
 
             SchemaDefinition sd = new SchemaDefinition();
-
-            //SchemaDefinitions is a consideration for future use.  For the time being
-            //Clear it before adding a new schema
-            SchemaDefinitions.Clear();
 
             FileInfo f = new FileInfo(DBLocation);
             if (!f.Exists)
                 { LastError = "Database not found."; sd.LoadStatus = -1; return sd; }
 
-            if (DataAccess.IsEncrypted(DBLocation))
+            if (!DataAccess.IsValidDB(DBLocation, null, out _))
             {
                 GetPassword gp = new GetPassword
                 {
@@ -167,18 +185,28 @@ namespace SQLiteWorkshop
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode))
-            { sd.LoadError = returnCode; sd.LoadStatus = -1; return sd; }
+            if (!OpenDB(DBLocation, ref conn, ref cmd))
+            { sd.LoadStatus = -1; return sd; }
 
             sd.Tables = GetTables(cmd);
             sd.Views = GetViews(cmd);
             sd.Triggers = GetTriggers(cmd);
+            sd.AttachDbs = AttachDbLayouts;
 
             CloseDB(conn);
             sd.LoadStatus = 0;
-            sd.LoadError = SQLiteErrorCode.Ok;
             SchemaDefinitions[DBLocation] = sd;
             return sd;
+        }
+
+        /// <summary>
+        /// Remove a database from the SchemaDefinitions collection
+        /// </summary>
+        /// <param name="DBLocation">Fully Quakified name of the DB to remove</param>
+        internal static void RemoveSchema(string DBLocation)
+        {
+            if (SchemaDefinitions.ContainsKey(DBLocation)) 
+                SchemaDefinitions.Remove(DBLocation);
         }
 
         internal static bool AddTableToSchema(string DBLocation, string table)
@@ -186,10 +214,10 @@ namespace SQLiteWorkshop
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return false;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return false;
 
             cmd.CommandText = string.Format(QRY_TABLE, "\"" + table + "\"");
-            DataTable dt = ExecuteDataTable(cmd, out returnCode);
+            DataTable dt = ExecuteDataTable(cmd, out SQLiteErrorCode returnCode);
             if (dt.Rows.Count == 0) return false;
 
             TableLayout tl = LoadTable(cmd, dt.Rows[0]);
@@ -205,10 +233,10 @@ namespace SQLiteWorkshop
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return false;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return false;
 
             cmd.CommandText = string.Format(QRY_TABLE, "\"" + table + "\"");
-            DataTable dt = ExecuteDataTable(cmd, out returnCode);
+            DataTable dt = ExecuteDataTable(cmd, out SQLiteErrorCode returnCode);
             if (dt.Rows.Count > 0) return false;
 
             if (SchemaDefinitions[DBLocation].Tables.ContainsKey(table))
@@ -225,10 +253,11 @@ namespace SQLiteWorkshop
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return;
 
             SchemaDefinition sd = SchemaDefinitions[DBLocation];
             sd.Tables = GetTables(cmd);
+            SchemaDefinitions[DBLocation] = sd;
             CloseDB(conn);
         }
 
@@ -242,10 +271,11 @@ namespace SQLiteWorkshop
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return;
 
             SchemaDefinition sd = SchemaDefinitions[DBLocation];
             sd.Views = GetViews(cmd);
+            SchemaDefinitions[DBLocation] = sd;
             CloseDB(conn);
         }
 
@@ -259,14 +289,15 @@ namespace SQLiteWorkshop
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return;
 
             SchemaDefinition sd = SchemaDefinitions[DBLocation];
             sd.Triggers = GetTriggers(cmd);
+            SchemaDefinitions[DBLocation] = sd;
             CloseDB(conn);
         }
 
-        internal static Dictionary<string, TableLayout> GetTables(SQLiteCommand cmd, string tablename = null)
+        private static Dictionary<string, TableLayout> GetTables(SQLiteCommand cmd)
         {
             Dictionary<string, TableLayout> TableLayouts = new Dictionary<string, TableLayout>();
 
@@ -294,7 +325,7 @@ namespace SQLiteWorkshop
             return TableLayouts;
         }
 
-        internal static TableLayout LoadTable(SQLiteCommand cmd, DataRow dr)
+        private static TableLayout LoadTable(SQLiteCommand cmd, DataRow dr)
         {
             TableLayout tl = new TableLayout
             {
@@ -303,7 +334,7 @@ namespace SQLiteWorkshop
                 Indexes = GetIndexes(dr["name"].ToString(), cmd),
                 Columns = GetColumns(dr["name"].ToString(), cmd),
                 ForeignKeys = GetForeignKeys(dr["name"].ToString(), cmd),
-                TblType = Common.IsSystemTable(dr["name"].ToString()) ? SQLiteTableType.system : SQLiteTableType.user,
+                TblType = IsSystemTable(dr["name"].ToString()) ? SQLiteTableType.system : SQLiteTableType.user,
                 PrimaryKeys = new Dictionary<string, long>()
             };
             foreach (var column in tl.Columns)
@@ -313,13 +344,13 @@ namespace SQLiteWorkshop
             return tl;
         }
 
-        internal static Dictionary<string, TableLayout> GetTables(string DBLocation)
+        internal static Dictionary<string, TableLayout> GetTables(string DBLocation, string password)
         {
-            Dictionary<string, TableLayout> TableLayouts = new Dictionary<string, TableLayout>();
+            Dictionary<string, TableLayout> TableLayouts;
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return null;
+            if (!OpenDB(DBLocation, ref conn, ref cmd, false, password)) return null;
 
             TableLayouts = GetTables(cmd);
 
@@ -327,7 +358,7 @@ namespace SQLiteWorkshop
             return TableLayouts;
         }
 
-        internal static Dictionary<string, IndexLayout> GetIndexes(string TableName, SQLiteCommand cmd)
+        private static Dictionary<string, IndexLayout> GetIndexes(string TableName, SQLiteCommand cmd)
         {
             Dictionary<string, IndexLayout> IndexLayouts = new Dictionary<string, IndexLayout>();
 
@@ -349,9 +380,9 @@ namespace SQLiteWorkshop
                 {
                     if (dr["name"].ToString() == drDetail["name"].ToString())
                     {
-                        il.Unique = drDetail["unique"].ToString() == "0" ? false : true;
+                        il.Unique = drDetail["unique"].ToString() != "0";
                         il.Origin = drDetail["origin"].ToString();
-                        il.Partial = drDetail["partial"].ToString() == "0" ? false : true;
+                        il.Partial = drDetail["partial"].ToString() != "0";
                     }
                 }
                 IndexLayouts.Add(dr["name"].ToString(), il);
@@ -360,14 +391,14 @@ namespace SQLiteWorkshop
             return IndexLayouts;
         }
 
-        internal static Dictionary<string, IndexLayout> GetIndexes(string DBLocation, string TableName)
+        private static Dictionary<string, IndexLayout> GetIndexes(string DBLocation, string TableName)
         {
-            Dictionary<string, IndexLayout> IndexLayouts = new Dictionary<string, IndexLayout>();
+            Dictionary<string, IndexLayout> IndexLayouts;
 
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return null;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return null;
 
             IndexLayouts = GetIndexes(TableName, cmd);
 
@@ -375,7 +406,7 @@ namespace SQLiteWorkshop
             return IndexLayouts;
         }
 
-        internal static Dictionary<string, ColumnLayout> GetColumns(string TableName, SQLiteCommand cmd)
+        private static Dictionary<string, ColumnLayout> GetColumns(string TableName, SQLiteCommand cmd)
         {
             Dictionary<string, ColumnLayout> ColumnLayouts = new Dictionary<string, ColumnLayout>();
 
@@ -400,14 +431,14 @@ namespace SQLiteWorkshop
             return ColumnLayouts;
         }
 
-        internal static Dictionary<string, ColumnLayout> GetColumns(string DBLocation, string TableName)
+        private static Dictionary<string, ColumnLayout> GetColumns(string DBLocation, string TableName)
         {
-            Dictionary<string, ColumnLayout> ColumnLayouts = new Dictionary<string, ColumnLayout>();
+            Dictionary<string, ColumnLayout> ColumnLayouts;
 
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return null;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return null;
 
             ColumnLayouts = GetColumns(TableName, cmd);
 
@@ -415,7 +446,7 @@ namespace SQLiteWorkshop
             return ColumnLayouts;
         }
 
-        internal static Dictionary<string, IndexColumnLayout> GetIndexColumns(string IndexName, SQLiteCommand cmd)
+        private static Dictionary<string, IndexColumnLayout> GetIndexColumns(string IndexName, SQLiteCommand cmd)
         {
             Dictionary<string, IndexColumnLayout> IndexColumnLayouts = new Dictionary<string, IndexColumnLayout>();
 
@@ -438,7 +469,7 @@ namespace SQLiteWorkshop
             return IndexColumnLayouts;
         }
 
-        internal static Dictionary<string, ForeignKeyLayout> GetForeignKeys(string TableName, SQLiteCommand cmd)
+        private static Dictionary<string, ForeignKeyLayout> GetForeignKeys(string TableName, SQLiteCommand cmd)
         {
             Dictionary<string, ForeignKeyLayout> FKeyLayouts = new Dictionary<string, ForeignKeyLayout>();
 
@@ -465,14 +496,14 @@ namespace SQLiteWorkshop
             return FKeyLayouts;
         }
 
-        internal static Dictionary<string, ForeignKeyLayout> GetForeignKeys(string DBLocation, string TableName)
+        private static Dictionary<string, ForeignKeyLayout> GetForeignKeys(string DBLocation, string TableName)
         {
-            Dictionary<string, ForeignKeyLayout> FKeyLayouts = new Dictionary<string, ForeignKeyLayout>();
+            Dictionary<string, ForeignKeyLayout> FKeyLayouts;
 
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return null;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return null;
 
             FKeyLayouts = GetForeignKeys(TableName, cmd);
 
@@ -480,7 +511,7 @@ namespace SQLiteWorkshop
             return FKeyLayouts;
         }
 
-        internal static Dictionary<string, ViewLayout> GetViews(SQLiteCommand cmd)
+        private static Dictionary<string, ViewLayout> GetViews(SQLiteCommand cmd)
         {
             Dictionary<string, ViewLayout> ViewLayouts = new Dictionary<string, ViewLayout>();
 
@@ -500,7 +531,7 @@ namespace SQLiteWorkshop
             return ViewLayouts;
         }
 
-        internal static Dictionary<string, TriggerLayout> GetTriggers(SQLiteCommand cmd)
+        private static Dictionary<string, TriggerLayout> GetTriggers(SQLiteCommand cmd)
         {
             Dictionary<string, TriggerLayout> TriggerLayouts = new Dictionary<string, TriggerLayout>();
 
@@ -519,20 +550,60 @@ namespace SQLiteWorkshop
             return TriggerLayouts;
         }
 
-        internal static Dictionary<string, ViewLayout> GetViews(string DBLocation)
+        private static Dictionary<string, ViewLayout> GetViews(string DBLocation)
         {
-            Dictionary<string, ViewLayout> ViewLayouts = new Dictionary<string, ViewLayout>();
+            Dictionary<string, ViewLayout> ViewLayouts;
 
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode)) return null;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return null;
 
             ViewLayouts = GetViews(cmd);
 
             CloseDB(conn);
             return ViewLayouts;
         }
+
+        /// <summary>
+        /// Add an attached db.  When present, this db will be attached whenever the parent DB
+        /// is opened.
+        /// </summary>
+        /// <param name="DBLocation">Parent Database</param>
+        /// <param name="dbname">Database to Attach</param>
+        internal static void AddAttachedDb(string DBLocation, string dbname, string schema)
+        {
+            string dbkey = Path.GetFileName(dbname);
+            if (string.IsNullOrEmpty(dbkey)) return;
+
+            SchemaDefinition sd = DataAccess.SchemaDefinitions[DBLocation];
+            if (sd.AttachDbs.ContainsKey(dbkey)) return;
+
+            AttachDbLayout ad = new AttachDbLayout
+            {
+                DbLocation = dbname,
+                SchemaName = schema
+            };
+            sd.AttachDbs.Add(dbkey, ad);
+            DataAccess.SchemaDefinitions[DBLocation] = sd;
+
+            return;
+        }
+
+        /// <summary>
+        /// Remove an attached DB
+        /// </summary>
+        /// <param name="DBLocation">Parent Database</param>
+        /// <param name="dbname">Database to remove</param>
+        internal static void DelAttachedDb(string DBLocation, string dbname)
+        {
+            SchemaDefinition sd = DataAccess.SchemaDefinitions[DBLocation];
+            if (!sd.AttachDbs.ContainsKey(dbname)) return;
+            sd.AttachDbs.Remove(dbname);
+            DataAccess.SchemaDefinitions[DBLocation] = sd;
+            return;
+        }
+
         /// <summary>
         /// Create a new empty SQLite database.
         /// </summary>
@@ -544,12 +615,12 @@ namespace SQLiteWorkshop
             SQLiteCommand cmd = null;
 
             // The open creates the file
-            if (!OpenDB(dbName, ref conn, ref cmd, out SQLiteErrorCode returnCode, true)) return false;
+            if (!OpenDB(dbName, ref conn, ref cmd, true)) return false;
 
             // SQLite appears to create an empty file that stays empty until you put something in it
             // Create a dummy table
             cmd.CommandText = "CREATE TABLE \"$Temp\"(\"ID\" integer );";
-            ExecuteNonQuery(cmd, out returnCode);
+            ExecuteNonQuery(cmd, out SQLiteErrorCode returnCode);
             //Delete it right away
             cmd.CommandText = "DROP TABLE \"$Temp\";";
             ExecuteNonQuery(cmd, out returnCode);
@@ -569,7 +640,7 @@ namespace SQLiteWorkshop
             SQLiteCommand cmd = null;
             returnCode = SQLiteErrorCode.Ok;
 
-            if (!OpenDB(dbName, ref conn, ref cmd, out returnCode, true)) return false;
+            if (!OpenDB(dbName, ref conn, ref cmd, true)) return false;
 
             try
             {
@@ -582,6 +653,9 @@ namespace SQLiteWorkshop
                 return false;
             }
             finally { CloseDB(conn); }
+            SchemaDefinition sd = SchemaDefinitions[dbName];
+            sd.password = password;
+            SchemaDefinitions[dbName] = sd;
             return true;
         }
 
@@ -590,14 +664,9 @@ namespace SQLiteWorkshop
 
             sql = string.Format("Explain {0}", sql);
 
-            DataTable dt = DataAccess.ExecuteDataTable(dbName, sql, out returnCode);
-            if (dt == null)
-            {
-                returnCode = SQLiteErrorCode.Error;
-                return false;
-            }
+            DataTable dt = ExecuteDataTable(dbName, sql, out returnCode);
+            if (dt == null) return false;
             dt.Dispose();
-            returnCode = SQLiteErrorCode.Error;
             return true;
 
         }
@@ -627,7 +696,7 @@ namespace SQLiteWorkshop
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return null;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return null;
             if (returnCode != SQLiteErrorCode.Ok) return null;
 
             cmd.CommandText = SqlStatement;
@@ -672,7 +741,7 @@ namespace SQLiteWorkshop
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return null;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return null;
 
             cmd.CommandText = SqlStatement;
             DataTable dt = ExecuteDataTable(cmd, out returnCode);
@@ -725,6 +794,13 @@ namespace SQLiteWorkshop
                         }
                     }
                     dt.Rows.Add(dRow);
+                    //if (recordcount % 100 == 0) Application.DoEvents();
+                    if (CancelAction)
+                    {
+                        CancelAction = false;
+                        returnCode = SQLiteErrorCode.Interrupt;
+                        return dt;
+                    }
                 }
             }
             catch (Exception ex)
@@ -736,47 +812,47 @@ namespace SQLiteWorkshop
             return dt;
         }
 
-        internal static int ExecuteNonQuery(string DBLocation, string SqlStatement, out SQLiteErrorCode returnCode)
+        internal static long ExecuteNonQuery(string DBLocation, string SqlStatement, out SQLiteErrorCode returnCode)
         {
             returnCode = SQLiteErrorCode.Ok;
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return -1;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return -1;
 
             cmd.CommandText = SqlStatement;
-            int result = ExecuteNonQuery(cmd, out returnCode);
+            long result = ExecuteNonQuery(cmd, out returnCode);
             CloseDB(conn);
             return result;
         }
 
-        internal static int ExecuteNonQuery(string DBLocation, string SqlStatement, ArrayList parms, out SQLiteErrorCode returnCode)
+        internal static long ExecuteNonQuery(string DBLocation, string SqlStatement, ArrayList parms, out SQLiteErrorCode returnCode)
         {
             returnCode = SQLiteErrorCode.Ok;
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return -1;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return -1;
             for (int i = 0; i < parms.Count; i++)
             {
                 cmd.Parameters.Add(new SQLiteParameter() { Value = parms[i] });
             }
             cmd.CommandText = SqlStatement;
-            int result = ExecuteNonQuery(cmd, out returnCode);
+            long result = ExecuteNonQuery(cmd, out returnCode);
             CloseDB(conn);
             return result;
         }
 
-        internal static int ExecuteNonQuery(string DBLocation, string SqlStatement, ArrayList parms, out long LastInsertID, out SQLiteErrorCode returnCode)
+        internal static long ExecuteNonQuery(string DBLocation, string SqlStatement, ArrayList parms, out long LastInsertID, out SQLiteErrorCode returnCode)
         {
             returnCode = SQLiteErrorCode.Ok;
             LastInsertID = -1;
-            int result;
+            long result;
 
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return -1;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return -1;
             for (int i = 0; i < parms.Count; i++)
             {
                 cmd.Parameters.Add(new SQLiteParameter() { Value = parms[i] });
@@ -788,9 +864,9 @@ namespace SQLiteWorkshop
             return result;
         }
 
-        internal static int ExecuteNonQuery(SQLiteCommand cmd, out SQLiteErrorCode returnCode)
+        internal static long ExecuteNonQuery(SQLiteCommand cmd, out SQLiteErrorCode returnCode)
         {
-            int RecordCount = 0;
+            long RecordCount;
             returnCode = SQLiteErrorCode.Ok;
             //SQLiteTransaction tran;
             //tran = cmd.Connection.BeginTransaction();
@@ -816,7 +892,7 @@ namespace SQLiteWorkshop
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return null;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return null;
 
             cmd.CommandText = SqlStatement;
             object obj = ExecuteScalar(cmd, out returnCode);
@@ -830,8 +906,9 @@ namespace SQLiteWorkshop
 
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
+            returnCode = SQLiteErrorCode.Ok;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return null;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return null;
             cmd.CommandText = SqlStatement;
             for (int i = 0; i < parms.Count; i++)
             {
@@ -870,17 +947,17 @@ namespace SQLiteWorkshop
         /// <param name="IsNew">True if the database is to be created, False if the database already exists.</param>
         /// <param name="password">The password needed to access an encrypted SQLite database.</param>
         /// <returns>True if successful, False if the open fails</returns>
-        internal static bool OpenDB(string DBLocation, ref SQLiteConnection Conn, ref SQLiteCommand Cmd, out SQLiteErrorCode returnCode, bool IsNew = false, string password = null)
+        internal static bool OpenDB(string DBLocation, ref SQLiteConnection Conn, ref SQLiteCommand Cmd, bool IsNew = false, string password = null)
         {
             LastError = string.Empty;
             Conn = new SQLiteConnection
             {
                 ConnectionString = string.Format("Data Source={0};Version=3;New={1}", DBLocation, IsNew ? "True" : "False")
             };
-            if (password != null) Conn.ConnectionString += string.Format(";Password={0}", password);
+            if (!string.IsNullOrEmpty(password)) Conn.SetPassword(ToBytes(password));
 
-            if (SchemaDefinitions.TryGetValue(DBLocation, out SchemaDefinition sd))
-                if (!string.IsNullOrEmpty(sd.password)) Conn.ConnectionString += string.Format(";Password={0}", sd.password);
+            if (SchemaDefinitions.TryGetValue(DBLocation, out SchemaDefinition sd) && string.IsNullOrEmpty(password))
+                if (!string.IsNullOrEmpty(sd.password)) Conn.SetPassword(ToBytes(sd.password));
 
             try
             {
@@ -896,15 +973,41 @@ namespace SQLiteWorkshop
                 {
                     Connection = Conn
                 };
-                returnCode = SQLiteErrorCode.Ok;
+
+                // Make sure it's a valid DB
+                SQLiteTransaction t = Conn.BeginTransaction();
+                t.Rollback();
+
+                // Attach any connected databases
+                AttachDBs(sd, Cmd);
+
+                // Load BuiltIn Functions
+                foreach (BuiltInFunction function in FunctionList)
+                {
+                    if (function.LoadOnOpen)
+                    {
+                        object f = Activator.CreateInstance(function.Function);
+                        Functions.BindFunction(Conn, (SQLiteFunction)f);
+                    }
+                }
+
+                //object t = Activator.CreateInstance((Type)obj[2]);
                 return true;
             }
             catch (Exception ex)
             {
-                returnCode = SQLiteErrorCode.CantOpen;
                 LastError = ex.Message;
-                try { returnCode = Conn.ExtendedResultCode(); } catch { }
                 return false;
+            }
+        }
+
+        private static void AttachDBs(SchemaDefinition sd, SQLiteCommand cmd)
+        {
+            if (sd.AttachDbs == null) return;
+            foreach (KeyValuePair<string, AttachDbLayout> adl in sd.AttachDbs)
+            {
+                cmd.CommandText = string.Format("ATTACH DATABASE '{0}' AS '{1}';", adl.Value.DbLocation, adl.Value.SchemaName);
+                long rc = cmd.ExecuteNonQuery();
             }
         }
 
@@ -915,50 +1018,60 @@ namespace SQLiteWorkshop
             return true;
         }
 
-
         /// <summary>
-        /// Determine if an SQLite database is encrypted.
+        /// Determine if a file is a valid SQLite Database.
         /// </summary>
-        /// <param name="dbName">The fully qualified file name of the SQLite database.</param>
-        /// <returns>True if the database is encrypted and requires a password, False if the database is not encrypted.</returns>
-        internal static bool IsEncrypted(string dbName)
+        /// <param name="filename">Fully qualified name of the file to test</param>
+        /// <returns>true if the file is a valid DB, otherwise false</returns>
+        internal static bool IsValidDB(string filename, string password, out SQLiteErrorCode rc)
         {
-            return !VerifyPassword(dbName);
-        }
 
-        /// <summary>
-        /// Confirm that a password for an encrypted SQLite database is valid.
-        /// </summary>
-        /// <param name="DBLocation">The fully qualified file name of the SQLite database.</param>
-        /// <param name="password">The password needed to access the database.</param>
-        /// <returns>True if the password is valid, False if the password is not valid.</returns>
-        internal static bool VerifyPassword(string DBLocation, string password = null)
-        {
-            SQLiteConnection conn = null;
-            SQLiteCommand cmd = null;
+            SQLiteConnection conn = new SQLiteConnection
+            {
+                ConnectionString = string.Format("Data Source={0};FailIfMissing=True;", filename)
+            };
+            if (!string.IsNullOrEmpty(password)) conn.SetPassword(ToBytes(password)); 
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode, false, password)) return false;
-
-            // It appears that the database may open successfully if the wrong password is supplied.
-            // Attempt to access it to determine if the password is valid.
-            cmd.CommandText = "Select 1 AS Field1 FROM sqlite_master";
+            conn.SetExtendedResultCodes(true);
             try
             {
-                object obj = ExecuteScalar(cmd, out returnCode);
-                return true;
+                conn.Open();
             }
-            catch { return false; }
-            finally { CloseDB(conn); }
+            catch (Exception ex)
+            {
+                LastError = ex.Message;
+                try { rc = conn.ExtendedResultCode(); } catch { rc = SQLiteErrorCode.CantOpen; }
+                if (conn.State == System.Data.ConnectionState.Open) conn.Close();
+                return false;
+            }
+
+            try
+            {
+                SQLiteTransaction t = conn.BeginTransaction();
+                t.Rollback();
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                rc = conn.ExtendedResultCode();
+                if (conn.State == System.Data.ConnectionState.Open) conn.Close();
+            }
+            return true;
         }
 
-        internal static SQLiteCommand AttachDatabase(string DBLocation, string dbToAttach, string schema, out SQLiteErrorCode returnCode)
+
+        internal static SQLiteCommand AttachDatabase(string DBLocation, string dbToAttach, string schema, out SQLiteErrorCode returnCode, string password = null)
         {
             returnCode = SQLiteErrorCode.Unknown;
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
             
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return cmd;
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return cmd;
             cmd.CommandText = string.Format("Attach Database \"{0}\" As \"{1}\"", dbToAttach, schema);
+            if (!string.IsNullOrEmpty(password)) cmd.CommandText += string.Format("KEY {0}", password);
             try
             {
                 object obj = ExecuteScalar(cmd, out returnCode);
@@ -994,8 +1107,8 @@ namespace SQLiteWorkshop
             SQLiteCommand cmdDest = null;
             returnCode = SQLiteErrorCode.Ok;
 
-            if (!OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return false;
-            if (!OpenDB(BackupDBName, ref connDest, ref cmdDest, out returnCode))
+            if (!OpenDB(DBLocation, ref conn, ref cmd)) return false;
+            if (!OpenDB(BackupDBName, ref connDest, ref cmdDest))
             {
                 CloseDB(conn);
                 return false;
@@ -1044,14 +1157,14 @@ namespace SQLiteWorkshop
             SQLiteConnection conn = new SQLiteConnection();
             SQLiteCommand cmd = new SQLiteCommand();
 
-            DataAccess.OpenDB(DatabaseName, ref conn, ref cmd, out SQLiteErrorCode returnCode, false);
+            DataAccess.OpenDB(DatabaseName, ref conn, ref cmd, false);
 
             cmd.CommandText = string.Format("Select {0} from \"{1}\" Limit 1", rowidName, table);
             SQLiteDataReader dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly);
             PrimaryKeyName = dr.GetName(0);
             dr.Close();
             DataAccess.CloseDB(conn);
-            return PrimaryKeyName == rowidName ? true : false;
+            return PrimaryKeyName == rowidName;
         }
 
 

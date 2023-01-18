@@ -1,35 +1,66 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Data.SQLite;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
-    public partial class DBEditorTabControl : UserControl
+    internal partial class DBEditorTabControl : MainTabControl
     {
 
         string RowIDColName;
         string PrimaryKeyName;
         bool tableHasRowID;
+        long startclock;
+        private long sqlLimit = DEF_ROWEDIT;
 
-        public string DatabaseName { get; set; }
-        public string TableName { get; set; }
+
+        internal string TableName { get; set; }
+
+        internal bool CancelExecution { get; set; }
+
+        internal override string SqlStatement { 
+            get { return sqlRichTextBox.Text; }
+            set { } 
+        }
 
         internal DBEditorTabControl(string dbName, string tblname)
         {
             InitializeComponent();
+            InitializeClass(dbName);
             this.Dock = DockStyle.Fill;
             toolStripStatusLabelMsg.Text = string.Empty;
             toolStripStatusLabelTableName.Text = tblname;
-            DatabaseName = dbName;
+            
+            // Reserved for future use
+            sqlRichTextBox.Visible = false;
+
             TableName = tblname;
+            cmbLimit.Text = DEF_ROWEDIT.ToString();
+        }
+
+        // Reserved for future use
+        internal void ToggleSqlPanel()
+        {
+            panel1.Visible = !panel1.Visible;
+        }
+
+        // Reserved for future use
+        internal void ExecuteSql()
+        {
+            
+        }
+
+        internal void ProgressEventHandler(object sender, ProgressEventArgs e)
+        {
+            DataAccess.CancelAction = CancelExecution;
+            Application.DoEvents();
         }
 
         private void dgMain_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
@@ -57,18 +88,35 @@ namespace SQLiteWorkshop
         internal bool Execute()
         {
             bool rtn = InitializeWindow();
-            bool bNoWarning = false;
-            bool.TryParse(MainForm.cfg.appsetting(Config.CFG_ROWEDITWARN), out bNoWarning);
+            bool.TryParse(appSetting(Config.CFG_ROWEDITWARN), out bool bNoWarning);
             if (!bNoWarning) ShowWarning();
             return rtn;
         }
 
+        private void btnExecute_Click(object sender, EventArgs e)
+        {
+            if (cmbLimit.Text.Trim().ToLower() == "all")
+            {
+                sqlLimit = 0;
+            }
+            else 
+            if (!long.TryParse(cmbLimit.Text.Trim(), out sqlLimit))
+            {
+                ShowMsg(ERR_INVALIDLIMIT);
+                cmbLimit.Focus();
+                return;
+            }
+            InitializeWindow();
+        }
+
         private void ShowWarning()
         {
-            ShowMsg sm = new ShowMsg(ShowMsg.ButtonStyle.OK);
-            sm.Message = "WARNING!!!.  This editor does not provide any data validation.  Data will be stored as entered.  If you enter the wrong format (i.e. text in a datetime column), programs using this data may experience unpredictable results.\n\r\n\r\nIMPORTANT!!! Enter datetime columns as yyyy-mm-dd hh:mm:ss.\n\r\n\r\nPress 'Ok' to continue.";
+            ShowMsg sm = new ShowMsg(ShowMsg.ButtonStyle.OK)
+            {
+                Message = WARN_DBEDITOR
+            };
             sm.ShowDialog();
-            if (sm.DoNotShow) MainForm.cfg.SetSetting(Config.CFG_ROWEDITWARN, "true");
+            if (sm.DoNotShow) saveSetting(Config.CFG_ROWEDITWARN, "true");
         }
 
         /// <summary>
@@ -89,16 +137,31 @@ namespace SQLiteWorkshop
             try
             {
                 tableHasRowID = DataAccess.CheckForRowID(DatabaseName, TableName, out RowIDColName, out PrimaryKeyName);
-                dt = DataAccess.ExecuteDataTable(DatabaseName, BuildSelectSql(), out SQLiteErrorCode returnCode);
+                sqlRichTextBox.Text = BuildSelectSql();
+                
+                InitSettings();
+                CancelExecution = false;
+                // This is a static event so be sure to unsubscribe
+                DataAccess.ProgressReport += ProgressEventHandler;
+                dt = DataAccess.ExecuteDataTable(DatabaseName, sqlRichTextBox.Text, out SQLiteErrorCode returnCode);
+                DataAccess.ProgressReport -= ProgressEventHandler;
+                ShowSettings(dt == null ? 0 : dt.Rows.Count, returnCode);
+                
+                if (returnCode == SQLiteErrorCode.Interrupt)
+                {
+                    toolStripStatusLabelMsg.Text = ERR_CANCELLED;
+                    ShowMsg(ERR_CANCELLED);
+                }
+
                 if (returnCode == SQLiteErrorCode.Error)
                 {
-                    toolStripStatusLabelMsg.Text = string.Format("{0} Format Errors detected.", DataAccess.FormatErrorCount.ToString());
-                    Common.ShowMsg(Common.ERR_FORMATERROR);
+                    toolStripStatusLabelMsg.Text = string.Format(ERR_FORMATERRORCOUNT, DataAccess.FormatErrorCount.ToString());
+                    ShowMsg(ERR_FORMATERROR);
                 }
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Error reading database.\r\n{0}", ex.Message));
+                ShowMsg(string.Format("Error reading database.\r\n{0}", ex.Message));
                 return false;
             }
             finally { MainForm.mInstance.Cursor = Cursors.Default; }
@@ -156,7 +219,6 @@ namespace SQLiteWorkshop
         {
 
             DataRow dr = e.Row;
-            var o = dr.RowState;
             switch (dr.RowState)
             {
                 case DataRowState.Added:
@@ -179,15 +241,19 @@ namespace SQLiteWorkshop
             if (e.Row.Table.Columns[0].ColumnName == "rowid")
             {
                 string sql = string.Format("Delete From \"{0}\" Where rowid = {1}", TableName, e.Row[0].ToString());
-                int results = DataAccess.ExecuteNonQuery(DatabaseName, sql, out SQLiteErrorCode returnCode);
+
+                InitSettings();
+                long result = DataAccess.ExecuteNonQuery(DatabaseName, sql, out SQLiteErrorCode returnCode);
+                ShowSettings(result, returnCode);
+
                 if (returnCode != SQLiteErrorCode.Ok)
                 {
-                    MessageBox.Show(string.Format("Delete failed: {0}{1}Error Code: {2}", DataAccess.LastError, Environment.NewLine, returnCode.ToString()), Common.APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(string.Format("Delete failed: {0}{1}Error Code: {2}", DataAccess.LastError, Environment.NewLine, returnCode.ToString()), APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     toolStripStatusLabelMsg.Text = "0 Records Deleted";
                     return;
                 }
                 e.Row.Table.AcceptChanges();
-                toolStripStatusLabelMsg.Text = "1 Record Deleted";
+                toolStripStatusLabelMsg.Text = string.Format("{0} Record(s) Deleted", result);
             }
         }
 
@@ -232,10 +298,10 @@ namespace SQLiteWorkshop
                         if (ColumnsToUpdate > 0) sb.Append(",");
                         sb.Append("\"").Append(dr.Table.Columns[i].ColumnName).Append("\" = ?");
                         ColumnsToUpdate++;
-                        ColumnLayout cl = Common.FindColumnLayout(TableName, dr.Table.Columns[i].ColumnName);
-                        if (!Common.ValidateData(cl.ColumnType, dr[i, DataRowVersion.Proposed].ToString(), out string szValue))
+                        ColumnLayout cl = FindColumnLayout(DatabaseName, TableName, dr.Table.Columns[i].ColumnName);
+                        if (!ValidateData(cl.ColumnType, dr[i, DataRowVersion.Proposed].ToString(), out _))
                         {
-                            Common.ShowMsg(string.Format("Invalid value entered for Column [{0}]", dr.Table.Columns[i].ColumnName));
+                            ShowMsg(string.Format("Invalid value entered for Column [{0}]", dr.Table.Columns[i].ColumnName));
                             return false;
                         }
                         parms.Add(dr[i, DataRowVersion.Proposed]);
@@ -271,16 +337,20 @@ namespace SQLiteWorkshop
                 var count = DataAccess.ExecuteScalar(DatabaseName, string.Format("Select Count(*) From \"{0}\" {1}", TableName, sbWhere.ToString()), wparms, out returnCode);
                 if (Convert.ToInt32(count) != 1)
                 {
-                    Common.ShowMsg(Common.ERR_MULTIUPDATE);
+                    ShowMsg(ERR_MULTIUPDATE);
                     return false;
                 }
             }
 
             parms.AddRange(wparms);
-            var result = DataAccess.ExecuteNonQuery(DatabaseName, string.Format("{0} {1}", sb.ToString(), sbWhere.ToString()), parms, out returnCode);
+
+            InitSettings();
+            long result = DataAccess.ExecuteNonQuery(DatabaseName, string.Format("{0} {1}", sb.ToString(), sbWhere.ToString()), parms, out returnCode);
+            ShowSettings(result, returnCode);
+
             if (returnCode != SQLiteErrorCode.Ok)
             {
-                MessageBox.Show(string.Format("Update failed: {0}{1}Error Code: {2}", DataAccess.LastError, Environment.NewLine, returnCode.ToString()), Common.APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Update failed: {0}{1}Error Code: {2}", DataAccess.LastError, Environment.NewLine, returnCode.ToString()), APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 toolStripStatusLabelMsg.Text = "0 Records Updated";
                 return false;
             }
@@ -312,10 +382,11 @@ namespace SQLiteWorkshop
             sbInto.Append("\"").Append(dr.Table.Columns[dr.Table.Columns.Count - 1].ColumnName).Append("\")");
             sbValues.Append("?)");
             parms.Add(dr[dr.Table.Columns.Count - 1]);
-            int result = DataAccess.ExecuteNonQuery(DatabaseName, string.Format("{0} {1}", sbInto.ToString(), sbValues.ToString()), parms, out id, out SQLiteErrorCode returnCode);
+
+            long result = DataAccess.ExecuteNonQuery(DatabaseName, string.Format("{0} {1}", sbInto.ToString(), sbValues.ToString()), parms, out id, out SQLiteErrorCode returnCode);
             if (returnCode != SQLiteErrorCode.Ok)
             {
-                MessageBox.Show(string.Format("Insert failed: {0}{1}Error Code: {2}", DataAccess.LastError, Environment.NewLine, returnCode.ToString()), Common.APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Insert failed: {0}{1}Error Code: {2}", DataAccess.LastError, Environment.NewLine, returnCode.ToString()), APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 toolStripStatusLabelMsg.Text = "0 Records Added";
                 return false;
             }
@@ -339,19 +410,20 @@ namespace SQLiteWorkshop
                 sb.Append("\"").Append(item.Key).Append("\"");
             }
             sb.Append(" FROM ").Append(TableName);
-            sb.Append(" LIMIT 1000");
+            if (sqlLimit > 0) sb.Append(string.Format(" LIMIT {0}", sqlLimit));
 
             return sb.ToString();
         }
 
         string _lasterror;
+
         internal DataTable ExecuteDataTable(string DBLocation, string SqlStatement, out SQLiteErrorCode returnCode)
         {
             returnCode = SQLiteErrorCode.Ok;
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
 
-            if (!DataAccess.OpenDB(DBLocation, ref conn, ref cmd, out returnCode)) return null;
+            if (!DataAccess.OpenDB(DBLocation, ref conn, ref cmd)) return null;
 
             cmd.CommandText = SqlStatement;
             DataTable dt = ExecuteDataTable(cmd, out returnCode);
@@ -392,8 +464,7 @@ namespace SQLiteWorkshop
                         if (dr[i].GetType() == typeof(Int64))
                         {
                             if (DBNull.Value.Equals(dr[i])) { dRow[i] = 0; continue; }
-                            Int64 i64;
-                            Int64.TryParse(dr[i].ToString(), out i64);
+                            Int64.TryParse(dr[i].ToString(), out long i64);
                             dRow[i] = i64;
                         }
                         else
@@ -422,17 +493,37 @@ namespace SQLiteWorkshop
 
         private void dgMain_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            int i = e.RowIndex;
-            int j = e.ColumnIndex;
             string datacolumn = dgMain.Columns[e.ColumnIndex].Name;
-            ColumnLayout cl = Common.FindColumnLayout(TableName, datacolumn);
-            if (!Common.ValidateData(cl.ColumnType, dgMain.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString(), out string szValue))
+            ColumnLayout cl = FindColumnLayout(DatabaseName, TableName, datacolumn);
+            if (!ValidateData(cl.ColumnType, dgMain.Rows[e.RowIndex].Cells[e.ColumnIndex].Value.ToString(), out _))
             {
-                Common.ShowMsg("Invalid value");
+                ShowMsg("Invalid value");
                 dgMain.Focus();
                 dgMain.CurrentCell = dgMain.Rows[e.RowIndex].Cells[e.ColumnIndex];
                 dgMain.BeginEdit(true);
             }
+        }
+
+        /// <summary>
+        /// Initialize Connection Property Settings before DB access
+        /// </summary>
+        protected void InitSettings()
+        {
+            ConnProps.connSettings.ExecStart = DateTime.Now.ToString();
+            startclock = Timers.QueryPerformanceCounter();
+        }
+
+        /// <summary>
+        /// Finalize and display Connection Property Settings after DB access is complete.
+        /// </summary>
+        protected void ShowSettings(long rowcount, SQLiteErrorCode rc)
+        {
+            ConnProps.connSettings.ExecEnd = DateTime.Now.ToString();
+            ConnProps.connSettings.ElapsedTime = Timers.DisplayTime(Timers.QueryLapsedTime(startclock)); ;
+            ConnProps.connSettings.LastSqlStatus = rc.ToString();
+            ConnProps.connSettings.RowsAffected = rowcount.ToString();
+            m.LoadConnectionProperties();
+
         }
     }
 }

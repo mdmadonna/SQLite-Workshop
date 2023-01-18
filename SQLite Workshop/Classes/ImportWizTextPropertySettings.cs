@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.ComponentModel;
 using System.Reflection;
+
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
@@ -93,7 +94,7 @@ namespace SQLiteWorkshop
 
     internal class TypeConverter : StringConverter
     {
-        private string[] TypeChoices = Common.SQLiteTypes;
+        private string[] TypeChoices = SQLiteTypes;
 
         public override bool GetStandardValuesSupported(ITypeDescriptorContext context)
         {

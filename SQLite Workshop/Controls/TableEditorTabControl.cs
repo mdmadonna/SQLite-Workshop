@@ -1,27 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
 using System.Data.SQLite;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Collections;
+
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
-    public partial class TableEditorTabControl : UserControl
+    internal partial class TableEditorTabControl : MainTabControl
     {
-        private string _dbLocation;
+
+        internal override string SqlStatement { get; set; }
+
         private string[] PrimaryKeys;
         private string errorMsg;
         private StringBuilder sbFKeyClause;
+        readonly TableEditorPropertySettings tableSettings;
 
-        TableEditorPropertySettings tableSettings;
-
-        private ContextMenu tbContextMenu;
+        private readonly ContextMenu tbContextMenu;
 
         private enum PropertyRowDefs
         {
@@ -56,9 +54,9 @@ namespace SQLiteWorkshop
         
         public TableEditorTabControl(string dbLocation)
         {
-            _dbLocation = dbLocation;
             InitializeComponent();
-            if (Int32.TryParse(MainForm.cfg.appsetting(Config.CFG_TABLEEDITHSPLITP), out int parm)) hSplitter.SplitPosition = parm;
+            InitializeClass(dbLocation);
+            if (Int32.TryParse(appSetting(Config.CFG_TABLEEDITHSPLITP), out int parm)) hSplitter.SplitPosition = parm;
 
             tbContextMenu = new ContextMenu();
             tbContextMenu.MenuItems.AddRange(new MenuItem[]
@@ -78,19 +76,29 @@ namespace SQLiteWorkshop
             errorMsg = string.Empty;
             if (!ValidateInput())
             {
-                MessageBox.Show(errorMsg, Common.APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(errorMsg, APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             string sql = BuildCreateSQL();
-            DataAccess.ExecuteNonQuery(_dbLocation, sql, out SQLiteErrorCode returnCode);
+            ConnProps.connSettings.ExecStart = DateTime.Now.ToString();
+            long startclock = Timers.QueryPerformanceCounter();
+
+            long rCount = DataAccess.ExecuteNonQuery(DatabaseName, sql, out SQLiteErrorCode returnCode);
+
+            ConnProps.connSettings.ExecEnd = DateTime.Now.ToString();
+            ConnProps.connSettings.ElapsedTime = Timers.DisplayTime(Timers.QueryLapsedTime(startclock)); ;
+            ConnProps.connSettings.LastSqlStatus = returnCode.ToString();
+            ConnProps.connSettings.RowsAffected = rCount.ToString();
+            m.LoadConnectionProperties();
+
             if (returnCode != SQLiteErrorCode.Ok)
             {
-                Common.ShowMsg(string.Format(Common.ERR_CREATEDBFAILED, DataAccess.LastError, returnCode.ToString()));
+                ShowMsg(string.Format(ERR_CREATEDBFAILED, DataAccess.LastError, returnCode.ToString()));
             }
             else
             {
-                Common.ShowMsg(string.Format(Common.OK_DBCREATED, txtTableName.Text),MessageBoxButtons.OK, MessageBoxIcon.Information);
-                MainForm.mInstance.AddTable(txtTableName.Text);
+                ShowMsg(string.Format(OK_DBCREATED, txtTableName.Text),MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MainForm.mInstance.AddTable(txtTableName.Text, DatabaseName);
             }
         }
 
@@ -99,23 +107,24 @@ namespace SQLiteWorkshop
 
         private ColumnRow MoveGridRow(DataGridViewRow dr)
         {
-            ColumnRow cr = new ColumnRow();
+            ColumnRow cr = new ColumnRow
+            {
 
-            // Assign to local variables for readability
-            cr.ColName = dr.Cells["ColName"].Value == null ? string.Empty : dr.Cells["ColName"].Value.ToString().Trim();
-            cr.ColType = dr.Cells["ColType"].Value == null ? string.Empty : dr.Cells["ColType"].Value.ToString();
-            cr.ColAllowNulls = dr.Cells["ColAllowNulls"].Value == null ? false : (bool)dr.Cells["ColAllowNulls"].Value;
-            cr.ColUnique = dr.Cells["ColUnique"].Value == null ? false : (bool)dr.Cells["ColUnique"].Value;
-            cr.ColDefault = dr.Cells["ColDefault"].Value == null ? string.Empty : dr.Cells["ColDefault"].Value.ToString();
-            cr.ColPrimaryKey = 0;
+                // Assign to local variables for readability
+                ColName = dr.Cells["ColName"].Value == null ? string.Empty : dr.Cells["ColName"].Value.ToString().Trim(),
+                ColType = dr.Cells["ColType"].Value == null ? string.Empty : dr.Cells["ColType"].Value.ToString(),
+                ColAllowNulls = dr.Cells["ColAllowNulls"].Value == null ? false : (bool)dr.Cells["ColAllowNulls"].Value,
+                ColUnique = dr.Cells["ColUnique"].Value == null ? false : (bool)dr.Cells["ColUnique"].Value,
+                ColDefault = dr.Cells["ColDefault"].Value == null ? string.Empty : dr.Cells["ColDefault"].Value.ToString(),
+                ColPrimaryKey = 0,
+                ColCollation = dr.Cells["ColCollation"].Value == null ? null : dr.Cells["ColCollation"].Value.ToString(),
+                ColCheck = dr.Cells["ColCheck"].Value == null ? null : dr.Cells["ColCheck"].Value.ToString(),
+                FK_Table = dr.Cells["FKey_Table"].Value == null ? null : dr.Cells["FKey_Table"].Value.ToString(),
+                FK_Column = dr.Cells["FKey_Column"].Value == null ? null : dr.Cells["FKey_Column"].Value.ToString(),
+                FK_OnUpdate = dr.Cells["FKey_OnUpdate"].Value == null ? null : dr.Cells["FKey_OnUpdate"].Value.ToString(),
+                FK_OnDelete = dr.Cells["FKey_OnDelete"].Value == null ? null : dr.Cells["FKey_OnDelete"].Value.ToString()
+            };
             if (dr.Cells["ColPrimaryKey"].Value != null) Int32.TryParse(dr.Cells["ColPrimaryKey"].Value.ToString(), out cr.ColPrimaryKey);
-            cr.ColCollation = dr.Cells["ColCollation"].Value == null ? null : dr.Cells["ColCollation"].Value.ToString();
-            cr.ColCheck = dr.Cells["ColCheck"].Value == null ? null : dr.Cells["ColCheck"].Value.ToString();
-            cr.FK_Table = dr.Cells["FKey_Table"].Value == null ? null : dr.Cells["FKey_Table"].Value.ToString();
-            cr.FK_Column = dr.Cells["FKey_Column"].Value == null ? null : dr.Cells["FKey_Column"].Value.ToString();
-            cr.FK_OnUpdate = dr.Cells["FKey_OnUpdate"].Value == null ? null : dr.Cells["FKey_OnUpdate"].Value.ToString();
-            cr.FK_OnDelete = dr.Cells["FKey_OnDelete"].Value == null ? null : dr.Cells["FKey_OnDelete"].Value.ToString();
-
             return cr;
         }
 
@@ -259,7 +268,7 @@ namespace SQLiteWorkshop
             // if the default value is a function just return true
             if (value.Trim().StartsWith("(")) return true;
 
-            if (Common.IsInteger(type))
+            if (IsInteger(type))
             {
                 if (!Int64.TryParse(value, out Int64 i))
                 {
@@ -269,9 +278,9 @@ namespace SQLiteWorkshop
                 return true;
             }
 
-            if (Common.IsText(type)) return true;
+            if (IsText(type)) return true;
 
-            if (Common.IsReal(type))
+            if (IsReal(type))
             {
                 if (!double.TryParse(value, out double i))
                 {
@@ -280,7 +289,7 @@ namespace SQLiteWorkshop
                 }
                 return true;
             }
-            if (Common.IsDate(type))
+            if (IsDate(type))
             {
                 if (!DateTime.TryParse(value, out DateTime i))
                 {
@@ -289,7 +298,7 @@ namespace SQLiteWorkshop
                 }
                 return true;
             }
-            if (Common.IsNumeric(type))
+            if (IsNumeric(type))
             {
                 if (!decimal.TryParse(value, out decimal i))
                 {
@@ -298,7 +307,7 @@ namespace SQLiteWorkshop
                 }
                 return true;
             }
-            if (Common.IsBoolean(type))
+            if (IsBoolean(type))
             {
                 if (!bool.TryParse(value, out bool i))
                 {
@@ -327,19 +336,24 @@ namespace SQLiteWorkshop
 
                 if (string.IsNullOrEmpty(cr.ColName)) break;
 
-                ColumnLayout column = new ColumnLayout();
-                column.Check = cr.ColCheck;
-                column.Collation = cr.ColCollation;
-                column.ColumnType = cr.ColType;
-                column.DefaultValue = cr.ColDefault;
-                column.ForeignKey = new ForeignKeyLayout();
-                column.ForeignKey.Table = cr.FK_Table;
-                column.ForeignKey.To = cr.FK_Column;
-                column.ForeignKey.OnUpdate = cr.FK_OnUpdate;
-                column.ForeignKey.OnDelete = cr.FK_OnDelete;
-                column.NullType = cr.ColAllowNulls ? 0 : 1;
-                column.PrimaryKey = cr.ColPrimaryKey;
-                column.Unique = cr.ColUnique;
+                ColumnLayout column = new ColumnLayout
+                {
+                    Check = cr.ColCheck,
+                    Collation = cr.ColCollation,
+                    ColumnType = cr.ColType,
+                    DefaultValue = cr.ColDefault,
+                    ForeignKey = new ForeignKeyLayout()
+                    {
+                        Table = cr.FK_Table,
+                        To = cr.FK_Column,
+                        OnUpdate = cr.FK_OnUpdate,
+                        OnDelete = cr.FK_OnDelete
+                    },
+                    NullType = cr.ColAllowNulls ? 0 : 1,
+                    PrimaryKey = cr.ColPrimaryKey,
+                    Unique = cr.ColUnique
+                };
+
                 Columns.Add(cr.ColName, column);
             }
             return SqlFactory.CreateSQL(txtTableName.Text, Columns);
@@ -407,7 +421,7 @@ namespace SQLiteWorkshop
                 sb.Append(" Default ");
                 // If Column Type is a Text Type, wrap the default value in Quotes.
                 // Note that Default values that are functions must be preceeded by a "("
-                if (!cr.ColDefault.Trim().StartsWith("(") || Common.IsText(cr.ColType))
+                if (!cr.ColDefault.Trim().StartsWith("(") || IsText(cr.ColType))
                 { sb.Append("\"").Append(cr.ColDefault).Append("\""); }
                 else
                 { sb.Append(cr.ColDefault); }
@@ -527,7 +541,7 @@ namespace SQLiteWorkshop
             }
             if (i >= gridCell.Items.Count)
             {
-                MessageBox.Show("Invalid Column Type", Common.APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Invalid Column Type", APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return false;
             }
             return true;
@@ -597,7 +611,7 @@ namespace SQLiteWorkshop
 
         private void TableEditorTabControl_Leave(object sender, EventArgs e)
         {
-            MainForm.cfg.SetSetting(Config.CFG_TABLEEDITHSPLITP, hSplitter.SplitPosition.ToString());
+            saveSetting(Config.CFG_TABLEEDITHSPLITP, hSplitter.SplitPosition.ToString());
         }
 
         private void propertyGridTable_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -667,6 +681,7 @@ namespace SQLiteWorkshop
 
         private void propertyGridTable_Leave(object sender, EventArgs e)
         {
+            if (dgvTableDef.SelectedRows.Count == 0) return;
             int currentRow = dgvTableDef.SelectedRows[0].Index;
             LastRow = currentRow;
             DataGridViewRow dgr = dgvTableDef.Rows[currentRow];
@@ -683,11 +698,13 @@ namespace SQLiteWorkshop
         {
             if (!ValidateInput())
             {
-                MessageBox.Show(errorMsg, Common.APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(errorMsg, APPNAME, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            ShowSQL sSQL = new ShowSQL();
-            sSQL.SQL = BuildCreateSQL();
+            ShowSQL sSQL = new ShowSQL
+            {
+                SQL = BuildCreateSQL()
+            };
             sSQL.ShowDialog();
         }
     }

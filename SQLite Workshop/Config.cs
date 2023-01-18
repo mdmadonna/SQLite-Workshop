@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-using System.Data.SQLite;
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
@@ -31,31 +27,47 @@ namespace SQLiteWorkshop
         internal const string CFG_ANALYZEWARN       = "ANALYZEWARN";                //Analyzer warning message
         internal const string CFG_COLUMNEDITWARN    = "COLUMNEDITWARN";             //Column editor warning
         internal const string CFG_ROWEDITWARN       = "ROWEDITWARN";                //Row editor warning
+        internal const string CFG_RECOVERDBWARN     = "RECOVERDBWARN";              //Recover Database warning
+        internal const string CFG_LANGUAGE          = "LANGUAGE";                   //Default Language
+        internal const string CFG_TOOLSLOCATION     = "TOOLSLOCATION";              //Download location for SQLite tools
+        internal const string CFG_KEYPHRASE         = "KEYPHRASE";                  //Security Key
+        internal const string CFG_FUNCNOLOAD        = "FUNCNOLOAD";                 //Built-In functions to not Load when Connection is opened
+        internal const string CFG_OPENLASTDB        = "OPENLASTDB";                 //Open the last used database at startup
+        internal const string CFG_IGNOREIMPERRORS   = "IGNOREIMPORTERRORS";         //Ignore All Import Errors
+        internal const string CFG_MAXIMPERRORS      = "MAXIMPORTERRORS";            //Maximum number of allowed import errors
+        internal const string CFG_SAVEIMPORT        = "SAVEIMPORT";                 //Save Import Credentials
+        internal const string CFG_IMPHISTORY        = "IMPHIST";                    //Saved Import History
+        internal const string CFG_IMPTEXT           = "IMPTEXT";                    //Imported Text File History
+        internal const string CFG_IMPEXCEL          = "IMPEXCEL";                   //Imported Excel File History
+        internal const string CFG_IMPSQLITE         = "IMPSQLITE";                  //Imported SQLite Database History
+        internal const string CFG_IMPMYSQL          = "IMPMYSQL";                   //Imported MySql Database History
+        internal const string CFG_IMPSQLSERVER      = "IMPSQLSERVER";               //Imported SQL Server Database History
+        internal const string CFG_IMPMSACCESS       = "IMPMSACCESS ";               //Imported MSAccess Database History
+        internal const string CFG_IMPODBC           = "IMPODBC";                    //Imported ODBC Database History
+        internal const string CFG_IMPSQL            = "IMPSQL";                     //Imported SQL File History
 
 
         //Configuration File
         const string CONFIGFILENAME = "SQLite_Workshop.config";
         string _configFile;
         Configuration cfg;
+        static bool ConfigModified = false;
 
         internal Config()
         {
-            _configFile = string.Format(@"{0}\{1}\{2}\{3}", Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "ajmsoft", "SQLite_Workshop", CONFIGFILENAME);
-            ExeConfigurationFileMap configMap = new ExeConfigurationFileMap();
-            configMap.ExeConfigFilename = _configFile;
-            cfg = ConfigurationManager.OpenMappedExeConfiguration(configMap, ConfigurationUserLevel.None);
-            Properties.Settings.Default.Reload();
-        }
-        internal string appsetting(string setting)
-        {
-            return cfg.AppSettings.Settings[setting] == null ? null : cfg.AppSettings.Settings[setting].Value;
+            ReloadConfig();
         }
 
-        internal void SetSetting(string setting, string value)
+        internal string appSetting(string setting)
+        {
+            return cfg.AppSettings.Settings[setting]?.Value;
+        }
+
+        internal void setSetting(string setting, string value)
         {
             try
             {
-                if (appsetting(setting) == null)
+                if (appSetting(setting) == null)
                 {
                     cfg.AppSettings.Settings.Add(setting, value);
                 }
@@ -65,14 +77,40 @@ namespace SQLiteWorkshop
                 }
                 cfg.Save(ConfigurationSaveMode.Minimal, true);
                 ConfigurationManager.RefreshSection("appSettings");
+                ConfigModified = false;
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Error Saving SQLite Workshop Configuration Data\r\n{0}", ex.Message));
+                // If another instance or external application has updated the 
+                // configuration file, reload it and retry the update.
+                if (ex.Message.StartsWith(ERR_CONFIGCHANGED))
+                {
+                    if (!ConfigModified)
+                    {
+                        ReloadConfig();
+                        ConfigModified = true;
+                        setSetting(setting, value);
+                        ConfigModified = false;
+                    }
+                    return;
+                }
+                ShowMsg(string.Format("Error Saving SQLite Workshop Configuration Data\r\n{0}", ex.Message));
             }
-            Properties.Settings.Default.Reload();
+            finally
+            {
+                Properties.Settings.Default.Reload();
+            }
             return;
 
+        }
+
+        private void ReloadConfig()
+        {
+            _configFile = string.Format(@"{0}\{1}\{2}", Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "SQLite_Workshop", CONFIGFILENAME);
+            ExeConfigurationFileMap configMap = new ExeConfigurationFileMap();
+            configMap.ExeConfigFilename = _configFile;
+            cfg = ConfigurationManager.OpenMappedExeConfiguration(configMap, ConfigurationUserLevel.None);
+            Properties.Settings.Default.Reload();
         }
     }
 }

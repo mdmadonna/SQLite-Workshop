@@ -1,4 +1,9 @@
-﻿using System;
+﻿/*********************************************************************************************
+ * 
+ * Ask User for the database password
+ * 
+ ********************************************************************************************/
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -9,11 +14,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.GUIManager;
+
 namespace SQLiteWorkshop
 {
     public partial class GetPassword : Form
     {
-
+        ToolTip toolTip;
         internal string Password;
         internal bool Cancelled;
 
@@ -21,22 +29,21 @@ namespace SQLiteWorkshop
         public GetPassword()
         {
             InitializeComponent();
-            txtPassword.Focus();
-            lblMsg.Text = string.Empty;
         }
 
         private void GetPassword_Load(object sender, EventArgs e)
         {
-            
+            lblError.Text = string.Empty;
+            toolTip = new ToolTip();
+            HouseKeeping(this, "Database Password");
             //In case Alt-F4 is pressed or Close Control box is clicked
             Cancelled = true;
             Password = string.Empty;
-
+            txtPassword.Focus();
         }
 
-        private void btnEnter_Click(object sender, EventArgs e)
+        private void btnSave_Click(object sender, EventArgs e)
         {
-
             if (!ValidatePassword()) return;
 
             Password = txtPassword.Text;
@@ -44,18 +51,27 @@ namespace SQLiteWorkshop
             this.Close();
         }
 
-        private void btnCancel_Click(object sender, EventArgs e)
+        private void btnClose_Click(object sender, EventArgs e)
         {
             Cancelled = true;
-            Password = string.Empty;
             this.Close();
+        }
+
+        private void GetPassword_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            FormClose(this);
+        }
+
+        private void btnViewPW_Click(object sender, EventArgs e)
+        {
+            txtPassword.PasswordChar = txtPassword.PasswordChar == '*' ? '\0' : '*';
         }
 
         private bool ValidatePassword()
         {
-            if (DataAccess.VerifyPassword(DBLocation, txtPassword.Text)) return true;
+            if (DataAccess.IsValidDB(DBLocation, txtPassword.Text, out _)) return true;
 
-            lblMsg.Text = "Invalid Password";
+            lblError.Text = "Invalid Password";
             txtPassword.Focus();
             return false;
         }

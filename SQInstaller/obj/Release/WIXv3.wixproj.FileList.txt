@@ -1,0 +1,6 @@
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\WIXv3\bin\Release\WIXv3.msi
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\WIXv3\bin\Release\WIXv3.wixpdb
+obj\Release\Product.wixobj
+obj\Release\WIXv3.wixproj.BindContentsFileListnull.txt
+obj\Release\WIXv3.wixproj.BindOutputsFileListnull.txt
+obj\Release\WIXv3.wixproj.BindBuiltOutputsFileListnull.txt

@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using CsvHelper;
+using static SQLiteWorkshop.Config;
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
@@ -16,9 +17,11 @@ namespace SQLiteWorkshop
         internal bool FirstRowHasHeadings { get; set; }
         internal char Delimiter { get; set; }
         internal string TextQualifier { get; set; }
+        internal Dictionary<string, ImportWizTextPropertySettings> ColumnSettings { get; set; }
 
-        internal DBTextManager(string fileName) : base(fileName)
+        internal DBTextManager(string fileName, string DBLoc) : base(fileName, DBLoc)
         {
+            ImportKey = CFG_IMPTEXT;
             FileName = fileName;
         }
 
@@ -55,34 +58,56 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Cannot Open File {0}\r\nError: {1}", FileName, ex.Message));
+                ShowMsg(string.Format("Cannot Open File {0}\r\nError: {1}", FileName, ex.Message));
                 return columns;
             }
 
-            string line = sr.ReadLine();
-            sr.Close();
+            CsvHelper.Configuration.Configuration csvConfig = BuildConfig();
+            CsvReader csv = new CsvReader(sr, csvConfig);
+            csv.Read();
 
-            string[] col = SplitLine(line, -1, Delimiter, TextQualifier);
-            int i;
-
-            for (i = 0; i < col.Length; i++)
+            try
             {
-                DBColumn dbc = new DBColumn();
-                columns.Add(FirstRowHasHeadings ? col[i] : string.Format("Column {0}", i.ToString()), dbc);
-            }
+                if (isBadRecord)
+                {
+                    ShowMsg(string.Format(ERR_BADRECORD, badRecords[0]));
+                }
+                if (FirstRowHasHeadings) { csv.ReadHeader(); }
 
+                int i;
+
+                for (i = 0; i < csv.Context.Record.Length; i++)
+                {
+                    DBColumn dbc = new DBColumn();
+                    string columnName = FirstRowHasHeadings ? csv.Context.HeaderRecord[i] : string.Format("Column {0}", i.ToString());
+                    //Make sure column name is unique
+                    int j = 0;
+                    while (columns.ContainsKey(columnName))
+                    {
+                        j++;
+                        columnName = string.Format("{0}_{1}", columnName, j);
+                    }
+                    columns.Add(columnName, dbc);
+                }
+            }
+            finally
+            {
+                sr.Close();
+            }
             return columns;
+
         }
 
         internal override bool Import(string SourceFile, string DestTable, Dictionary<string, DBColumn> columns)
         {
             bool rCode;
-            int rtnCode;
+            long rtnCode;
             string InsertSQL;
-            int recCount = 0;
+            long recCount = 0;
             int i;
             SQLiteTransaction sqlT = null;
-            StreamReader sr = null; ;
+            StreamReader sr = null;
+            CsvReader csv = null;
 
             SQLiteErrorCode returnCode;
 
@@ -92,10 +117,11 @@ namespace SQLiteWorkshop
             SQLiteConnection SQConn = new SQLiteConnection();
             SQLiteCommand SQCmd = new SQLiteCommand();
 
-            rCode = DataAccess.OpenDB(MainForm.mInstance.CurrentDB, ref SQConn, ref SQCmd, out returnCode);
-            if (!rCode || returnCode != SQLiteErrorCode.Ok)
+            rCode = DataAccess.OpenDB(TargetDB, ref SQConn, ref SQCmd);
+            if (!rCode)
             {
-                Common.ShowMsg(String.Format(Common.ERR_SQL, DataAccess.LastError, returnCode));
+                FireStatusEvent(ImportStatus.Failed, 0);
+                ShowMsg(String.Format(ERR_OPEN, DataAccess.LastError));
                 return false;
             }
 
@@ -105,7 +131,8 @@ namespace SQLiteWorkshop
                 rtnCode = DataAccess.ExecuteNonQuery(SQCmd, out returnCode);
                 if (rtnCode < 0 || returnCode != SQLiteErrorCode.Ok)
                 {
-                    Common.ShowMsg(String.Format(Common.ERR_SQL, DataAccess.LastError, returnCode));
+                    FireStatusEvent(ImportStatus.Failed, 0);
+                    ShowMsg(String.Format(ERR_SQL, DataAccess.LastError, returnCode));
                     return false;
                 }
 
@@ -127,27 +154,45 @@ namespace SQLiteWorkshop
                 }
 
                 sr = new StreamReader(SourceFile);
-                string line;
+                //string line;
+                FireStatusEvent(ImportStatus.Starting, 0);
 
-                if (FirstRowHasHeadings) sr.ReadLine();
-                while ((line = sr.ReadLine()) != null)
+                CsvHelper.Configuration.Configuration csvConfig = BuildConfig();
+                csv = new CsvReader(sr,csvConfig);
+
+                if (FirstRowHasHeadings) { csv.Read(); csv.ReadHeader(); }
+                while (csv.Read())
                 {
-                    string[] fields = SplitLine(line, columns.Count, Delimiter, TextQualifier);
+                    if (isBadRecord) throw new Exception(string.Format(ERR_BADRECORD, badRecords[0]));
+
                     SQCmd.Parameters.Clear();
-                    for (i = 0; i < fields.Length; i++)
+                    for (i = 0; i < columns.Count; i++)
                     {
-                        if (bInclude[i])
+                        if (i < csv.Context.Record.Length && bInclude[i])
                         {
-                            if (columns[fldName[i]].Type != "blob")
-                            { SQCmd.Parameters.AddWithValue(String.Empty, fields[i]); }
-                            else
-                            { SQCmd.Parameters.Add(String.Empty, DbType.Binary).Value = FormatData(fields[i]); }
+                            switch (columns[fldName[i]].Type.ToLower())
+                            {
+                                case "blob":
+                                    SQCmd.Parameters.Add(String.Empty, DbType.Binary).Value = FormatData(csv.GetField(i));
+                                    break;
+                                case "date":
+                                case "datetime":
+                                    if (DateTime.TryParse(csv.GetField(i), out DateTime WrkDate))
+                                    { SQCmd.Parameters.AddWithValue(String.Empty, WrkDate.ToString("o")); }
+                                    else
+                                    { SQCmd.Parameters.AddWithValue(String.Empty, csv.GetField(i)); }
+                                    break;
+                                default:
+                                    SQCmd.Parameters.AddWithValue(String.Empty, csv.GetField(i));
+                                    break;
+                            }
                         }
                     }
                     SQCmd.ExecuteNonQuery();
                     recCount++;
-                    if (recCount % 100 == 0) FireStatusEvent(ImportStatus.InProgress, recCount);
+                    if (recCount % 100 == 0) FireStatusEvent(ImportStatus.InProgress, recCount, DestTable);
                 }
+               
                 sr.Close();
                 sqlT.Commit();
             }
@@ -155,14 +200,22 @@ namespace SQLiteWorkshop
             {
                 sqlT.Rollback();
                 try { if (sr != null) sr.Close(); } catch { }
-                Common.ShowMsg(string.Format(Common.ERR_SQL, ex.Message, SQLiteErrorCode.Ok));
+                FireStatusEvent(ImportStatus.Failed, 0);
+                if (SQCmd.Connection.ExtendedResultCode() != SQLiteErrorCode.Ok)
+                {
+                    ShowMsg(string.Format(ERR_SQL, ex.Message, SQCmd.Connection.ExtendedResultCode().ToString()));
+                }
+                else
+                {
+                    ShowMsg(ex.Message);
+                }
                 return false;
             }
             finally
             {
                 DataAccess.CloseDB(SQConn);
             }
-            MainForm.mInstance.AddTable(DestTable);
+            MainForm.mInstance.AddTable(DestTable, TargetDB);
             try { FireStatusEvent(ImportStatus.Complete, recCount); } catch { }
             return true;
         }
@@ -180,97 +233,93 @@ namespace SQLiteWorkshop
             return b1;
         }
 
-        internal string[] SplitLine(string line, int count, char delimiter, string textQualifier)
+        internal bool isBadRecord { get; set; }
+        internal List<string> badRecords = new List<string>();
+
+        internal CsvHelper.Configuration.Configuration BuildConfig()
         {
-            string[] fields = count > 0 ? new string[count] : new string[999];
-            string[] tmpFields;
-
-            // if no delimiter is present, just split and return a max of 'count' fields
-            if (string.IsNullOrWhiteSpace(textQualifier))
+            CsvHelper.Configuration.Configuration ch = new CsvHelper.Configuration.Configuration
             {
-                tmpFields = line.Split(delimiter);
-                if (count < 0) count = tmpFields.Length;
-                if (tmpFields.Length == count) return tmpFields;
-                Array.Copy(tmpFields, fields, tmpFields.Length > count ? count : tmpFields.Length);
-                return fields;
-            }
+                Quote = string.IsNullOrWhiteSpace(TextQualifier) ? '"' : TextQualifier.ToCharArray()[0],
+                Delimiter = Delimiter.ToString(),
+                HasHeaderRecord = FirstRowHasHeadings
+            };
+            isBadRecord = false;
+            ch.BadDataFound = context => {
+                isBadRecord = true;
+                badRecords.Add(context.RawRecord);
+            };
+            ch.MissingFieldFound = null;
 
-            // Otherwise pull fields out 1 at a time
-            int fieldCount = 0;
-            int curpos = 0;
-            bool tqFnd = false;
-            string szDelimiter = delimiter.ToString();
-            StringBuilder sb = new StringBuilder();
-
-            while (curpos < line.Length)
-            {
-                string curchar = line.Substring(curpos, 1);
-                if (tqFnd)                                                      // Are we processing Qualified Text?
-                {
-                    if (curchar != textQualifier)                               // if we haven't encountered a textqualifier, copy char to string and move on
-                    {
-                        sb.Append(curchar);
-                    }
-                    else
-                    if (curpos == line.Length) break;                           // If we found ending qualifier and are at end off line, we're done
-                    else
-                    if (line.Substring(curpos + 1, 1) == textQualifier)         // if we found double text qualifier, copy char and move on but skip double
-                    {
-                        sb.Append(curchar);
-                        curpos++;
-                    }
-                    else                                                        // otherwise we're at end of field
-                    {
-                        fields[fieldCount] = sb.ToString();                     // move field to results array
-                        fieldCount++;                                           // increment fieldcounter
-                        sb.Clear();                                             // clear stringbuilder
-                        tqFnd = false;                                          // mark end of qualified field
-                        //let's look for the delimiter so we can move to the next field
-                        while (curpos < line.Length && line.Substring(curpos + 1, 1) != szDelimiter)
-                        {
-                            curpos++;                                           // move past this character
-                            if (line.Substring(curpos, 1) != " ")               // if it's non blank, we have an improperly quoted field
-                            {
-                                return null;                                    // Just exit and return nothing
-                            }
-                        }
-                    }
-                }
-                else
-                if (curchar == textQualifier) { tqFnd = true; }                 // If we found a qualifier. indicate qualified mode and continue
-                else
-                if (curchar == szDelimiter || curpos == line.Length - 1)         // if we found a delimiter, we're at end of field
-                {
-                    fields[fieldCount] = sb.ToString();
-                    fieldCount++;
-                    sb.Clear();
-                }
-                else
-                {
-                    sb.Append(curchar);
-                }
-
-                curpos++;
-                if (!(fieldCount < fields.Length)) break;
-            }
-
-            if (count < 0)
-            {
-                tmpFields = new string[fieldCount];
-                Array.Copy(fields, tmpFields, fieldCount);
-                return tmpFields;
-            }
-            return fields;
+            return ch;
         }
-
+       
         /// <summary>
-        /// Should never be called
+        /// Setup preview data
         /// </summary>
-        /// <param name="TableName"></param>
+        /// <param name="TableName">Not used</param>
         /// <returns></returns>
         internal override DataTable PreviewData(string TableName)
         {
-            throw new NotImplementedException();
+            StreamReader sr;
+            DataTable dt;
+
+            try
+            {
+                sr = new StreamReader(FileName);
+            }
+            catch (Exception ex)
+            {
+                ShowMsg(string.Format("Cannot Open File {0}\r\nError: {1}", FileName, ex.Message));
+                return null;
+            }
+
+            dt = new DataTable();
+            foreach (var cs in ColumnSettings)
+            {
+                DataColumn dc = new DataColumn(cs.Key)
+                {
+                    ColumnName = cs.Value.Name
+                };
+                dt.Columns.Add(dc);
+            }
+
+            int count = 0;
+
+            CsvHelper.Configuration.Configuration csvConfig = BuildConfig();
+            CsvReader csv = new CsvReader(sr, csvConfig);
+
+            int colcount = 0;
+            if (FirstRowHasHeadings) { csv.Read(); csv.ReadHeader(); }
+            try
+            {
+                while (csv.Read())
+                {
+                    if (isBadRecord)
+                    {
+                        ShowMsg(string.Format(ERR_BADRECORD, badRecords[0]));
+                        break;
+                    }
+
+                    if (colcount == 0) colcount = csv.Context.Record.Length;
+                    string[] cols = new string[csv.Context.Record.Length];
+                    for (int i = 0; i < cols.Length; i++)
+                    {
+                        cols[i] = csv.GetField(i);
+                    }
+                    dt.Rows.Add(cols);
+                    count++;
+                    if (count >= 100) break;
+                }
+            }
+            catch (Exception ex)
+            {
+                try { if (sr != null) sr.Close(); } catch { }
+                string msg = ex.Message;
+                try { msg += csv.Context.RawRecord; } catch { }
+                ShowMsg(msg);
+            }
+            return dt;
         }
     }
 }

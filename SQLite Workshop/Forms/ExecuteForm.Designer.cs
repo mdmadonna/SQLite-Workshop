@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ExecuteForm));
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnExecute = new System.Windows.Forms.Button();
             this.txtMessage = new System.Windows.Forms.TextBox();
@@ -38,17 +37,10 @@
             this.toolStripExecutionStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripTimerStatus = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelTop = new System.Windows.Forms.Panel();
-            this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.lblFormHeading = new System.Windows.Forms.Label();
-            this.panelControl = new System.Windows.Forms.Panel();
-            this.pbClose = new System.Windows.Forms.PictureBox();
             this.panelFill = new System.Windows.Forms.Panel();
+            this.btnGetFile = new System.Windows.Forms.Button();
             this.lblError = new System.Windows.Forms.Label();
             this.statusStrip.SuspendLayout();
-            this.panelTop.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
-            this.panelControl.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbClose)).BeginInit();
             this.panelFill.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -57,7 +49,7 @@
             this.btnCancel.Location = new System.Drawing.Point(319, 204);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
-            this.btnCancel.TabIndex = 0;
+            this.btnCancel.TabIndex = 4;
             this.btnCancel.Text = "Cancel";
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
@@ -67,7 +59,7 @@
             this.btnExecute.Location = new System.Drawing.Point(218, 204);
             this.btnExecute.Name = "btnExecute";
             this.btnExecute.Size = new System.Drawing.Size(75, 23);
-            this.btnExecute.TabIndex = 1;
+            this.btnExecute.TabIndex = 3;
             this.btnExecute.Text = "Yes";
             this.btnExecute.UseVisualStyleBackColor = true;
             this.btnExecute.Click += new System.EventHandler(this.btnExecute_Click);
@@ -96,7 +88,7 @@
             this.txtInfo.Location = new System.Drawing.Point(85, 164);
             this.txtInfo.Name = "txtInfo";
             this.txtInfo.Size = new System.Drawing.Size(309, 20);
-            this.txtInfo.TabIndex = 6;
+            this.txtInfo.TabIndex = 1;
             // 
             // statusStrip
             // 
@@ -127,62 +119,16 @@
             // panelTop
             // 
             this.panelTop.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.panelTop.Controls.Add(this.pictureBox1);
-            this.panelTop.Controls.Add(this.lblFormHeading);
-            this.panelTop.Controls.Add(this.panelControl);
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Location = new System.Drawing.Point(1, 1);
             this.panelTop.Name = "panelTop";
             this.panelTop.Size = new System.Drawing.Size(409, 28);
             this.panelTop.TabIndex = 8;
-            this.panelTop.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MainForm_MouseDown);
-            // 
-            // pictureBox1
-            // 
-            this.pictureBox1.Image = global::SQLiteWorkshop.Properties.Resources.MainSmall;
-            this.pictureBox1.Location = new System.Drawing.Point(3, 3);
-            this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(24, 24);
-            this.pictureBox1.TabIndex = 2;
-            this.pictureBox1.TabStop = false;
-            // 
-            // lblFormHeading
-            // 
-            this.lblFormHeading.AutoSize = true;
-            this.lblFormHeading.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblFormHeading.ForeColor = System.Drawing.Color.DimGray;
-            this.lblFormHeading.Location = new System.Drawing.Point(29, 7);
-            this.lblFormHeading.Name = "lblFormHeading";
-            this.lblFormHeading.Size = new System.Drawing.Size(119, 16);
-            this.lblFormHeading.TabIndex = 1;
-            this.lblFormHeading.Text = "lblFormHeading";
-            // 
-            // panelControl
-            // 
-            this.panelControl.Controls.Add(this.pbClose);
-            this.panelControl.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panelControl.Location = new System.Drawing.Point(352, 0);
-            this.panelControl.Name = "panelControl";
-            this.panelControl.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
-            this.panelControl.Size = new System.Drawing.Size(57, 28);
-            this.panelControl.TabIndex = 0;
-            // 
-            // pbClose
-            // 
-            this.pbClose.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pbClose.Image = global::SQLiteWorkshop.Properties.Resources.Close;
-            this.pbClose.Location = new System.Drawing.Point(23, 0);
-            this.pbClose.Name = "pbClose";
-            this.pbClose.Size = new System.Drawing.Size(24, 28);
-            this.pbClose.TabIndex = 0;
-            this.pbClose.TabStop = false;
-            this.pbClose.Click += new System.EventHandler(this.pbClose_Click);
-            this.pbClose.MouseEnter += new System.EventHandler(this.ControlBox_MouseEnter);
-            this.pbClose.MouseLeave += new System.EventHandler(this.ControlBox_MouseLeave);
             // 
             // panelFill
             // 
             this.panelFill.BackColor = System.Drawing.SystemColors.Window;
+            this.panelFill.Controls.Add(this.btnGetFile);
             this.panelFill.Controls.Add(this.lblError);
             this.panelFill.Controls.Add(this.txtMessage);
             this.panelFill.Controls.Add(this.btnCancel);
@@ -194,6 +140,16 @@
             this.panelFill.Name = "panelFill";
             this.panelFill.Size = new System.Drawing.Size(409, 242);
             this.panelFill.TabIndex = 9;
+            // 
+            // btnGetFile
+            // 
+            this.btnGetFile.Location = new System.Drawing.Point(367, 162);
+            this.btnGetFile.Name = "btnGetFile";
+            this.btnGetFile.Size = new System.Drawing.Size(27, 23);
+            this.btnGetFile.TabIndex = 2;
+            this.btnGetFile.Text = "...";
+            this.btnGetFile.UseVisualStyleBackColor = true;
+            this.btnGetFile.Click += new System.EventHandler(this.btnGetFile_Click);
             // 
             // lblError
             // 
@@ -215,18 +171,13 @@
             this.Controls.Add(this.panelTop);
             this.Controls.Add(this.statusStrip);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ExecuteForm";
             this.Padding = new System.Windows.Forms.Padding(1);
             this.Text = "ExecuteForm";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ExecuteForm_FormClosed);
             this.Load += new System.EventHandler(this.ExecuteForm_Load);
             this.statusStrip.ResumeLayout(false);
             this.statusStrip.PerformLayout();
-            this.panelTop.ResumeLayout(false);
-            this.panelTop.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
-            this.panelControl.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pbClose)).EndInit();
             this.panelFill.ResumeLayout(false);
             this.panelFill.PerformLayout();
             this.ResumeLayout(false);
@@ -245,11 +196,8 @@
         private System.Windows.Forms.ToolStripStatusLabel toolStripExecutionStatus;
         private System.Windows.Forms.ToolStripStatusLabel toolStripTimerStatus;
         private System.Windows.Forms.Panel panelTop;
-        private System.Windows.Forms.Panel panelControl;
-        private System.Windows.Forms.PictureBox pbClose;
         private System.Windows.Forms.Panel panelFill;
-        private System.Windows.Forms.Label lblFormHeading;
         private System.Windows.Forms.Label lblError;
-        private System.Windows.Forms.PictureBox pictureBox1;
+        private System.Windows.Forms.Button btnGetFile;
     }
 }

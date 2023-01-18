@@ -28,31 +28,26 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImportWiz));
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusMsg = new System.Windows.Forms.ToolStripStatusLabel();
             this.panelTop = new System.Windows.Forms.Panel();
-            this.lblFormHeading = new System.Windows.Forms.Label();
-            this.pbIcon = new System.Windows.Forms.PictureBox();
-            this.panelControls = new System.Windows.Forms.Panel();
-            this.pbClose = new System.Windows.Forms.PictureBox();
             this.panelBottom = new System.Windows.Forms.Panel();
             this.btnPrevious = new System.Windows.Forms.Button();
             this.btnNext = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
             this.panelWizMain = new System.Windows.Forms.Panel();
             this.panelWizMainText = new System.Windows.Forms.Panel();
+            this.cmbFileName = new System.Windows.Forms.ComboBox();
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.lblPassword = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.txtFileName = new System.Windows.Forms.TextBox();
             this.btnFileSearch = new System.Windows.Forms.Button();
             this.panelWizMainMySql = new System.Windows.Forms.Panel();
             this.comboBoxMySqlDatabaseList = new System.Windows.Forms.ComboBox();
             this.txtMySqlPassword = new System.Windows.Forms.TextBox();
             this.txtMySqlUserName = new System.Windows.Forms.TextBox();
-            this.txtMySqlServer = new System.Windows.Forms.TextBox();
+            this.cmbMySqlServer = new System.Windows.Forms.ComboBox();
             this.label21 = new System.Windows.Forms.Label();
             this.label20 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
@@ -74,7 +69,7 @@
             this.label12 = new System.Windows.Forms.Label();
             this.radioSqlServerAuth = new System.Windows.Forms.RadioButton();
             this.radioWinAuth = new System.Windows.Forms.RadioButton();
-            this.txtServer = new System.Windows.Forms.TextBox();
+            this.cmbServer = new System.Windows.Forms.ComboBox();
             this.label11 = new System.Windows.Forms.Label();
             this.panelWizMainTop = new System.Windows.Forms.Panel();
             this.label1 = new System.Windows.Forms.Label();
@@ -83,6 +78,8 @@
             this.panelWizText = new System.Windows.Forms.Panel();
             this.tabText = new System.Windows.Forms.TabControl();
             this.tabTextGeneral = new System.Windows.Forms.TabPage();
+            this.lblWrkSheet = new System.Windows.Forms.Label();
+            this.cmbWrkSheet = new System.Windows.Forms.ComboBox();
             this.cmbDestinationTable = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
             this.groupBoxDelimiter = new System.Windows.Forms.GroupBox();
@@ -93,7 +90,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.radioButtonPipe = new System.Windows.Forms.RadioButton();
             this.radioButtonSemiColon = new System.Windows.Forms.RadioButton();
-            this.label6 = new System.Windows.Forms.Label();
+            this.lblTextQualifier = new System.Windows.Forms.Label();
             this.checkBoxFirstRowContainsHeadings = new System.Windows.Forms.CheckBox();
             this.comboBoxTextQualifier = new System.Windows.Forms.ComboBox();
             this.tabTextColumns = new System.Windows.Forms.TabPage();
@@ -120,11 +117,19 @@
             this.panelWizDBTop = new System.Windows.Forms.Panel();
             this.label9 = new System.Windows.Forms.Label();
             this.lblDBName = new System.Windows.Forms.Label();
+            this.panelWizStatus = new System.Windows.Forms.Panel();
+            this.txtStatusMsg = new System.Windows.Forms.TextBox();
+            this.panelWizSummary = new System.Windows.Forms.Panel();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label22 = new System.Windows.Forms.Label();
+            this.lblSource = new System.Windows.Forms.Label();
+            this.lblDest = new System.Windows.Forms.Label();
+            this.pnlImpResultsTxt = new System.Windows.Forms.Panel();
+            this.pnlImpResultsDB = new System.Windows.Forms.Panel();
+            this.lvImpResults = new System.Windows.Forms.ListView();
+            this.btnShowErrors = new System.Windows.Forms.Button();
             this.statusStrip1.SuspendLayout();
-            this.panelTop.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).BeginInit();
-            this.panelControls.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbClose)).BeginInit();
             this.panelBottom.SuspendLayout();
             this.panelWizMain.SuspendLayout();
             this.panelWizMainText.SuspendLayout();
@@ -147,6 +152,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvTables)).BeginInit();
             this.panelWizDBMid.SuspendLayout();
             this.panelWizDBTop.SuspendLayout();
+            this.panelWizStatus.SuspendLayout();
+            this.panelWizSummary.SuspendLayout();
+            this.pnlImpResultsDB.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -154,9 +162,9 @@
             this.statusStrip1.BackColor = System.Drawing.SystemColors.InactiveCaption;
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusMsg});
-            this.statusStrip1.Location = new System.Drawing.Point(1, 369);
+            this.statusStrip1.Location = new System.Drawing.Point(1, 550);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(649, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(1231, 22);
             this.statusStrip1.TabIndex = 0;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -169,61 +177,11 @@
             // panelTop
             // 
             this.panelTop.BackColor = System.Drawing.SystemColors.InactiveCaption;
-            this.panelTop.Controls.Add(this.lblFormHeading);
-            this.panelTop.Controls.Add(this.pbIcon);
-            this.panelTop.Controls.Add(this.panelControls);
             this.panelTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelTop.Location = new System.Drawing.Point(1, 1);
             this.panelTop.Name = "panelTop";
-            this.panelTop.Size = new System.Drawing.Size(649, 28);
+            this.panelTop.Size = new System.Drawing.Size(1231, 28);
             this.panelTop.TabIndex = 1;
-            this.panelTop.MouseDown += new System.Windows.Forms.MouseEventHandler(this.MainForm_MouseDown);
-            // 
-            // lblFormHeading
-            // 
-            this.lblFormHeading.AutoSize = true;
-            this.lblFormHeading.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblFormHeading.ForeColor = System.Drawing.Color.DimGray;
-            this.lblFormHeading.Location = new System.Drawing.Point(29, 7);
-            this.lblFormHeading.Name = "lblFormHeading";
-            this.lblFormHeading.Size = new System.Drawing.Size(121, 17);
-            this.lblFormHeading.TabIndex = 5;
-            this.lblFormHeading.Text = "lblFormHeading";
-            // 
-            // pbIcon
-            // 
-            this.pbIcon.Image = ((System.Drawing.Image)(resources.GetObject("pbIcon.Image")));
-            this.pbIcon.Location = new System.Drawing.Point(3, 3);
-            this.pbIcon.Name = "pbIcon";
-            this.pbIcon.Size = new System.Drawing.Size(24, 24);
-            this.pbIcon.TabIndex = 4;
-            this.pbIcon.TabStop = false;
-            // 
-            // panelControls
-            // 
-            this.panelControls.Controls.Add(this.pbClose);
-            this.panelControls.Dock = System.Windows.Forms.DockStyle.Right;
-            this.panelControls.Location = new System.Drawing.Point(526, 0);
-            this.panelControls.Name = "panelControls";
-            this.panelControls.Padding = new System.Windows.Forms.Padding(10, 0, 10, 0);
-            this.panelControls.Size = new System.Drawing.Size(123, 28);
-            this.panelControls.TabIndex = 3;
-            // 
-            // pbClose
-            // 
-            this.pbClose.Dock = System.Windows.Forms.DockStyle.Right;
-            this.pbClose.Image = ((System.Drawing.Image)(resources.GetObject("pbClose.Image")));
-            this.pbClose.Location = new System.Drawing.Point(89, 0);
-            this.pbClose.Margin = new System.Windows.Forms.Padding(0);
-            this.pbClose.Name = "pbClose";
-            this.pbClose.Size = new System.Drawing.Size(24, 28);
-            this.pbClose.TabIndex = 11;
-            this.pbClose.TabStop = false;
-            this.pbClose.Click += new System.EventHandler(this.pbClose_Click);
-            this.pbClose.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ControlBox_MouseDown);
-            this.pbClose.MouseEnter += new System.EventHandler(this.ControlBox_MouseEnter);
-            this.pbClose.MouseLeave += new System.EventHandler(this.ControlBox_MouseLeave);
-            this.pbClose.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ControlBox_MouseUp);
             // 
             // panelBottom
             // 
@@ -232,9 +190,9 @@
             this.panelBottom.Controls.Add(this.btnNext);
             this.panelBottom.Controls.Add(this.btnClose);
             this.panelBottom.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panelBottom.Location = new System.Drawing.Point(1, 330);
+            this.panelBottom.Location = new System.Drawing.Point(1, 511);
             this.panelBottom.Name = "panelBottom";
-            this.panelBottom.Size = new System.Drawing.Size(649, 39);
+            this.panelBottom.Size = new System.Drawing.Size(1231, 39);
             this.panelBottom.TabIndex = 2;
             // 
             // btnPrevious
@@ -275,23 +233,31 @@
             this.panelWizMain.Controls.Add(this.panelWizMainODBC);
             this.panelWizMain.Controls.Add(this.panelWizMainDB);
             this.panelWizMain.Controls.Add(this.panelWizMainTop);
-            this.panelWizMain.Location = new System.Drawing.Point(1, 94);
+            this.panelWizMain.Location = new System.Drawing.Point(548, 37);
             this.panelWizMain.Name = "panelWizMain";
-            this.panelWizMain.Size = new System.Drawing.Size(649, 74);
+            this.panelWizMain.Size = new System.Drawing.Size(649, 289);
             this.panelWizMain.TabIndex = 3;
             // 
             // panelWizMainText
             // 
+            this.panelWizMainText.Controls.Add(this.cmbFileName);
             this.panelWizMainText.Controls.Add(this.txtPassword);
             this.panelWizMainText.Controls.Add(this.lblPassword);
             this.panelWizMainText.Controls.Add(this.label4);
-            this.panelWizMainText.Controls.Add(this.txtFileName);
             this.panelWizMainText.Controls.Add(this.btnFileSearch);
-            this.panelWizMainText.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panelWizMainText.Location = new System.Drawing.Point(0, 100);
+            this.panelWizMainText.Location = new System.Drawing.Point(0, 0);
             this.panelWizMainText.Name = "panelWizMainText";
-            this.panelWizMainText.Size = new System.Drawing.Size(649, 0);
+            this.panelWizMainText.Size = new System.Drawing.Size(649, 74);
             this.panelWizMainText.TabIndex = 17;
+            // 
+            // cmbFileName
+            // 
+            this.cmbFileName.Location = new System.Drawing.Point(124, 29);
+            this.cmbFileName.Name = "cmbFileName";
+            this.cmbFileName.Size = new System.Drawing.Size(365, 21);
+            this.cmbFileName.TabIndex = 12;
+            this.cmbFileName.SelectedIndexChanged += new System.EventHandler(this.cmbFileName_SelectedIndexChanged);
+            this.cmbFileName.Leave += new System.EventHandler(this.cmbFileName_Leave);
             // 
             // txtPassword
             // 
@@ -319,13 +285,6 @@
             this.label4.TabIndex = 11;
             this.label4.Text = "File Name:";
             // 
-            // txtFileName
-            // 
-            this.txtFileName.Location = new System.Drawing.Point(124, 29);
-            this.txtFileName.Name = "txtFileName";
-            this.txtFileName.Size = new System.Drawing.Size(365, 20);
-            this.txtFileName.TabIndex = 12;
-            // 
             // btnFileSearch
             // 
             this.btnFileSearch.Location = new System.Drawing.Point(508, 27);
@@ -341,7 +300,7 @@
             this.panelWizMainMySql.Controls.Add(this.comboBoxMySqlDatabaseList);
             this.panelWizMainMySql.Controls.Add(this.txtMySqlPassword);
             this.panelWizMainMySql.Controls.Add(this.txtMySqlUserName);
-            this.panelWizMainMySql.Controls.Add(this.txtMySqlServer);
+            this.panelWizMainMySql.Controls.Add(this.cmbMySqlServer);
             this.panelWizMainMySql.Controls.Add(this.label21);
             this.panelWizMainMySql.Controls.Add(this.label20);
             this.panelWizMainMySql.Controls.Add(this.label19);
@@ -376,12 +335,14 @@
             this.txtMySqlUserName.Size = new System.Drawing.Size(295, 20);
             this.txtMySqlUserName.TabIndex = 5;
             // 
-            // txtMySqlServer
+            // cmbMySqlServer
             // 
-            this.txtMySqlServer.Location = new System.Drawing.Point(124, 22);
-            this.txtMySqlServer.Name = "txtMySqlServer";
-            this.txtMySqlServer.Size = new System.Drawing.Size(339, 20);
-            this.txtMySqlServer.TabIndex = 4;
+            this.cmbMySqlServer.Location = new System.Drawing.Point(124, 22);
+            this.cmbMySqlServer.Name = "cmbMySqlServer";
+            this.cmbMySqlServer.Size = new System.Drawing.Size(339, 21);
+            this.cmbMySqlServer.TabIndex = 4;
+            this.cmbMySqlServer.SelectedIndexChanged += new System.EventHandler(this.cmbMySqlServer_SelectedIndexChanged);
+            this.cmbMySqlServer.Leave += new System.EventHandler(this.cmbMySqlServer_Leave);
             // 
             // label21
             // 
@@ -427,9 +388,9 @@
             this.panelWizMainODBC.Controls.Add(this.label16);
             this.panelWizMainODBC.Controls.Add(this.comboBoxOdbcDataSource);
             this.panelWizMainODBC.Controls.Add(this.label15);
-            this.panelWizMainODBC.Location = new System.Drawing.Point(451, 192);
+            this.panelWizMainODBC.Location = new System.Drawing.Point(46, 127);
             this.panelWizMainODBC.Name = "panelWizMainODBC";
-            this.panelWizMainODBC.Size = new System.Drawing.Size(198, 109);
+            this.panelWizMainODBC.Size = new System.Drawing.Size(244, 122);
             this.panelWizMainODBC.TabIndex = 19;
             // 
             // txtOdbcPassword
@@ -472,6 +433,8 @@
             this.comboBoxOdbcDataSource.Name = "comboBoxOdbcDataSource";
             this.comboBoxOdbcDataSource.Size = new System.Drawing.Size(322, 21);
             this.comboBoxOdbcDataSource.TabIndex = 1;
+            this.comboBoxOdbcDataSource.SelectedIndexChanged += new System.EventHandler(this.comboBoxOdbcDataSource_SelectedIndexChanged);
+            this.comboBoxOdbcDataSource.Leave += new System.EventHandler(this.comboBoxOdbcDataSource_Leave);
             // 
             // label15
             // 
@@ -487,7 +450,7 @@
             this.panelWizMainDB.Controls.Add(this.comboBoxDatabaseList);
             this.panelWizMainDB.Controls.Add(this.label14);
             this.panelWizMainDB.Controls.Add(this.groupBox1);
-            this.panelWizMainDB.Controls.Add(this.txtServer);
+            this.panelWizMainDB.Controls.Add(this.cmbServer);
             this.panelWizMainDB.Controls.Add(this.label11);
             this.panelWizMainDB.Location = new System.Drawing.Point(172, 138);
             this.panelWizMainDB.Name = "panelWizMainDB";
@@ -580,18 +543,20 @@
             this.radioWinAuth.Checked = true;
             this.radioWinAuth.Location = new System.Drawing.Point(25, 19);
             this.radioWinAuth.Name = "radioWinAuth";
-            this.radioWinAuth.Size = new System.Drawing.Size(134, 17);
+            this.radioWinAuth.Size = new System.Drawing.Size(140, 17);
             this.radioWinAuth.TabIndex = 0;
             this.radioWinAuth.TabStop = true;
-            this.radioWinAuth.Text = "Windows Authentiction";
+            this.radioWinAuth.Text = "Windows Authentication";
             this.radioWinAuth.UseVisualStyleBackColor = true;
             // 
-            // txtServer
+            // cmbServer
             // 
-            this.txtServer.Location = new System.Drawing.Point(124, 18);
-            this.txtServer.Name = "txtServer";
-            this.txtServer.Size = new System.Drawing.Size(195, 20);
-            this.txtServer.TabIndex = 1;
+            this.cmbServer.Location = new System.Drawing.Point(124, 18);
+            this.cmbServer.Name = "cmbServer";
+            this.cmbServer.Size = new System.Drawing.Size(195, 21);
+            this.cmbServer.TabIndex = 1;
+            this.cmbServer.SelectedIndexChanged += new System.EventHandler(this.cmbServer_SelectedIndexChanged);
+            this.cmbServer.Leave += new System.EventHandler(this.cmbServer_Leave);
             // 
             // label11
             // 
@@ -677,10 +642,12 @@
             // 
             // tabTextGeneral
             // 
+            this.tabTextGeneral.Controls.Add(this.lblWrkSheet);
+            this.tabTextGeneral.Controls.Add(this.cmbWrkSheet);
             this.tabTextGeneral.Controls.Add(this.cmbDestinationTable);
             this.tabTextGeneral.Controls.Add(this.label3);
             this.tabTextGeneral.Controls.Add(this.groupBoxDelimiter);
-            this.tabTextGeneral.Controls.Add(this.label6);
+            this.tabTextGeneral.Controls.Add(this.lblTextQualifier);
             this.tabTextGeneral.Controls.Add(this.checkBoxFirstRowContainsHeadings);
             this.tabTextGeneral.Controls.Add(this.comboBoxTextQualifier);
             this.tabTextGeneral.Location = new System.Drawing.Point(4, 22);
@@ -690,6 +657,24 @@
             this.tabTextGeneral.TabIndex = 0;
             this.tabTextGeneral.Text = "General";
             this.tabTextGeneral.UseVisualStyleBackColor = true;
+            // 
+            // lblWrkSheet
+            // 
+            this.lblWrkSheet.AutoSize = true;
+            this.lblWrkSheet.Location = new System.Drawing.Point(48, 179);
+            this.lblWrkSheet.Name = "lblWrkSheet";
+            this.lblWrkSheet.Size = new System.Drawing.Size(67, 13);
+            this.lblWrkSheet.TabIndex = 14;
+            this.lblWrkSheet.Text = "Work Sheet:";
+            // 
+            // cmbWrkSheet
+            // 
+            this.cmbWrkSheet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbWrkSheet.FormattingEnabled = true;
+            this.cmbWrkSheet.Location = new System.Drawing.Point(129, 176);
+            this.cmbWrkSheet.Name = "cmbWrkSheet";
+            this.cmbWrkSheet.Size = new System.Drawing.Size(195, 21);
+            this.cmbWrkSheet.TabIndex = 13;
             // 
             // cmbDestinationTable
             // 
@@ -799,14 +784,14 @@
             this.radioButtonSemiColon.UseVisualStyleBackColor = true;
             this.radioButtonSemiColon.Click += new System.EventHandler(this.radioButton_Click);
             // 
-            // label6
+            // lblTextQualifier
             // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(391, 102);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(72, 13);
-            this.label6.TabIndex = 7;
-            this.label6.Text = "Text Qualifier:";
+            this.lblTextQualifier.AutoSize = true;
+            this.lblTextQualifier.Location = new System.Drawing.Point(391, 102);
+            this.lblTextQualifier.Name = "lblTextQualifier";
+            this.lblTextQualifier.Size = new System.Drawing.Size(72, 13);
+            this.lblTextQualifier.TabIndex = 7;
+            this.lblTextQualifier.Text = "Text Qualifier:";
             // 
             // checkBoxFirstRowContainsHeadings
             // 
@@ -963,10 +948,9 @@
             this.panelWizDB.Controls.Add(this.dgvTables);
             this.panelWizDB.Controls.Add(this.panelWizDBMid);
             this.panelWizDB.Controls.Add(this.panelWizDBTop);
-            this.panelWizDB.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelWizDB.Location = new System.Drawing.Point(1, 29);
             this.panelWizDB.Name = "panelWizDB";
-            this.panelWizDB.Size = new System.Drawing.Size(649, 301);
+            this.panelWizDB.Size = new System.Drawing.Size(445, 301);
             this.panelWizDB.TabIndex = 5;
             // 
             // dgvTables
@@ -981,10 +965,9 @@
             this.Destination,
             this.Map,
             this.Preview});
-            this.dgvTables.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvTables.Location = new System.Drawing.Point(0, 72);
             this.dgvTables.Name = "dgvTables";
-            this.dgvTables.Size = new System.Drawing.Size(649, 229);
+            this.dgvTables.Size = new System.Drawing.Size(306, 229);
             this.dgvTables.TabIndex = 4;
             this.dgvTables.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvTables_CellContentClick);
             this.dgvTables.CellMouseUp += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvTables_CellMouseUp);
@@ -1033,7 +1016,7 @@
             this.panelWizDBMid.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelWizDBMid.Location = new System.Drawing.Point(0, 46);
             this.panelWizDBMid.Name = "panelWizDBMid";
-            this.panelWizDBMid.Size = new System.Drawing.Size(649, 26);
+            this.panelWizDBMid.Size = new System.Drawing.Size(445, 26);
             this.panelWizDBMid.TabIndex = 5;
             // 
             // label10
@@ -1054,7 +1037,7 @@
             this.panelWizDBTop.Dock = System.Windows.Forms.DockStyle.Top;
             this.panelWizDBTop.Location = new System.Drawing.Point(0, 0);
             this.panelWizDBTop.Name = "panelWizDBTop";
-            this.panelWizDBTop.Size = new System.Drawing.Size(649, 46);
+            this.panelWizDBTop.Size = new System.Drawing.Size(445, 46);
             this.panelWizDBTop.TabIndex = 3;
             // 
             // label9
@@ -1077,14 +1060,132 @@
             this.lblDBName.TabIndex = 2;
             this.lblDBName.Text = "lblDBName";
             // 
+            // panelWizStatus
+            // 
+            this.panelWizStatus.BackColor = System.Drawing.SystemColors.Control;
+            this.panelWizStatus.Controls.Add(this.txtStatusMsg);
+            this.panelWizStatus.Location = new System.Drawing.Point(882, 340);
+            this.panelWizStatus.Name = "panelWizStatus";
+            this.panelWizStatus.Size = new System.Drawing.Size(200, 134);
+            this.panelWizStatus.TabIndex = 6;
+            // 
+            // txtStatusMsg
+            // 
+            this.txtStatusMsg.Font = new System.Drawing.Font("Courier New", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtStatusMsg.Location = new System.Drawing.Point(20, 0);
+            this.txtStatusMsg.Multiline = true;
+            this.txtStatusMsg.Name = "txtStatusMsg";
+            this.txtStatusMsg.ReadOnly = true;
+            this.txtStatusMsg.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtStatusMsg.Size = new System.Drawing.Size(81, 100);
+            this.txtStatusMsg.TabIndex = 0;
+            // 
+            // panelWizSummary
+            // 
+            this.panelWizSummary.BackColor = System.Drawing.SystemColors.Window;
+            this.panelWizSummary.Controls.Add(this.btnShowErrors);
+            this.panelWizSummary.Controls.Add(this.pnlImpResultsDB);
+            this.panelWizSummary.Controls.Add(this.pnlImpResultsTxt);
+            this.panelWizSummary.Controls.Add(this.lblDest);
+            this.panelWizSummary.Controls.Add(this.lblSource);
+            this.panelWizSummary.Controls.Add(this.label22);
+            this.panelWizSummary.Controls.Add(this.label8);
+            this.panelWizSummary.Controls.Add(this.label6);
+            this.panelWizSummary.Location = new System.Drawing.Point(291, 223);
+            this.panelWizSummary.Name = "panelWizSummary";
+            this.panelWizSummary.Size = new System.Drawing.Size(484, 233);
+            this.panelWizSummary.TabIndex = 7;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.ForeColor = System.Drawing.Color.DimGray;
+            this.label6.Location = new System.Drawing.Point(16, 13);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(107, 16);
+            this.label6.TabIndex = 2;
+            this.label6.Text = "Import Results";
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(23, 47);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(44, 13);
+            this.label8.TabIndex = 3;
+            this.label8.Text = "Source:";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.Location = new System.Drawing.Point(23, 72);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(63, 13);
+            this.label22.TabIndex = 4;
+            this.label22.Text = "Destination:";
+            // 
+            // lblSource
+            // 
+            this.lblSource.AutoSize = true;
+            this.lblSource.Location = new System.Drawing.Point(89, 47);
+            this.lblSource.Name = "lblSource";
+            this.lblSource.Size = new System.Drawing.Size(51, 13);
+            this.lblSource.TabIndex = 5;
+            this.lblSource.Text = "lblSource";
+            // 
+            // lblDest
+            // 
+            this.lblDest.AutoSize = true;
+            this.lblDest.Location = new System.Drawing.Point(89, 72);
+            this.lblDest.Name = "lblDest";
+            this.lblDest.Size = new System.Drawing.Size(39, 13);
+            this.lblDest.TabIndex = 6;
+            this.lblDest.Text = "lblDest";
+            // 
+            // pnlImpResultsTxt
+            // 
+            this.pnlImpResultsTxt.Location = new System.Drawing.Point(26, 99);
+            this.pnlImpResultsTxt.Name = "pnlImpResultsTxt";
+            this.pnlImpResultsTxt.Size = new System.Drawing.Size(200, 100);
+            this.pnlImpResultsTxt.TabIndex = 7;
+            // 
+            // pnlImpResultsDB
+            // 
+            this.pnlImpResultsDB.Controls.Add(this.lvImpResults);
+            this.pnlImpResultsDB.Location = new System.Drawing.Point(257, 99);
+            this.pnlImpResultsDB.Name = "pnlImpResultsDB";
+            this.pnlImpResultsDB.Size = new System.Drawing.Size(200, 100);
+            this.pnlImpResultsDB.TabIndex = 8;
+            // 
+            // lvImpResults
+            // 
+            this.lvImpResults.HideSelection = false;
+            this.lvImpResults.Location = new System.Drawing.Point(17, 16);
+            this.lvImpResults.Name = "lvImpResults";
+            this.lvImpResults.Size = new System.Drawing.Size(121, 45);
+            this.lvImpResults.TabIndex = 0;
+            this.lvImpResults.UseCompatibleStateImageBehavior = false;
+            // 
+            // btnShowErrors
+            // 
+            this.btnShowErrors.Location = new System.Drawing.Point(381, 205);
+            this.btnShowErrors.Name = "btnShowErrors";
+            this.btnShowErrors.Size = new System.Drawing.Size(75, 23);
+            this.btnShowErrors.TabIndex = 9;
+            this.btnShowErrors.Text = "View Errors";
+            this.btnShowErrors.UseVisualStyleBackColor = true;
+            // 
             // ImportWiz
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(50)))));
-            this.ClientSize = new System.Drawing.Size(651, 392);
-            this.Controls.Add(this.panelWizDB);
+            this.ClientSize = new System.Drawing.Size(1233, 573);
+            this.Controls.Add(this.panelWizSummary);
             this.Controls.Add(this.panelWizText);
+            this.Controls.Add(this.panelWizStatus);
+            this.Controls.Add(this.panelWizDB);
             this.Controls.Add(this.panelWizMain);
             this.Controls.Add(this.panelBottom);
             this.Controls.Add(this.panelTop);
@@ -1093,14 +1194,10 @@
             this.Name = "ImportWiz";
             this.Padding = new System.Windows.Forms.Padding(1);
             this.Text = "Import Wizard";
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.ImportWiz_FormClosed);
             this.Load += new System.EventHandler(this.ImportWiz_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.panelTop.ResumeLayout(false);
-            this.panelTop.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pbIcon)).EndInit();
-            this.panelControls.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pbClose)).EndInit();
             this.panelBottom.ResumeLayout(false);
             this.panelWizMain.ResumeLayout(false);
             this.panelWizMainText.ResumeLayout(false);
@@ -1135,6 +1232,11 @@
             this.panelWizDBMid.PerformLayout();
             this.panelWizDBTop.ResumeLayout(false);
             this.panelWizDBTop.PerformLayout();
+            this.panelWizStatus.ResumeLayout(false);
+            this.panelWizStatus.PerformLayout();
+            this.panelWizSummary.ResumeLayout(false);
+            this.panelWizSummary.PerformLayout();
+            this.pnlImpResultsDB.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1144,15 +1246,11 @@
 
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.Panel panelTop;
-        private System.Windows.Forms.Panel panelControls;
-        private System.Windows.Forms.PictureBox pbClose;
-        private System.Windows.Forms.PictureBox pbIcon;
-        private System.Windows.Forms.Label lblFormHeading;
         private System.Windows.Forms.Panel panelBottom;
         private System.Windows.Forms.Button btnClose;
         private System.Windows.Forms.Panel panelWizMain;
         private System.Windows.Forms.Button btnFileSearch;
-        private System.Windows.Forms.TextBox txtFileName;
+        private System.Windows.Forms.ComboBox cmbFileName;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.ComboBox cmbSourceDB;
         private System.Windows.Forms.Label label2;
@@ -1176,7 +1274,7 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.RadioButton radioButtonPipe;
         private System.Windows.Forms.RadioButton radioButtonSemiColon;
-        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lblTextQualifier;
         private System.Windows.Forms.CheckBox checkBoxFirstRowContainsHeadings;
         private System.Windows.Forms.ComboBox comboBoxTextQualifier;
         private System.Windows.Forms.PropertyGrid propertyGridColumns;
@@ -1193,7 +1291,6 @@
         private System.Windows.Forms.ComboBox cmbDestinationTable;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Panel panelWizDB;
-        private System.Windows.Forms.DataGridView dgvTables;
         private System.Windows.Forms.Panel panelWizDBMid;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Panel panelWizDBTop;
@@ -1209,7 +1306,7 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.RadioButton radioSqlServerAuth;
         private System.Windows.Forms.RadioButton radioWinAuth;
-        private System.Windows.Forms.TextBox txtServer;
+        private System.Windows.Forms.ComboBox cmbServer;
         private System.Windows.Forms.Label label11;
         private System.Windows.Forms.Panel panelWizMainODBC;
         private System.Windows.Forms.ComboBox comboBoxOdbcDataSource;
@@ -1222,15 +1319,30 @@
         private System.Windows.Forms.ComboBox comboBoxMySqlDatabaseList;
         private System.Windows.Forms.TextBox txtMySqlPassword;
         private System.Windows.Forms.TextBox txtMySqlUserName;
-        private System.Windows.Forms.TextBox txtMySqlServer;
+        private System.Windows.Forms.ComboBox cmbMySqlServer;
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.Label label20;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Panel panelWizStatus;
+        private System.Windows.Forms.TextBox txtStatusMsg;
+        private System.Windows.Forms.DataGridView dgvTables;
         private System.Windows.Forms.DataGridViewCheckBoxColumn CheckBoxSelectedTable;
         private System.Windows.Forms.DataGridViewTextBoxColumn Source;
         private System.Windows.Forms.DataGridViewTextBoxColumn Destination;
         private System.Windows.Forms.DataGridViewTextBoxColumn Map;
         private System.Windows.Forms.DataGridViewButtonColumn Preview;
+        private System.Windows.Forms.Label lblWrkSheet;
+        private System.Windows.Forms.ComboBox cmbWrkSheet;
+        private System.Windows.Forms.Panel panelWizSummary;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.Label lblSource;
+        private System.Windows.Forms.Label lblDest;
+        private System.Windows.Forms.Panel pnlImpResultsTxt;
+        private System.Windows.Forms.Panel pnlImpResultsDB;
+        private System.Windows.Forms.ListView lvImpResults;
+        private System.Windows.Forms.Button btnShowErrors;
     }
 }

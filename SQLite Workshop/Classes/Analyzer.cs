@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
@@ -21,9 +21,9 @@ namespace SQLiteWorkshop
             LoadStatsReport(sender, e);
         }
 
-        string _tablename;
-        string _dblocation;
-        DataTable dt;
+        readonly string _tablename;
+        readonly string _dblocation;
+        readonly DataTable dt;
 
         public int ObjectCount { get; set; }
         public bool Cancel { get; set; }
@@ -33,7 +33,7 @@ namespace SQLiteWorkshop
             _dblocation = DatabaseLocation;
             _tablename = TableName;
             string sql = string.Format("Select * From sqlite_master Where type in (\"table\", \"index\") {0} ", _tablename.ToLower() == "all" ? string.Empty : string.Format("And tbl_name = \"{0}\"", _tablename));
-            dt = DataAccess.ExecuteDataTable(_dblocation, sql, out SQLiteErrorCode returnCode);
+            dt = DataAccess.ExecuteDataTable(_dblocation, sql, out SQLiteErrorCode _);
             ObjectCount = dt.Rows.Count;
         }
 
@@ -50,7 +50,7 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format(Common.ERR_GENERAL, ex.Message));
+                ShowMsg(string.Format(ERR_GENERAL, ex.Message));
             }
         }
         private bool BuildStats()
@@ -60,15 +60,15 @@ namespace SQLiteWorkshop
             LoadStatsEventArgs e = new LoadStatsEventArgs();
             SQLiteConnection conn = null;
             SQLiteCommand cmd = null;
-            int rc;
+            long rc;
 
-                        try
+            try
             {
-                rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, sql, out returnCode);
-                rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, string.Format("Delete From {0}", Common.StatsTable), out returnCode);
+                rc = DataAccess.ExecuteNonQuery(_dblocation, sql, out returnCode);
+                rc = DataAccess.ExecuteNonQuery(_dblocation, string.Format("Delete From {0}", StatsTable), out returnCode);
 
                 
-                DataAccess.OpenDB(MainForm.mInstance.CurrentDB, ref conn, ref cmd, out returnCode, false);
+                DataAccess.OpenDB(_dblocation, ref conn, ref cmd, false);
                 BindFunction(conn, new isleaf());
                 BindFunction(conn, new isoverflow());
                 BindFunction(conn, new isinternal());
@@ -83,7 +83,7 @@ namespace SQLiteWorkshop
                     string select = CreateSelectStmt(dr["name"].ToString(), dr["tbl_name"].ToString());
                     cmd.CommandText = select;
                     cmd.Parameters.Clear();
-                    cmd.Parameters.AddWithValue("is_index", dr["type"].ToString() == "index" ? true : false);
+                    cmd.Parameters.AddWithValue("is_index", dr["type"].ToString() == "index");
                     cmd.ExecuteNonQuery();
                     int gap_cnt = 0;
                     long prevpage = 0;
@@ -96,14 +96,14 @@ namespace SQLiteWorkshop
                         prevpage = (long)pdr["pageno"];
                     }
                     pdr.Close();
-                    sql = string.Format("Update {0} Set gap_cnt = {1} Where name = \"{2}\"", Common.StatsTable, gap_cnt.ToString(), dr["name"].ToString());
+                    sql = string.Format("Update {0} Set gap_cnt = {1} Where name = \"{2}\"", StatsTable, gap_cnt.ToString(), dr["name"].ToString());
                     cmd.CommandText = sql;
                     cmd.ExecuteNonQuery();
                     e.LoadComplete = true;
                     LoadStatsReport(this, e);
                     if (Cancel)
                     {
-                        rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, string.Format("Delete From {0}", Common.StatsTable), out returnCode);
+                        rc = DataAccess.ExecuteNonQuery(_dblocation, string.Format("Delete From {0}", StatsTable), out returnCode);
                         break;
                     }
                 }
@@ -112,10 +112,10 @@ namespace SQLiteWorkshop
             {
                 if (returnCode == SQLiteErrorCode.Interrupt)
                 {
-                    rc = DataAccess.ExecuteNonQuery(MainForm.mInstance.CurrentDB, string.Format("Delete From {0}", Common.StatsTable), out returnCode);
+                    rc = DataAccess.ExecuteNonQuery(_dblocation, string.Format("Delete From {0}", StatsTable), out returnCode);
                     return false;
                 }
-                Common.ShowMsg(string.Format(Common.ERR_SQL, ex.Message, returnCode));
+                ShowMsg(string.Format(ERR_SQL, ex.Message, returnCode));
                 return false;
             }
             finally
@@ -136,7 +136,7 @@ namespace SQLiteWorkshop
         private string CreateSQL()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("CREATE TABLE IF NOT EXISTS {0}(", Common.StatsTable);
+            sb.AppendFormat("CREATE TABLE IF NOT EXISTS {0}(", StatsTable);
             sb.Append("sdate,");                        //Date table was last refreshed
             sb.Append("name clob,");                    //Name of a table or index in the database file
             sb.Append("tblname clob,");                 //Name of associated table
@@ -156,32 +156,13 @@ namespace SQLiteWorkshop
             sb.Append("gap_cnt int,");                  //Number of gaps in the page layout
             sb.Append("compressed_size int");           // Total bytes stored on disk
             sb.Append(") ;");
-        
-
-
-            /* 
-            StringBuilder sb = new StringBuilder();
-            sb.Append("CREATE TABLE IF NOT EXISTS SQLite_Workshop.stats(");
-            sb.Append("  sdate      DATE,");             // Date stats were created
-            sb.Append("  name       STRING,");           // Name of table or index 
-            sb.Append("  path       INTEGER,");          // Path to page from root 
-            sb.Append("  pageno     INTEGER,");          // Page number 
-            sb.Append("  pagetype   STRING,");           // 'internal', 'leaf' or 'overflow' 
-            sb.Append("  ncell      INTEGER,");          // Cells on page (0 for overflow) 
-            sb.Append("  payload    INTEGER,");          // Bytes of payload on this page 
-            sb.Append("  unused     INTEGER,");          // Bytes of unused space on this page 
-            sb.Append("  mx_payload INTEGER,");          // Largest payload size of all cells 
-            sb.Append("  pgoffset   INTEGER,");          // Offset of page in file 
-            sb.Append("  pgsize     INTEGER ");          // Size of the page 
-            sb.Append(");");
-            */
             return sb.ToString();
         }
 
         private string CreateSelectStmt(string objName, string tableName)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat("Insert Into {0} ", Common.StatsTable);
+            sb.AppendFormat("Insert Into {0} ", StatsTable);
             sb.Append("SELECT ");
             sb.Append("CURRENT_TIMESTAMP AS sdate,");
             sb.AppendFormat("\"{0}\" AS name,", objName);
@@ -222,7 +203,7 @@ namespace SQLiteWorkshop
             public override object Invoke(object[] args)
             {
                 string pagetype = args[0].ToString(); 
-                bool isIndex = (long)args[1] == 1 ? true : false;
+                bool isIndex = (long)args[1] == 1;
                 return pagetype == "leaf" || (pagetype == "internal" && isIndex);
             }
         }
@@ -233,7 +214,7 @@ namespace SQLiteWorkshop
             public override object Invoke(object[] args)
             {
                 string pagetype = args[0].ToString();
-                bool isIndex = (long)args[1] == 1 ? true : false;
+                bool isIndex = (long)args[1] == 1;
                 return pagetype == "internal" && !isIndex;
             }
         }
@@ -244,7 +225,7 @@ namespace SQLiteWorkshop
             public override object Invoke(object[] args)
             {
                 string pagetype = args[0].ToString();
-                bool isIndex = (long)args[1] == 1 ? true : false;
+                //bool isIndex = (long)args[1] == 1 ? true : false;
                 return pagetype == "overflow";
             }
         }

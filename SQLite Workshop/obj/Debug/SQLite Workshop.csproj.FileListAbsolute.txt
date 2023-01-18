@@ -1,0 +1,172 @@
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\bin\Debug\SQLite Workshop.exe.config
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\bin\Debug\SQLite Workshop.exe
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\bin\Debug\SQLite Workshop.pdb
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csprojResolveAssemblyReference.cache
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.GenerateResource.Cache
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.CoreCompileInputs.cache
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.exe
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.pdb
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\bin\Debug\System.Data.SQLite.dll
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.SqlTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.MainForm.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.Properties.Resources.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.AboutBox.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.ExecuteForm.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.DBEditorTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.GetPassword.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.TableEditorTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.DBProperties.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.Template.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.ImportWiz.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.ShowSQL.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.BuildIndex.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.BuildColumn.resources
+C:\MyVSProjects\@Utility\@Database\SQLite Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.CopyComplete
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\View\Drop View.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Definitions.txt
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Database\Database List.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Database\Vacuum.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Index\Drop Index.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Index\Rebuild Index.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Query\Column Profile.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Query\Select Duplicate Rows.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Query\Summary Counts.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Table\Drop Table.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Table\Index List.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Trigger\Drop Trigger.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Trigger\Last Update Date.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\SQLite Workshop.exe.config
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\SQLite Workshop.exe
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\SQLite Workshop.pdb
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\CsvHelper.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Data.SQLite.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\CsvHelper.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.AboutBox.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.DBEditorTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.SqlTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.TableEditorTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.MainForm.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.Properties.Resources.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.GenerateResource.cache
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.CoreCompileInputs.cache
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.CopyComplete
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.exe
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.pdb
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\View\Create View.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Index\Create Index.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Table\Create Table.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Trigger\Create Trigger.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Data.SQLite.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Data.SQLite.dll.config
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\View\Create Join.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.RowEditTabControl.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Buffers.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Memory.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Numerics.Vectors.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Text.Encodings.Web.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Text.Json.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Threading.Tasks.Extensions.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.ValueTuple.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Buffers.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Memory.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Numerics.Vectors.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Text.Encodings.Web.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Text.Json.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Threading.Tasks.Extensions.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.ValueTuple.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\language\en.txt
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.AttachDB.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.Template.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.ImportWiz.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.ShowSQL.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.GetPassword.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.ExecuteForm.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.Options.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.DataSet.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.dll
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.pdb
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.DataSet.pdb
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.DataSet.xml
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Query\Select Into.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.Mapping.resources
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.AssemblyReference.cache
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.DBRecover.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\language\en.txt
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Query\Select Into.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\View\Create View.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\View\Create Join.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\View\Drop View.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Definitions.txt
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Database\Database List.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Database\Vacuum.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Index\Create Index.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Index\Drop Index.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Index\Rebuild Index.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Query\Column Profile.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Query\Select Duplicate Rows.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Query\Summary Counts.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Table\Create Table.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Table\Drop Table.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Table\Index List.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Trigger\Create Trigger.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Trigger\Drop Trigger.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Templates\Trigger\Last Update Date.sql
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\SQLite Workshop.exe.config
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\SQLite Workshop.exe
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\SQLite Workshop.pdb
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\CsvHelper.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.DataSet.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Buffers.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Data.SQLite.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Memory.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Numerics.Vectors.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Text.Encodings.Web.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Text.Json.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Threading.Tasks.Extensions.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.ValueTuple.dll
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\CsvHelper.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.DataSet.pdb
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\ExcelDataReader.DataSet.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\Microsoft.Bcl.AsyncInterfaces.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Buffers.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Data.SQLite.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Data.SQLite.dll.config
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Memory.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Numerics.Vectors.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Runtime.CompilerServices.Unsafe.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Text.Encodings.Web.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Text.Json.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.Threading.Tasks.Extensions.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Debug\System.ValueTuple.xml
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.AssemblyReference.cache
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.SuggestedBindingRedirects.cache
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.AboutBox.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.DBEditorTabControl.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.RowEditTabControl.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.SqlTabControl.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.TableEditorTabControl.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.AttachDB.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.DBRecover.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.ExecuteForm.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.ImportWiz.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.Options.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.ShowSQL.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.GetPassword.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.Mapping.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.Template.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.MainForm.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLiteWorkshop.Properties.Resources.resources
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.GenerateResource.cache
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.CoreCompileInputs.cache
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.csproj.CopyComplete
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.exe
+F:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\obj\Debug\SQLite Workshop.pdb

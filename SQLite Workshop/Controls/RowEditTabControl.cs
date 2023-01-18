@@ -1,25 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Data;
 using System.Data.SQLite;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Collections;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.IO;
+
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
-    public partial class RecordEditTabControl : UserControl
+    internal partial class RowEditTabControl : MainTabControl
     {
         internal struct ColData
         {
             internal string colname;
             internal string coltype;
+            internal string collength;
         }
 
         string RowIDColName;
@@ -31,13 +29,13 @@ namespace SQLiteWorkshop
         string BaseSQL = string.Empty;
         string searchSQL = string.Empty;
         string searchWhereClause = string.Empty;
-        int CurrentRow = 0;
-        int RowCount = 0;
+        long startclock;
+        long CurrentRow = 0;
+        long RowCount = 0;
         bool AddingRow = false;
 
         DataTable dt;
-
-        string[] Rowids = new string[] { "rowid", "_rowid_", "OID" };
+        readonly string[] Rowids = new string[] { "rowid", "_rowid_", "OID" };
 
         protected enum RowStatus
         {
@@ -47,16 +45,25 @@ namespace SQLiteWorkshop
             Inconsistent
         }
 
-        public string DatabaseName { get; set; }
+        internal override string SqlStatement { 
+            get 
+            {
+                string wc = string.IsNullOrEmpty(richTextWhere.Text) ? string.Empty : string.Format("Where {0}", richTextWhere.Text.Trim());
+                return string.Format("{0} {1}", BaseSQL, wc); 
+            }
+            set { } 
+        }
+
+        
         public string TableName { get; set; }
 
-        internal RecordEditTabControl(string dbName, string tblname)
+        internal RowEditTabControl(string dbName, string tblname)
         {
             InitializeComponent();
+            InitializeClass(dbName);
             this.Dock = DockStyle.Fill;
             toolStripLabelTotalRecords.Text = string.Empty;
             toolStripLabelStatus.Text = string.Empty;
-            DatabaseName = dbName;
             TableName = tblname;
             InitializePage();
             LoadRecord(0);
@@ -88,7 +95,7 @@ namespace SQLiteWorkshop
             int iRowCount = Convert.ToInt32(DataAccess.ExecuteScalar(DatabaseName, searchSQL, out SQLiteErrorCode returnCode));
             if (iRowCount == -1 || returnCode != SQLiteErrorCode.Ok)
             {
-                Common.ShowMsg(string.Format("Error processing SQL.  Please review your WHERE clause.\r\n{0}", DataAccess.LastError));
+                ShowMsg(string.Format(ERR_SQLWHERE, DataAccess.LastError));
                 searchSQL = BaseSQL;
                 searchWhereClause = string.Empty;
                 RowCount = 0;
@@ -103,16 +110,18 @@ namespace SQLiteWorkshop
 
             SQLiteConnection conn = new SQLiteConnection();
             SQLiteCommand cmd = new SQLiteCommand();
-            DataAccess.OpenDB(DatabaseName, ref conn, ref cmd, out returnCode, false);
+            DataAccess.OpenDB(DatabaseName, ref conn, ref cmd, false);
+            DataTable ColumnList;
             SQLiteDataReader dr;
             cmd.CommandText = searchSQL;
             try
             {
                 dr = cmd.ExecuteReader(CommandBehavior.SchemaOnly);
+                ColumnList = dr.GetSchemaTable();
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Error processing SQL.  Please review your WHERE clause.\r\n{0}", ex.Message));
+                ShowMsg(string.Format(ERR_SQLWHERE, ex.Message));
                 searchSQL = BaseSQL;
                 searchWhereClause = string.Empty;
                 DataAccess.CloseDB(conn);
@@ -149,8 +158,11 @@ namespace SQLiteWorkshop
                 ColData cd = new ColData()
                 {
                     colname = colname,
-                    coltype = dr.GetDataTypeName(i)
+                    //coltype = dr.GetDataTypeName(i),
+                    coltype = ColumnList.Rows[i].ItemArray[24].ToString(),
+                    collength = ColumnList.Rows[i]["ColumnSize"].ToString()
                 };
+
                 txt.Tag = cd;
                 txt.Top = start;
                 txt.Left = lbl.Left + lablen;
@@ -185,7 +197,7 @@ namespace SQLiteWorkshop
         {
             if (!ShowData(((Button)sender).Tag.ToString()))
             {
-                Common.ShowMsg("Unable to display data.");
+                ShowMsg(ERR_NODISPLAY);
                 return;
             }
         }
@@ -193,7 +205,7 @@ namespace SQLiteWorkshop
         /// Load a record onto the window and enable/disable controls appropriately
         /// </summary>
         /// <param name="RowNum"></param>
-        protected void LoadRecord(int RowNum)
+        protected void LoadRecord(long RowNum)
         {
             if (RowCount == 0) { InitEmptyNavigator(); return; }
 
@@ -201,8 +213,13 @@ namespace SQLiteWorkshop
             if (RowNum < 1) RowNum = 1;
 
             string sql = string.Format("{0} Limit 1 Offset {1}", searchSQL, RowNum - 1);
+
+            InitSettings();
+
             dt = DataAccess.ExecuteDataTable(DatabaseName, sql, out SQLiteErrorCode returnCode);
 
+            ShowSettings(dt == null ? 0 : dt.Rows.Count, returnCode);
+            
             if (dt.Rows.Count != 1) return;
             DataRow dr = dt.Rows[0];
             for (int i = 0; i < dr.ItemArray.Count(); i++)
@@ -359,11 +376,11 @@ namespace SQLiteWorkshop
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("Update \"{0}\" Set", TableName);
             int count = 0;
-            int i = 0;
             ArrayList parms = new ArrayList();
 
             DataRow dr = dt.Rows[0];
 
+            int i;
             for (i = 0; i < dr.ItemArray.Count(); i++)
             {
                 if (i == RowIdIndex) continue;
@@ -386,7 +403,7 @@ namespace SQLiteWorkshop
             switch (rowStat)
             {
                 case RowStatus.Updated:
-                    dgResult = Common.ShowMsg("The Row has changed since it was retrieved.  Click 'Yes' to save your changes anyway or click 'No' to discard your change and retrieve current data for this row.", MessageBoxButtons.YesNo);
+                    dgResult = ShowMsg("The Row has changed since it was retrieved.  Click 'Yes' to save your changes anyway or click 'No' to discard your change and retrieve current data for this row.", MessageBoxButtons.YesNo);
                     if (dgResult == DialogResult.No)
                     {
                         LoadRecord(CurrentRow);
@@ -394,10 +411,10 @@ namespace SQLiteWorkshop
                     }
                     break;
                 case RowStatus.Inconsistent:
-                    dgResult = Common.ShowMsg("The Row has changed since it was retrieved.  Please read the Row again before updating it.");
+                    ShowMsg("The Row has changed since it was retrieved.  Please read the Row again before updating it.");
                     return false;
                 case RowStatus.NotFound:
-                    dgResult = Common.ShowMsg("The Row cannot be found.");
+                    ShowMsg("The Row cannot be found.");
                     return false;
                 default:
                     break;
@@ -406,8 +423,12 @@ namespace SQLiteWorkshop
             if (!BuildWhereClause(currDataRow, out string whereClause)) return false;
             sb.AppendFormat(" {0}", whereClause);
 
-            int recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, sb.ToString(), parms, out SQLiteErrorCode returnCode);
+            InitSettings();
+
+            long recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, sb.ToString(), parms, out SQLiteErrorCode returnCode);
             toolStripLabelStatus.Text = string.Format("{0} Record(s) updated.", recsupdated.ToString());
+
+            ShowSettings(recsupdated, returnCode);
             return true;
         }
         #endregion
@@ -426,9 +447,7 @@ namespace SQLiteWorkshop
             ArrayList parms = new ArrayList();
 
             int count = 0;
-            int i = 0;
-
-            for (i = 0; i <= panelBody.Controls.Count; i++)
+            for (int i = 0; i <= panelBody.Controls.Count; i++)
             {
                 if (i == RowIdIndex) continue;
                 TextBox t = FindTextBox(string.Format("txt{0}", i.ToString().PadLeft(4, '0')));
@@ -445,16 +464,19 @@ namespace SQLiteWorkshop
             }
             if (count == 0)
             {
-                DialogResult dgResult = Common.ShowMsg("No data to insert. Please enter data to insert or press the 'Undo' button to cancel insert.");
+                ShowMsg("No data to insert. Please enter data to insert or press the 'Undo' button to cancel insert.");
                 return false;
             }
             sb.Append(")");
             sbValues.Append(")");
 
-            int recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, string.Format("{0} {1}", sb.ToString(), sbValues.ToString()), parms, out SQLiteErrorCode returnCode);
+            InitSettings();
+            long recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, string.Format("{0} {1}", sb.ToString(), sbValues.ToString()), parms, out SQLiteErrorCode returnCode);
+            ShowSettings(recsupdated, returnCode);
+
             if (recsupdated == -1 || returnCode != SQLiteErrorCode.Ok)
             {
-                DialogResult dgResult = Common.ShowMsg(string.Format(Common.ERR_SQL, DataAccess.LastError, returnCode));
+                ShowMsg(string.Format(ERR_SQL, DataAccess.LastError, returnCode));
                 return false;
             }
 
@@ -483,7 +505,7 @@ namespace SQLiteWorkshop
             switch (rowStat)
             {
                 case RowStatus.Updated:
-                    dgResult = Common.ShowMsg("The Row has changed since it was retrieved.  Click 'Yes' to delete this row or click 'No' to abort.", MessageBoxButtons.YesNo);
+                    dgResult = ShowMsg("The Row has changed since it was retrieved.  Click 'Yes' to delete this row or click 'No' to abort.", MessageBoxButtons.YesNo);
                     if (dgResult == DialogResult.No)
                     {
                         LoadRecord(CurrentRow);
@@ -491,30 +513,38 @@ namespace SQLiteWorkshop
                     }
                     break;
                 case RowStatus.Inconsistent:
-                    dgResult = Common.ShowMsg("The Row has changed since it was retrieved.  Please read theRow again before deleting it.");
+                    ShowMsg("The Row has changed since it was retrieved.  Please read theRow again before deleting it.");
                     return false;
                 case RowStatus.NotFound:
-                    dgResult = Common.ShowMsg("The Row cannot be found.");
+                    ShowMsg("The Row cannot be found.");
                     return false;
                 default:
                     break;
             }
 
-            dgResult = Common.ShowMsg("Confirm Delete. Press 'Ok' to Delete or 'Cancel' to abort.", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
+            dgResult = ShowMsg("Confirm Delete. Press 'Ok' to Delete or 'Cancel' to abort.", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning);
             if (dgResult == DialogResult.Cancel) return false;
 
             if (!BuildWhereClause(currDataRow, out string whereClause)) return false;
             string sql = string.Format("Delete from \"{0}\" {1}", TableName, whereClause);
-            int recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, sql, out SQLiteErrorCode returnCode);
-            toolStripLabelStatus.Text = "1 Record deleted.";
-            RowCount--;
+
+            InitSettings();
+            long recsupdated = DataAccess.ExecuteNonQuery(DatabaseName, sql, out SQLiteErrorCode returnCode);
+            ShowSettings(recsupdated, returnCode);
+
+            if (returnCode != SQLiteErrorCode.Ok)
+            {
+                MessageBox.Show(string.Format(MB_DELETE_ERROR, returnCode.ToString(), DataAccess.LastError));
+            }
+            toolStripLabelStatus.Text = string.Format("{0} Record(s) deleted.", recsupdated);
+            RowCount -= recsupdated;
             return true;
         }
         #endregion
 
         #region helpers
 
-        string[] boolvalues = new string[] { "0" , "1", "true", "false"};
+        readonly string[] boolvalues = new string[] { "0", "1", "true", "false" };
         /// <summary>
         /// Validate entered data and convert it to SQLite acceptablr value
         /// </summary>
@@ -533,7 +563,7 @@ namespace SQLiteWorkshop
                         szValue = t.Text;
                         return true;
                     }
-                    Common.ShowMsg("Please enter 'true' or 'false'");
+                    ShowMsg("Please enter 'true' or 'false'");
                     t.Focus();
                     break;
 
@@ -545,7 +575,7 @@ namespace SQLiteWorkshop
                         szValue = newdate.ToString("yyyy-MM-dd HH:mm:ss");
                         return true;
                     }
-                    Common.ShowMsg("Please enter a valid Date");
+                    ShowMsg("Please enter a valid Date");
                     t.Focus();
                     break;
 
@@ -555,26 +585,87 @@ namespace SQLiteWorkshop
                         szValue = newtime.ToString("HH:mm:ss");
                         return true;
                     }
-                    Common.ShowMsg("Please enter a valid Time");
+                    ShowMsg("Please enter a valid Time");
+                    t.Focus();
+                    break;
+
+                case "bigint":
+                case "int8":
+                    if (Int64.TryParse(t.Text, out _))
+                    {
+                        szValue = t.Text;
+                        return true;
+                    }
+                    ShowMsg("Please enter a valid Long Integer");
                     t.Focus();
                     break;
 
                 case "integer":
                 case "int":
-                case "tinyint":
-                case "smallint":
                 case "mediumint":
-                case "bigint":
-                case "unsigned big int":
-                case "int2":
                 case "int4":
-                case "int8":
-                    if (int.TryParse(t.Text, out int newint))
+                    if (int.TryParse(t.Text, out _))
                     {
                         szValue = t.Text;
                         return true;
                     }
-                    Common.ShowMsg("Please enter a valid Integer");
+                    ShowMsg("Please enter a valid Integer");
+                    t.Focus();
+                    break;
+
+                case "smallint":
+                case "int2":
+                    if (Int16.TryParse(t.Text, out _))
+                    {
+                        szValue = t.Text;
+                        return true;
+                    }
+                    ShowMsg("Please enter a valid Small Integer");
+                    t.Focus();
+                    break;
+
+                case "tinyint":
+                    if (Int16.TryParse(t.Text, out Int16 i))
+                    {
+                        if (i >= 0 && i <= 255)
+                        { szValue = t.Text; return true; }
+                    }
+                    ShowMsg("Please enter a valid Tiny Integer");
+                    t.Focus();
+                    break;
+
+                case "unsigned bigint":
+                case "unsigned int8":
+                    if (UInt64.TryParse(t.Text, out _))
+                    {
+                        szValue = t.Text;
+                        return true;
+                    }
+                    ShowMsg("Please enter a valid unsigned Long Integer");
+                    t.Focus();
+                    break;
+
+                case "unsigned integer":
+                case "unsigned int":
+                case "unsigned mediumint":
+                case "unsigned int4":
+                    if (UInt32.TryParse(t.Text, out _))
+                    {
+                        szValue = t.Text;
+                        return true;
+                    }
+                    ShowMsg("Please enter a valid unsigned Integer");
+                    t.Focus();
+                    break;
+
+                case "unsigned smallint":
+                case "unsigned int2":
+                    if (UInt16.TryParse(t.Text, out _))
+                    {
+                        szValue = t.Text;
+                        return true;
+                    }
+                    ShowMsg("Please enter a valid unsigned Small Integer");
                     t.Focus();
                     break;
 
@@ -590,22 +681,34 @@ namespace SQLiteWorkshop
                         szValue = newdbl.ToString();
                         return true;
                     }
-                    Common.ShowMsg("Please enter a valid value");
+                    ShowMsg("Please enter a valid value");
+                    t.Focus();
+                    break;
+
+                case "char":
+                case "nchar":
+                case "varchar":
+                case "nvarchar":
+                    if (t.Text.Length <= Convert.ToInt32(cd.collength))
+                    {
+                        szValue = t.Text;
+                        return true;
+                    }
+                    ShowMsg(string.Format("Length cannot exceed {0} characters.", cd.collength));
+                    t.Focus();
+                    break;
+
+                case "decimal":
+                    if (decimal.TryParse(t.Text, out decimal newdec))
+                    {
+                        szValue = newdec.ToString();
+                        return true;
+                    }
+                    ShowMsg("Please enter a valid Decimal value");
                     t.Focus();
                     break;
 
                 default:
-                    if (cd.coltype.ToLower().StartsWith("decimal"))
-                    {
-                        if (decimal.TryParse(t.Text, out decimal newdec))
-                        {
-                            szValue = newdec.ToString();
-                            return true;
-                        }
-                        Common.ShowMsg("Please enter a valid Decimal value");
-                        t.Focus();
-                        break;
-                    }
                     szValue = t.Text;
                     return true;
             }
@@ -639,7 +742,10 @@ namespace SQLiteWorkshop
             }
 
             currDataRow = null;
+
+            InitSettings();
             DataTable currdt = DataAccess.ExecuteDataTable(DatabaseName, sql, out SQLiteErrorCode returnCode);
+            ShowSettings(currdt == null ? 0 : currdt.Rows.Count, returnCode);
 
             if (dt.Rows.Count != 1) return RowStatus.NotFound;
 
@@ -687,7 +793,7 @@ namespace SQLiteWorkshop
                 var ucount = DataAccess.ExecuteScalar(DatabaseName, string.Format("Select Count(*) From \"{0}\" {1}", TableName, sbWhere.ToString()), out SQLiteErrorCode returnCode);
                 if (Convert.ToInt32(ucount) != 1)
                 {
-                    Common.ShowMsg(Common.ERR_MULTIUPDATE);
+                    ShowMsg(ERR_MULTIUPDATE);
                     WhereClause = string.Empty;
                     return false;
                 }
@@ -695,6 +801,28 @@ namespace SQLiteWorkshop
             }
             WhereClause = sb.ToString();
             return true;
+        }
+
+        /// <summary>
+        /// Initialize Connection Property Settings before DB access
+        /// </summary>
+        protected void InitSettings()
+        {
+            ConnProps.connSettings.ExecStart = DateTime.Now.ToString();
+            startclock = Timers.QueryPerformanceCounter();
+        }
+
+        /// <summary>
+        /// Finalize and display Connection Property Settings after DB access is complete.
+        /// </summary>
+        protected void ShowSettings(long rowcount, SQLiteErrorCode rc)
+        {
+            ConnProps.connSettings.ExecEnd = DateTime.Now.ToString();
+            ConnProps.connSettings.ElapsedTime = Timers.DisplayTime(Timers.QueryLapsedTime(startclock)); ;
+            ConnProps.connSettings.LastSqlStatus = rc.ToString();
+            ConnProps.connSettings.RowsAffected = rowcount.ToString();
+            m.LoadConnectionProperties();
+
         }
 
         /// <summary>
@@ -828,7 +956,7 @@ namespace SQLiteWorkshop
                     return;
                 }
             }
-            Common.ShowMsg(string.Format("Please enter a number between 1 and {0}", RowCount.ToString()));
+            ShowMsg(string.Format("Please enter a number between 1 and {0}", RowCount.ToString()));
             toolStripTextBoxCurrentItem.Text = (CurrentRow).ToString();
         }
 

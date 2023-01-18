@@ -1,15 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Drawing.Printing;
 using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.GUIManager;
 
 namespace SQLiteWorkshop
 {
@@ -22,7 +20,8 @@ namespace SQLiteWorkshop
             table,
             index
         }
-
+        
+        ToolTip toolTip;
         internal string DatabaseLocation { get; set; }
         internal string TableName { get; set; }
 
@@ -41,17 +40,25 @@ namespace SQLiteWorkshop
 
         private void DBAnalyze_Load(object sender, EventArgs e)
         {
-            lblFormHeading.Text = "Database Analysis";
+            toolTip = new ToolTip();
+            HouseKeeping(this, "Database Analysis");
             AnalyzeDB();
+        }
+
+        private void DBAnalyze_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            FormClose(this);
         }
 
         private bool ShowWarning()
         {
-            ShowMsg sm = new ShowMsg();
-            sm.Message = "WARNING!!!.  Depending on the size of your database, the Analyzer may take several minutes to several hours to execute.  Additionally, it will create a table in your database containing key statistics related to the data in your database.\r\n\r\nPress 'Ok' to continue or 'Cancel' to exit.";
+            ShowMsg sm = new ShowMsg
+            {
+                Message = "WARNING!!!.  Depending on the size of your database, the Analyzer may take several minutes to several hours to execute.  Additionally, it will create a table in your database containing key statistics related to the data in your database.\r\n\r\nPress 'Ok' to continue or 'Cancel' to exit."
+            };
             sm.ShowDialog();
-            if (sm.DoNotShow) MainForm.cfg.SetSetting(Config.CFG_ANALYZEWARN, "true");
-            return sm.Result == DialogResult.Cancel ? false : true;
+            if (sm.DoNotShow) saveSetting(Config.CFG_ANALYZEWARN, "true");
+            return sm.Result != DialogResult.Cancel;
         }
 
         private void btnRefresh_Click(object sender, EventArgs e)
@@ -63,17 +70,20 @@ namespace SQLiteWorkshop
         private void btnPrint_Click(object sender, EventArgs e)
         {
             //Create an instance of our printer class
-            SQPrinter p = new SQPrinter();
+            SQPrinter p = new SQPrinter
+            {
+                //Set the TextToPrint property
+                TextToPrint = richTextBoxReport.Text
+            };
 
-            //Set the TextToPrint property
-            p.TextToPrint = richTextBoxReport.Text;
-
-            PrintDialog pd = new PrintDialog();
-            pd.AllowPrintToFile = true;
-            pd.AllowSomePages = true;
-            pd.Document = p;
-            pd.AllowCurrentPage = true;
-            pd.AllowSelection = true;
+            PrintDialog pd = new PrintDialog
+            {
+                AllowPrintToFile = true,
+                AllowSomePages = true,
+                Document = p,
+                AllowCurrentPage = true,
+                AllowSelection = true
+            };
             DialogResult dgr = pd.ShowDialog();
             if (dgr == DialogResult.OK)
             {
@@ -91,8 +101,7 @@ namespace SQLiteWorkshop
 
         protected bool LoadStats()
         {
-            bool bNoWarning = false;
-            bool.TryParse(MainForm.cfg.appsetting(Config.CFG_ANALYZEWARN), out bNoWarning);
+            bool.TryParse(appSetting(Config.CFG_ANALYZEWARN), out bool bNoWarning);
             if (!bNoWarning)
             {
                 if (!ShowWarning()) { this.Close(); return false; }
@@ -103,7 +112,7 @@ namespace SQLiteWorkshop
 
             if (tablecount == 0)
             {
-                Common.ShowMsg("This database does not contain any tables.\r\nAnalysis terminated.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ShowMsg("This database does not contain any tables.\r\nAnalysis terminated.", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.Close();
                 return false;
             }
@@ -146,14 +155,14 @@ namespace SQLiteWorkshop
                 if (!StatsFileExists()) if (!LoadStats()) return;
                 richTextBoxReport.Text = string.Empty;
 
-                string sql = string.Format("Select Distinct tblname From {0}", Common.StatsTable);
+                string sql = string.Format("Select Distinct tblname From {0}", StatsTable);
                 dtTableList = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
-                sql = string.Format("Select Distinct tblname, name From {0}", Common.StatsTable);
+                sql = string.Format("Select Distinct tblname, name From {0}", StatsTable);
                 dtObjectList = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
 
                 if (dtTableList.Rows.Count == 0)
                 {
-                    Common.ShowMsg("This database does not contain any tables.\r\nAnalysis terminated.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    ShowMsg("This database does not contain any tables.\r\nAnalysis terminated.", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     this.Close();
                     return;
                 }
@@ -169,7 +178,7 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format(Common.ERR_GENERAL, ex.Message));
+                ShowMsg(string.Format(ERR_GENERAL, ex.Message));
                 return;
             }
 
@@ -204,7 +213,7 @@ namespace SQLiteWorkshop
 
 
 
-            sql = string.Format("Select min(sdate) from \"{0}\"", Common.StatsTable);
+            sql = string.Format("Select min(sdate) from \"{0}\"", StatsTable);
             var obj = DataAccess.ExecuteScalar(DatabaseLocation, sql, out returnCode);
             string reportDate = obj.ToString();
 
@@ -241,7 +250,7 @@ namespace SQLiteWorkshop
             richTextBoxReport.AppendText(MakeCaption("*** Page counts for all tables with their indices "));
             richTextBoxReport.AppendText("\r\n\r\n");
 
-            string sql = string.Format("Select * From (Select tblname, sum(leaf_pages) + sum(int_pages) + sum(ovfl_pages) AS totpages From {0} Group By tblname) Order By totpages Desc", Common.StatsTable);
+            string sql = string.Format("Select * From (Select tblname, sum(leaf_pages) + sum(int_pages) + sum(ovfl_pages) AS totpages From {0} Group By tblname) Order By totpages Desc", StatsTable);
             DataTable dt = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
             foreach (DataRow dr in dt.Rows)
             {
@@ -256,7 +265,7 @@ namespace SQLiteWorkshop
             
             richTextBoxReport.AppendText(MakeCaption("*** Page counts for all tables and indices separately "));
             richTextBoxReport.AppendText("\r\n\r\n");
-            string sql = string.Format("Select * From (Select name, sum(leaf_pages) + sum(int_pages) + sum(ovfl_pages) AS totpages From {0} Group By name) Order By totpages Desc", Common.StatsTable);
+            string sql = string.Format("Select * From (Select name, sum(leaf_pages) + sum(int_pages) + sum(ovfl_pages) AS totpages From {0} Group By name) Order By totpages Desc", StatsTable);
             DataTable dt = DataAccess.ExecuteDataTable(DatabaseLocation, sql, out returnCode);
             foreach (DataRow dr in dt.Rows)
             {
@@ -373,7 +382,7 @@ namespace SQLiteWorkshop
             return caption.PadRight(80, '*');
         }
 
-        int linewidth = 50;
+        readonly int linewidth = 50;
         /// <summary>
         /// Build a report line
         /// </summary>
@@ -420,72 +429,20 @@ namespace SQLiteWorkshop
             sb.Append("(sum(ovfl_unused)) AS ovfl_unused, ");
             sb.Append("(sum(gap_cnt)) AS gap_cnt, ");
             sb.Append("(sum(compressed_size)) AS compressed_size ");
-            sb.AppendFormat("FROM \"{0}\" {1}", Common.StatsTable, whereClause);
+            sb.AppendFormat("FROM \"{0}\" {1}", StatsTable, whereClause);
             return sb.ToString();
         }
         protected bool StatsFileExists()
         {
-            SQLiteErrorCode returnCode;
 
-            string sql = string.Format("Select count(*) From sqlite_master Where tbl_name = \"{0}\"", Common.StatsTable);
-            long count = (long)DataAccess.ExecuteScalar(DatabaseLocation, sql, out returnCode);
+            string sql = string.Format("Select count(*) From sqlite_master Where tbl_name = \"{0}\"", StatsTable);
+            long count = (long)DataAccess.ExecuteScalar(DatabaseLocation, sql, out SQLiteErrorCode returnCode);
             if (count == 0) return false;
 
-            sql = string.Format("Select count(*) From \"{0}\"", Common.StatsTable);
+            sql = string.Format("Select count(*) From \"{0}\"", StatsTable);
             count = (long)DataAccess.ExecuteScalar(DatabaseLocation, sql, out returnCode);
-            return count == 0 ? false : true; ;
+            return count != 0;
         }
- 
-
-        #region ControlBox Handlers
-        private void pbClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void ControlBox_MouseEnter(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.White;
-        }
-
-        private void ControlBox_MouseLeave(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        private void ControlBox_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.Wheat;
-            ((PictureBox)sender).BorderStyle = BorderStyle.Fixed3D;
-        }
-
-        private void ControlBox_MouseUp(object sender, MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        #endregion
-
-        #region Form Management
-
-        public const int WM_NCLBUTTONDOWN = 0xA1;
-        public const int HT_CAPTION = 0x2;
-
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern bool ReleaseCapture();
-
-        private void MainForm_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
-            }
-        }
-        #endregion
-
 
     }
 }

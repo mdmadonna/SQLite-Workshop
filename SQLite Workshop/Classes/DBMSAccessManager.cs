@@ -1,58 +1,30 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
-using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.Config;
 
 namespace SQLiteWorkshop
 {
     class DBMSAccessManager : DBManager
     {
-
-        const string accdbConnectionstring = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Persist Security Info=True";
-        const string mdbConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data source=(0)";
-
-        OleDbConnection conn;
-
-        internal string DatabaseName { get; set; }
-
-        internal DBMSAccessManager(string DBName) : base(DBName)
+        // For future use. For the time being just execute the base constructor
+        internal DBMSAccessManager(string SourceDB, string TargetDB, string SourceServer = null, string SourceUserName = null, string SourcePassword = null) : base(SourceDB, TargetDB, SourceServer, SourceUserName, SourcePassword)
         {
-            DatabaseName = DBName;
+            ImportKey = CFG_IMPMSACCESS;
         }
 
         ~DBMSAccessManager()
         {
-            CloseDB();
+            CloseImportDB();
         }
 
-        protected bool OpenDB()
-        {
-            conn = new OleDbConnection();
-            conn.ConnectionString = DatabaseName.EndsWith(".mdb") ? string.Format(mdbConnectionString, DatabaseName) : string.Format(accdbConnectionstring, DatabaseName);
-            try
-            {
-                conn.Open();
-            }
-            catch (Exception ex)
-            {
-                LastError = ex.Message;
-                throw new Exception(ex.Message);
-            }
-            return true;
-        }
-
-        protected bool CloseDB()
-        {
-            if (conn == null || conn.State != ConnectionState.Open) return false;
-            conn.Close();
-            return true;
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         internal override DBDatabaseList GetDatabaseList()
         {
             throw new NotImplementedException();
@@ -63,13 +35,17 @@ namespace SQLiteWorkshop
 
             Dictionary<string, DBTable> Tables = new Dictionary<string, DBTable>();
 
-            if (conn == null || conn.State != ConnectionState.Open) OpenDB();
+            try
+            {
+                if (conn == null || conn.State != ConnectionState.Open) OpenImportDB();
+            }
+            catch { return new DBSchema(); }
 
             // Exclude System Tables
             string[] restrictionValues = new string[4];
             restrictionValues[3] = "Table";
 
-            DataTable TableList = conn.GetSchema("Tables", restrictionValues);
+            DataTable TableList = ((OleDbConnection)conn).GetSchema("Tables", restrictionValues);
 
             foreach (DataRow dr in TableList.Rows)
             {
@@ -77,49 +53,32 @@ namespace SQLiteWorkshop
                 Tables.Add(dbt.Name, dbt);
             }
 
-            DBSchema schema = new DBSchema();
-            schema.Tables = Tables;
-            CloseDB();
+            DBSchema schema = new DBSchema
+            {
+                Tables = Tables
+            };
+            CloseImportDB();
             return schema;
         }
 
         internal override Dictionary<string, DBColumn> GetColumns(string TableName)
         {
 
-            Dictionary<string, DBColumn> DBColumns = new Dictionary<string, DBColumn>();
+            Dictionary<string, DBColumn> DBColumns = base.GetColumns(TableName);
 
-            if (conn == null || conn.State != ConnectionState.Open) OpenDB();
-
-            OleDbCommand cmd = new OleDbCommand();
-            cmd.Connection = conn;
-            cmd.CommandText = string.Format("Select * From [{0}]", TableName);
-            OleDbDataReader OleDbdr = cmd.ExecuteReader(CommandBehavior.SingleRow);
-            OleDbdr.Read();
-            DataTable ColumnList = OleDbdr.GetSchemaTable();
-            int i = 0;
-            foreach (DataRow dr in ColumnList.Rows)
+            // MSAccess maintains additional info in a somewhat proprietary manner
+            // We need to retrieve it.
+            try
             {
-                DBColumn dbc = new DBColumn() { Name = dr["ColumnName"].ToString() };
-                dbc.Ordinal = (int)dr["ColumnOrdinal"];
-                dbc.Type = dr["DataType"].ToString();
-                dbc.SqlType = OleDbdr.GetDataTypeName(dbc.Ordinal);
-                dbc.Size = (int)dr["ColumnSize"];
-                dbc.NumericPrecision = Convert.ToInt32(dr["NumericPrecision"]);
-                dbc.NumericScale = Convert.ToInt32(dr["NumericScale"]);
-                dbc.IsLong = (bool)dr["IsLong"];
-                dbc.IsNullable = (bool)dr["AllowDBNull"];
-                dbc.IsUnique = (bool)dr["IsUnique"];
-                dbc.IsKey = (bool)dr["IsKey"];
-                dbc.IsAutoIncrement = (bool)dr["IsAutoIncrement"];
-                DBColumns.Add(dbc.Name, dbc);
-                i++;
+                if (conn == null || conn.State != ConnectionState.Open) OpenImportDB();
             }
+            catch { return DBColumns; }
 
             // Limit result to the current table
             string[] restrictionValues = new string[4];
             restrictionValues[2] = TableName;
 
-            ColumnList = conn.GetSchema("Columns", restrictionValues);
+            DataTable ColumnList = ((OleDbConnection)conn).GetSchema("Columns", restrictionValues);
 
             foreach (DataRow dr in ColumnList.Rows)
             {
@@ -131,92 +90,18 @@ namespace SQLiteWorkshop
                 DBColumns[dr["COLUMN_NAME"].ToString()] = dbc;
             }
 
-            CloseDB();
+            CloseImportDB();
             return DBColumns;
         }
 
         internal override bool Import(string SourceTable, string DestTable, Dictionary<string, DBColumn> columns = null)
         {
-            bool rCode;
-            int rtnCode;
-            string InsertSQL;
-            int recCount = 0;
-            SQLiteTransaction sqlT = null; ;
-
-            SQLiteErrorCode returnCode;
-            if (columns == null) columns = GetColumns(SourceTable);
-
-            //Only if table does not exist
-            string CreateSql = BuildCreateSql(DestTable, columns, out InsertSQL);
-
-            SQLiteConnection SQConn = new SQLiteConnection();
-            SQLiteCommand SQCmd = new SQLiteCommand();
-
-            rCode = DataAccess.OpenDB(MainForm.mInstance.CurrentDB, ref SQConn, ref SQCmd, out returnCode);
-            if (!rCode || returnCode != SQLiteErrorCode.Ok)
-            {
-                Common.ShowMsg(String.Format(Common.ERR_SQL, DataAccess.LastError, returnCode));
-                return false;
-            }
-
-            try
-            {
-                sqlT = SQConn.BeginTransaction();
-                SQCmd.CommandText = CreateSql;
-                rtnCode = DataAccess.ExecuteNonQuery(SQCmd, out returnCode);
-                if (rtnCode < 0 || returnCode != SQLiteErrorCode.Ok)
-                {
-                    Common.ShowMsg(String.Format(Common.ERR_SQL, DataAccess.LastError, returnCode));
-                    sqlT.Rollback();
-                    return false;
-                }
-                SQCmd.CommandText = InsertSQL;
-
-                OpenDB();
-                OleDbCommand OleCmd = new OleDbCommand();
-                OleCmd.Connection = conn;
-                OleCmd.CommandText = string.Format("Select * FROM [{0}]", SourceTable);
-                OleDbDataReader dr = OleCmd.ExecuteReader();
-                while (dr.Read())
-                {
-                    SQCmd.Parameters.Clear();
-                    for (int i = 0; i < dr.FieldCount; i++)
-                    {
-                        //SQCmd.Parameters.AddWithValue(string.Format("p{0}", i.ToString()), dr[i]);
-                        SQCmd.Parameters.AddWithValue(String.Empty, dr[i]);
-                    }
-                    SQCmd.ExecuteNonQuery();
-                    recCount++;
-                    if (recCount % 100 == 0) FireStatusEvent(ImportStatus.InProgress, recCount);
-                }
-                dr.Close();
-                CloseDB();
-                sqlT.Commit();
-            }
-            catch (Exception ex)
-            {
-                sqlT.Rollback();
-                Common.ShowMsg(string.Format(Common.ERR_SQL, ex.Message, SQLiteErrorCode.Ok));
-                return false;
-            }
-            finally
-            {
-                DataAccess.CloseDB(SQConn);
-            }
-            MainForm.mInstance.AddTable(DestTable);
-            try { FireStatusEvent(ImportStatus.Complete, recCount); } catch { }
-            return true;
+            return base.Import(SourceTable, DestTable, columns);
         }
 
         internal override DataTable PreviewData(string TableName)
         {
-            OpenDB();
-            OleDbCommand OleCmd = new OleDbCommand();
-            OleCmd.Connection = conn;
-            OleCmd.CommandText = string.Format("Select Top 100 * FROM [{0}]", TableName);
-            DataTable dt = LoadPreviewData(OleCmd);
-            CloseDB();
-            return dt;
+            return base.PreviewData(TableName);
         }
     }
 }

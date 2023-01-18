@@ -1,13 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.GUIManager;
 
 namespace SQLiteWorkshop
 {
@@ -28,7 +26,8 @@ namespace SQLiteWorkshop
 
         private void BuildIndex_Load(object sender, EventArgs e)
         {
-            lblFormHeading.Text = "Build Index";
+            toolTip = new ToolTip();
+            HouseKeeping(this, "Build Index");
             toolStripStatusLabelResult.Text = string.Empty;
 
             DatabaseLocation = MainForm.mInstance.CurrentDB;
@@ -37,13 +36,9 @@ namespace SQLiteWorkshop
             comboBoxTableName.Items.Clear();
             foreach (var table in sd.Tables)
             {
-                if (!Common.IsSystemTable(table.Key)) comboBoxTableName.Items.Add(table.Key);
+                if (!IsSystemTable(table.Key)) comboBoxTableName.Items.Add(table.Key);
             }
             if (!string.IsNullOrEmpty(TableName)) comboBoxTableName.SelectedItem = TableName;
-
-            // Establish ToolTips for various controls.
-            toolTip = new ToolTip();
-            toolTip.SetToolTip(pbClose, "Close");
 
             dgiContextMenu = new ContextMenu();
             dgiContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Move Up", dgiContextMenu_Clicked, dgiContextMenu_Popup, dgiContextMenu_Selected, null) { Name = "MoveUp" });
@@ -51,6 +46,11 @@ namespace SQLiteWorkshop
             dgiContextMenu.MenuItems.Add(new MenuItem(MenuMerge.Add, 0, Shortcut.None, "Remove", dgiContextMenu_Clicked, dgiContextMenu_Popup, dgiContextMenu_Selected, null) { Name = "Remove" });
             dgvIndexColumns.ContextMenu = dgiContextMenu;
 
+        }
+
+        private void BuildIndex_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            FormClose(this);
         }
 
         private void comboBoxTableName_SelectedIndexChanged(object sender, EventArgs e)
@@ -69,7 +69,7 @@ namespace SQLiteWorkshop
         {
             if (!ValidateInput())
             {
-                Common.ShowMsg(ErrorMessage);
+                ShowMsg(ErrorMessage);
                 return;
             }
 
@@ -79,12 +79,12 @@ namespace SQLiteWorkshop
             Cursor = Cursors.Default;
             if (returnCode != SQLiteErrorCode.Ok)
             {
-                Common.ShowMsg(string.Format(Common.ERR_CREATEIDXFAILED, DataAccess.LastError, returnCode.ToString()));
+                ShowMsg(string.Format(ERR_CREATEIDXFAILED, DataAccess.LastError, returnCode.ToString()));
             }
             else
             {
-                Common.ShowMsg(string.Format(Common.OK_IDXCREATED, txtIndexName.Text), MessageBoxButtons.OK, MessageBoxIcon.Information);
-                MainForm.mInstance.AddTable(TableName);
+                toolStripStatusLabelResult.Text = string.Format(OK_IDXCREATED, txtIndexName.Text);
+                MainForm.mInstance.AddTable(TableName, DatabaseLocation);
             }
         }
 
@@ -92,7 +92,7 @@ namespace SQLiteWorkshop
         {
             if (!ValidateInput())
             {
-                Common.ShowMsg(ErrorMessage);
+                ShowMsg(ErrorMessage);
                 return;
             }
 
@@ -232,63 +232,6 @@ namespace SQLiteWorkshop
                     break;
             }
         }
-
-        #endregion
-
-        #region ControlBox Handlers
-        private void pbClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void ControlBox_MouseEnter(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.White;
-        }
-
-        private void ControlBox_MouseLeave(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        private void ControlBox_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.Wheat;
-            ((PictureBox)sender).BorderStyle = BorderStyle.Fixed3D;
-        }
-
-        private void ControlBox_MouseUp(object sender, MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        #endregion
-
-        #region Form Dragging Event Handler
-
-        public const int WM_NCLBUTTONDOWN = 0xA1;
-        public const int HT_CAPTION = 0x2;
-
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern bool ReleaseCapture();
-
-        private void MainForm_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
-            }
-        }
-
-
-
-
-
-
-
 
         #endregion
 

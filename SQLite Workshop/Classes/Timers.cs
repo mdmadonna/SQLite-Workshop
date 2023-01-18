@@ -35,17 +35,18 @@ namespace SQLiteWorkshop
         public static Double QueryLapsedTime(Int64 startClock)
         {
             Int64 stopClock = QueryPerformanceCounter();
-            //return (double)(Convert.ToDouble(stopClock - startClock) / Convert.ToDouble(QueryPerformanceFrequency()));
             return (stopClock - startClock) * 1.0 / QueryPerformanceFrequency();
 
         }
 
         public static string DisplayTime(double milliTime)
         {
-
-            int ihours = Convert.ToInt32(milliTime / 3600);
-            int iminutes = Convert.ToInt32((milliTime % 3600) / 60);
-            int iseconds = Convert.ToInt32((milliTime % 3600) % 60);
+            long millisecs = Convert.ToInt64(milliTime);
+            int millimin = (int)millisecs % 3600;
+            long ihours = (millisecs - millimin) / 3600;
+            long millisec = millimin % 60;
+            int iminutes = (int)(millimin - millisec) / 60;
+            int iseconds = (int)millisec;
             return string.Format("{0}:{1}:{2}", ihours.ToString().PadLeft(2, '0'), iminutes.ToString().PadLeft(2, '0'), iseconds.ToString().PadLeft(2, '0'));
         }
         #endregion

@@ -1,0 +1,15 @@
+..\SQLite Workshop\Templates\Query\Column Profile.sql
+..\SQLite Workshop\Templates\Index\Create Index.sql
+..\SQLite Workshop\Templates\Table\Create Table.sql
+..\SQLite Workshop\Templates\Trigger\Create Trigger.sql
+..\SQLite Workshop\Templates\View\Create View.sql
+..\SQLite Workshop\bin\Release\CsvHelper.dll
+..\SQLite Workshop\Templates\Database\Database List.sql
+..\SQLite Workshop\Templates\Table\Index List.sql
+..\SQLite Workshop\Templates\Trigger\Last Update Date.sql
+..\SQLite Workshop\Templates\Index\Rebuild Index.sql
+..\SQLite Workshop\Templates\Query\Select Duplicate Rows.sql
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\SQLite Workshop\bin\Release\SQLite Workshop.exe
+..\SQLite Workshop\Templates\Query\Summary Counts.sql
+..\SQLite Workshop\bin\Release\System.Data.SQLite.dll
+..\SQLite Workshop\Templates\Database\Vacuum.sql

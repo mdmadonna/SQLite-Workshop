@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SQLite;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using static SQLiteWorkshop.Common;
+using static SQLiteWorkshop.GUIManager;
 using CsvHelper;
 
 namespace SQLiteWorkshop
@@ -20,6 +19,7 @@ namespace SQLiteWorkshop
 
         public string DatabaseLocation { get; set; }
         public string TableName { get; set; }
+        private bool cancelExport = false;
 
         public ExportWiz()
         {
@@ -28,21 +28,21 @@ namespace SQLiteWorkshop
 
         private void ExportWiz_Load(object sender, EventArgs e)
         {
-            lblFormHeading.Text = "Export Wizard";
-
-            // Establish ToolTips for various controls.
             toolTip = new ToolTip();
-            toolTip.SetToolTip(pbClose, "Close");
+            HouseKeeping(this, string.Format("Export Wizard: {0}", DatabaseLocation));
             toolStripStatusLabel1.Text = string.Empty;
             InitializeForm();
         }
-
+        private void ExportWiz_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            FormClose(this);
+        }
         private void InitializeForm()
         {
             listBoxTables.Items.Clear();
             foreach (var table in DataAccess.SchemaDefinitions[DatabaseLocation].Tables)
             {
-                if (!Common.IsSystemTable(table.Key)) listBoxTables.Items.Add(table.Key);
+                if (!IsSystemTable(table.Key)) listBoxTables.Items.Add(table.Key);
             }
             foreach (var view in DataAccess.SchemaDefinitions[DatabaseLocation].Views)
             {
@@ -61,11 +61,24 @@ namespace SQLiteWorkshop
 
         private void btnExport_Click(object sender, EventArgs e)
         {
-            if (ValidateInput()) DoExport();
+            if (!ValidateInput()) return;
+            cancelExport = false;
+            btnExport.Enabled = false;
+            btnClose.Text = "Cancel";
+            btnClose.Cursor = Cursors.Default;
+            DoExport();
+            btnExport.Enabled = true;
+            btnClose.Text = "Close";
         }
 
         private void btnClose_Click(object sender, EventArgs e)
         {
+            if (btnClose.Text == "Cancel")
+            {
+                DialogResult rc = ShowMsg(WARN_EXPCANCEL, MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                if (rc == DialogResult.Yes) cancelExport = true;
+                return;
+            }
             this.Close();
         }
 
@@ -95,7 +108,7 @@ namespace SQLiteWorkshop
                 txtFileDestination.Text = string.IsNullOrEmpty(path) ? string.Format("{0}.csv", listBoxTables.Items[listBoxTables.SelectedIndex].ToString()) : string.Format("{0}\\{1}.csv", path, listBoxTables.Items[listBoxTables.SelectedIndex].ToString());
                 return;
             }
-            txtFileDestination.Text = string.IsNullOrEmpty(path) ? "SQWorkshop.sql" : string.Format("{0}\\SQWorkshop.csv", path);
+            txtFileDestination.Text = string.IsNullOrEmpty(path) ? "SQLWorkshop.sql" : string.Format("{0}\\SQLWorkshop.sql", path);
         }
 
         protected void GetFile()
@@ -107,7 +120,7 @@ namespace SQLiteWorkshop
                 FilterIndex = 2,
                 AddExtension = true,
                 AutoUpgradeEnabled = true,
-                DefaultExt = "csv",
+                DefaultExt = radioComma.Checked ? "csv" : "sql",
                 RestoreDirectory = true,
                 ValidateNames = true,
                 OverwritePrompt = false
@@ -134,14 +147,14 @@ namespace SQLiteWorkshop
         {
             if (listBoxTables.SelectedIndex < 0)
             {
-                Common.ShowMsg("Please select a table to export.");
+                ShowMsg("Please select a table to export.");
                 listBoxTables.Focus();
                 return false;
             }
 
             if (string.IsNullOrEmpty(txtFileDestination.Text))
             {
-                Common.ShowMsg("Please enter a destination file name.");
+                ShowMsg("Please enter a destination file name.");
                 txtFileDestination.Focus();
                 return false;
             }
@@ -149,7 +162,7 @@ namespace SQLiteWorkshop
             FileInfo fi = new FileInfo(txtFileDestination.Text);
             if (fi.Exists)
             {
-                DialogResult dr = Common.ShowMsg(string.Format("{0} already exists.\r\nDo you want to replace it?", txtFileDestination.Text), MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                DialogResult dr = ShowMsg(string.Format("{0} already exists.\r\nDo you want to replace it?", txtFileDestination.Text), MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
                 if (dr != DialogResult.Yes) { txtFileDestination.Focus(); return false; }
             }
 
@@ -158,13 +171,11 @@ namespace SQLiteWorkshop
 
         private void DoExport()
         {
-
             if (radioSQL.Checked)
             {
                 ExportSQL();
                 return;
             }
-
 
             StreamWriter sw;
             CsvWriter csv;
@@ -176,18 +187,21 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Unable to open {0}\r\n{1}", txtFileDestination.Text, ex.Message));
+                ShowMsg(string.Format("Unable to open {0}\r\n{1}", txtFileDestination.Text, ex.Message));
+                toolStripStatusLabel1.Text = EXP_FAILED;
                 return;
             }
 
             SQLiteConnection conn = new SQLiteConnection();
             SQLiteCommand cmd = new SQLiteCommand();
+            SQLiteDataReader dr = null;
             long RecordCount;
 
-            var rtn = DataAccess.OpenDB(DatabaseLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode, false);
-            if (!rtn || returnCode != SQLiteErrorCode.Ok)
+            var rtn = DataAccess.OpenDB(DatabaseLocation, ref conn, ref cmd, false);
+            if (!rtn)
             {
-                Common.ShowMsg("Unable to open database.");
+                ShowMsg("Unable to open database.");
+                toolStripStatusLabel1.Text = EXP_FAILED;
                 return;
             }
 
@@ -198,7 +212,7 @@ namespace SQLiteWorkshop
                 cmd.CommandText = string.Format("Select Count(*) From {0}", listBoxTables.SelectedItem.ToString());
                 RecordCount = Convert.ToInt64(cmd.ExecuteScalar());
                 cmd.CommandText = string.Format("Select * From {0}", listBoxTables.SelectedItem.ToString());
-                SQLiteDataReader dr = cmd.ExecuteReader();
+                dr = cmd.ExecuteReader();
                 if (checkBoxHeadings.Checked)
                 {
                     for (int i = 0; i < dr.FieldCount; i++)
@@ -217,18 +231,21 @@ namespace SQLiteWorkshop
                     csv.NextRecord();
                     recs++;
                     if (recs % 100 == 0) { toolStripStatusLabel1.Text = string.Format("{0} of {1} records written", recs, RecordCount); Application.DoEvents(); }
+                    if (cancelExport) break;
                 }
-                toolStripStatusLabel1.Text = "Export Complete";
-                sw.Close();
-                dr.Close();
+                toolStripStatusLabel1.Text = cancelExport ? EXP_CANCEL : EXP_COMPLETE;
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Export Failed.\r\n{0}", ex.Message));
+                ShowMsg(string.Format("Export Failed.\r\n{0}", ex.Message));
+                toolStripStatusLabel1.Text = EXP_FAILED;
                 return;
             }
             finally
             {
+                if (sw != null) sw.Close();
+                cmd.Cancel();
+                dr.Close();
                 DataAccess.CloseDB(conn);
                 this.Cursor = Cursors.Default;
             }
@@ -244,18 +261,21 @@ namespace SQLiteWorkshop
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Unable to open {0}\r\n{1}", txtFileDestination.Text, ex.Message));
+                ShowMsg(string.Format("Unable to open {0}\r\n{1}", txtFileDestination.Text, ex.Message));
+                toolStripStatusLabel1.Text = EXP_FAILED; 
                 return;
             }
 
             SQLiteConnection conn = new SQLiteConnection();
             SQLiteCommand cmd = new SQLiteCommand();
+            SQLiteDataReader dr = null;
             long RecordCount;
 
-            var rtn = DataAccess.OpenDB(DatabaseLocation, ref conn, ref cmd, out SQLiteErrorCode returnCode, false);
-            if (!rtn || returnCode != SQLiteErrorCode.Ok)
+            var rtn = DataAccess.OpenDB(DatabaseLocation, ref conn, ref cmd, false);
+            if (!rtn)
             {
-                Common.ShowMsg("Unable to open database.");
+                ShowMsg("Unable to open database.");
+                toolStripStatusLabel1.Text = EXP_FAILED;
                 return;
             }
 
@@ -265,6 +285,8 @@ namespace SQLiteWorkshop
             try
             {
                 RecordCount = 0;
+                sw.WriteLine("pragma foreign_keys=off;");
+                sw.WriteLine("begin;");
                 foreach (string table in listBoxTables.SelectedItems)
                 {
                     cmd.CommandText = string.Format("Select Count(*) From {0}", table);
@@ -273,13 +295,14 @@ namespace SQLiteWorkshop
                 long recs = 0;
                 foreach (string table in listBoxTables.SelectedItems)
                 {
+                    if (cancelExport) break;
                     toolStripStatusLabel1.Text = string.Format("Exporting {0}", table);
                     string CreateSQL = DataAccess.SchemaDefinitions[DatabaseLocation].Tables[table].CreateSQL.Trim();
                     if (!CreateSQL.EndsWith(";")) CreateSQL += ";";
                     sw.WriteLine(CreateSQL);
 
                     cmd.CommandText = string.Format("Select * From \"{0}\"", table);
-                    SQLiteDataReader dr = cmd.ExecuteReader();
+                    dr = cmd.ExecuteReader();
                     while (dr.Read())
                     {
                         sb.Clear();
@@ -300,26 +323,33 @@ namespace SQLiteWorkshop
                         sw.WriteLine(string.Format("{0} {1}", sb.ToString(), sbVal.ToString()));
                         recs++;
                         if (recs % 100 == 0) { toolStripStatusLabel1.Text = string.Format("Exporting {0}: {1} of {2} records written", table, recs, RecordCount); Application.DoEvents(); }
+                        if (cancelExport) break;
                     }
                     dr.Close();
-                    string IndexSql;
-                    foreach (var index in DataAccess.SchemaDefinitions[DatabaseLocation].Tables[table].Indexes)
+                    if (!cancelExport)
                     {
-                        IndexSql = index.Value.CreateSQL;
-                        if (!IndexSql.EndsWith(";")) IndexSql += ";";
-                        sw.WriteLine(IndexSql);
+                        string IndexSql;
+                        foreach (var index in DataAccess.SchemaDefinitions[DatabaseLocation].Tables[table].Indexes)
+                        {
+                            IndexSql = index.Value.CreateSQL;
+                            if (!IndexSql.EndsWith(";")) IndexSql += ";";
+                            sw.WriteLine(IndexSql);
+                        }
                     }
                 }
-                toolStripStatusLabel1.Text = "Export Complete";
-                sw.Close();
+                sw.WriteLine("commit;");
+                toolStripStatusLabel1.Text = cancelExport ? EXP_CANCEL : EXP_COMPLETE;
             }
             catch (Exception ex)
             {
-                Common.ShowMsg(string.Format("Export Failed.\r\n{0}", ex.Message));
+                ShowMsg(string.Format("Export Failed.\r\n{0}", ex.Message));
+                toolStripStatusLabel1.Text = EXP_FAILED;
                 return;
             }
             finally
             {
+                cmd.Cancel();
+                try { dr.Close(); } catch { }
                 DataAccess.CloseDB(conn);
                 this.Cursor = Cursors.Default;
                 try { sw.Close(); } catch { }
@@ -356,55 +386,5 @@ namespace SQLiteWorkshop
             StringBuilder sb = new StringBuilder();
             return sb.AppendFormat("x'{0}'",binstr).ToString();
         }
-
-        #region ControlBox Handlers
-        private void pbClose_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void ControlBox_MouseEnter(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.White;
-        }
-
-        private void ControlBox_MouseLeave(object sender, EventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        private void ControlBox_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = Color.Wheat;
-            ((PictureBox)sender).BorderStyle = BorderStyle.Fixed3D;
-        }
-
-        private void ControlBox_MouseUp(object sender, MouseEventArgs e)
-        {
-            ((PictureBox)sender).BackColor = SystemColors.InactiveCaption;
-            ((PictureBox)sender).BorderStyle = BorderStyle.None;
-        }
-        #endregion
-
-        #region Form Dragging Event Handler
-
-        public const int WM_NCLBUTTONDOWN = 0xA1;
-        public const int HT_CAPTION = 0x2;
-
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
-        [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
-        public static extern bool ReleaseCapture();
-
-        private void MainForm_MouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                ReleaseCapture();
-                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
-            }
-        }
-
-        #endregion
     }
 }

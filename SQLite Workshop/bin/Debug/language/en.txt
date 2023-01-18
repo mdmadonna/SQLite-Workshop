@@ -1,0 +1,3 @@
+﻿APPNAME | SQLite-Workshop
+# This is a comment
+APPNAME | SQLite Workshop

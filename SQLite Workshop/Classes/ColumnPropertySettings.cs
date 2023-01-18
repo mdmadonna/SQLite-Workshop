@@ -1,11 +1,9 @@
 ﻿                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+
+using static SQLiteWorkshop.Common;
 
 namespace SQLiteWorkshop
 {
@@ -37,7 +35,7 @@ namespace SQLiteWorkshop
             set
             {
                 type = value;
-                SetReadOnly(new string[] { "Size" }, !Common.IsText(type));
+                SetReadOnly(new string[] { "Size" }, !IsText(type));
             }
         }
 
@@ -194,21 +192,18 @@ namespace SQLiteWorkshop
 
             public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context)
             {
-                var t = this;
-
                 return new StandardValuesCollection(BuildColumnList());
             }
 
             private string[] BuildColumnList()
             {
-                var t = this;
                 if (string.IsNullOrEmpty(TableEditorPropertySettings.tablename)) return null;
 
                 SchemaDefinition sd = DataAccess.SchemaDefinitions[MainForm.mInstance.CurrentDB];
-                TableLayout table = sd.Tables[TableEditorPropertySettings.tablename];
-                ArrayList columnList = new ArrayList();
-
-                columnList.Add(string.Empty);
+                ArrayList columnList = new ArrayList
+                {
+                    string.Empty
+                };
                 foreach (var column in sd.Tables[TableEditorPropertySettings.tablename].Columns)
                 {
                     columnList.Add(column.Key);

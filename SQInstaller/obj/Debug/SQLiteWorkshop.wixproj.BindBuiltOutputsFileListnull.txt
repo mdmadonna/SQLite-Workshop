@@ -1,0 +1,2 @@
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\WIXv3\bin\Debug\WIXv3.msi
+C:\MyVSProjects\@Utility\@Database\SQLite-Workshop\WIXv3\bin\Debug\WIXv3.wixpdb
